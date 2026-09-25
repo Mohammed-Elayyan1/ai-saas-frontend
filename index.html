@@ -1979,9 +1979,9 @@
             // Pricing
             document.getElementById('pricingGrid').innerHTML = dict.pricing.plans.map((p, i) => {
                 const links = [
-                    "https://www.paypal.com/ncp/payment/23V3WQK4NVTG4", // الباقة 1 (Basic)
-                    "https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6", // الباقة 2 (Pro)
-                    "https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6"  // الباقة 3 (Enterprise)
+                    "https://www.paypal.com/ncp/payment/23V3WQK4NVTG4", // الباقة الأولى Basic ($29)
+                    "https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6", // الباقة الثانية Pro ($79)
+                    "https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6"  // الباقة الثالثة Enterprise ($199)
                 ];
                 const paypalUrl = links[i] || links[0];
 
