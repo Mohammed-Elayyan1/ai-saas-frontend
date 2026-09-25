@@ -2135,8 +2135,14 @@
         // Auth tabs
         document.getElementById('tabLogin').addEventListener('click', () => { authMode = 'login'; setAuthMode('login', currentDict()); });
         document.getElementById('tabSignup').addEventListener('click', () => { authMode = 'signup'; setAuthMode('signup', currentDict()); });
-        document.getElementById('authForm').addEventListener('submit', () => showToast(currentDict().auth.toastSubmit));
+        document.getElementById('authForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            showToast(currentDict().toastSubmit);
 
+            // إغلاق النافذة المنبثقة وتحويل المستخدم لقسم الأسعار والدفع
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+            window.location.href = "#pricing";
+        });
         // Payment
         // --- Wire the PayPal per-plan buttons to the real payment links ---
         document.querySelectorAll('#paypalLinkRow .amount-chip').forEach(a => {
