@@ -1979,11 +1979,11 @@
             // Pricing
             document.getElementById('pricingGrid').innerHTML = dict.pricing.plans.map((p, i) => {
                 const links = [
-                    "https://www.paypal.com/ncp/payment/23V3WQK4NVTG4", // الباقة الأولى Basic ($29)
-                    "https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6", // الباقة الثانية Pro ($79)
-                    "https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6"  // الباقة الثالثة Enterprise ($199)
+                    PAYPAL_LINKS.basic,      // Basic ($29)
+                    PAYPAL_LINKS.pro,        // Pro ($79)
+                    PAYPAL_LINKS.enterprise  // Enterprise ($199)
                 ];
-                const paypalUrl = links[i] || links[0];
+                const paypalUrl = links[i] || PAYPAL_LINKS.basic;
 
                 return `
         <div class="price-card ${p.badge ? 'featured' : ''}">
