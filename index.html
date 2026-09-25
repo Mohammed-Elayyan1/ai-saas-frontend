@@ -1,0 +1,2212 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصّة | الذكاء الاصطناعي للشركات — Platform | Enterprise AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-0: #07060f;
+            --bg-1: #0c0a1a;
+            --bg-2: #100d20;
+            --glass: rgba(255, 255, 255, 0.045);
+            --glass-strong: rgba(255, 255, 255, 0.075);
+            --border: rgba(255, 255, 255, 0.09);
+            --border-soft: rgba(255, 255, 255, 0.05);
+            --violet: #8b6bff;
+            --violet-2: #5b8dff;
+            --gold: #f0b64c;
+            --gold-2: #e69a2d;
+            --text-0: #f4f2fb;
+            --text-1: #b4aed0;
+            --text-2: #7a749a;
+            --success: #3ddc97;
+            --radius-lg: 22px;
+            --radius-md: 16px;
+            --radius-sm: 10px;
+            --shadow-glow: 0 0 0 1px var(--border), 0 20px 60px -20px rgba(80, 50, 255, 0.35);
+            --font-ar: 'Tajawal', sans-serif;
+            --font-en: 'Inter', sans-serif;
+            --font-body: var(--font-ar);
+        }
+
+        :root:not([data-theme="light"]) {
+            color-scheme: dark;
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root:not([data-theme="light"]) {
+                --bg-0: #0a0814;
+                --bg-1: #0f0c1e;
+            }
+        }
+
+        :root[data-theme="light"] {
+            --bg-0: #f3f1fb;
+            --bg-1: #ffffff;
+            --bg-2: #ece9f9;
+            --glass: rgba(20, 15, 50, 0.035);
+            --glass-strong: rgba(20, 15, 50, 0.06);
+            --border: rgba(20, 15, 50, 0.10);
+            --border-soft: rgba(20, 15, 50, 0.06);
+            --text-0: #181428;
+            --text-1: #4c4770;
+            --text-2: #847fa3;
+            color-scheme: light;
+        }
+
+        html[lang="en"] {
+            --font-body: var(--font-en);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background:
+                radial-gradient(ellipse 900px 500px at 15% -10%, rgba(139, 107, 255, 0.20), transparent 60%),
+                radial-gradient(ellipse 900px 600px at 110% 10%, rgba(91, 141, 255, 0.16), transparent 55%),
+                var(--bg-0);
+            color: var(--text-0);
+            line-height: 1.65;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        img,
+        svg {
+            display: block;
+            max-width: 100%;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        button {
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+        }
+
+        input {
+            font-family: inherit;
+        }
+
+        .wrap {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 0 28px;
+        }
+
+        ::selection {
+            background: rgba(139, 107, 255, 0.35);
+        }
+
+        a:focus-visible,
+        button:focus-visible,
+        input:focus-visible {
+            outline: 2px solid var(--violet-2);
+            outline-offset: 3px;
+            border-radius: 6px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        header.nav {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(16px) saturate(140%);
+            background: color-mix(in srgb, var(--bg-0) 72%, transparent);
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        .nav-inner {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 16px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1.15rem;
+        }
+
+        .brand .mark {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--violet), var(--violet-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            box-shadow: 0 6px 18px -4px rgba(139, 107, 255, 0.6);
+        }
+
+        nav.links {
+            display: flex;
+            gap: 30px;
+            font-size: 0.95rem;
+            color: var(--text-1);
+        }
+
+        nav.links a {
+            transition: color .2s;
+        }
+
+        nav.links a:hover {
+            color: var(--text-0);
+        }
+
+        .nav-cta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            color: var(--text-1);
+        }
+
+        .lang-btn {
+            padding: 0 12px;
+            width: auto;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 22px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.92rem;
+            transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+            white-space: nowrap;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--violet), var(--violet-2));
+            color: #fff;
+            box-shadow: 0 10px 30px -10px rgba(139, 107, 255, 0.7);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 14px 34px -8px rgba(139, 107, 255, 0.85);
+        }
+
+        .btn-ghost {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            color: var(--text-0);
+        }
+
+        .btn-ghost:hover {
+            background: var(--glass-strong);
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, var(--gold), var(--gold-2));
+            color: #221604;
+            box-shadow: 0 10px 26px -8px rgba(240, 182, 76, 0.55);
+        }
+
+        .btn-sm {
+            padding: 9px 16px;
+            font-size: 0.85rem;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        @media (max-width:860px) {
+            nav.links {
+                display: none;
+            }
+        }
+
+        .hero {
+            padding: 76px 0 40px;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.05fr 0.95fr;
+            gap: 56px;
+            align-items: center;
+        }
+
+        @media (max-width:940px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            padding: 7px 16px;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            color: var(--text-1);
+            margin-bottom: 22px;
+        }
+
+        .eyebrow .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 10px var(--success);
+        }
+
+        h1.hero-title {
+            font-size: clamp(2.1rem, 4.6vw, 3.4rem);
+            font-weight: 800;
+            line-height: 1.28;
+            letter-spacing: -0.5px;
+            margin-bottom: 22px;
+        }
+
+        h1.hero-title .grad {
+            background: linear-gradient(90deg, var(--violet) 10%, var(--violet-2) 90%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        p.hero-sub {
+            font-size: 1.08rem;
+            color: var(--text-1);
+            max-width: 520px;
+            margin-bottom: 32px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 36px;
+        }
+
+        .hero-trust {
+            display: flex;
+            gap: 26px;
+            flex-wrap: wrap;
+            color: var(--text-2);
+            font-size: 0.85rem;
+        }
+
+        .hero-trust span {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .mock {
+            position: relative;
+            border-radius: var(--radius-lg);
+            background: linear-gradient(180deg, var(--bg-2), var(--bg-1));
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-glow);
+            padding: 18px;
+            overflow: hidden;
+        }
+
+        .mock::before {
+            content: "";
+            position: absolute;
+            inset: -40% -40% auto auto;
+            width: 60%;
+            height: 60%;
+            background: radial-gradient(circle, rgba(139, 107, 255, 0.28), transparent 70%);
+            pointer-events: none;
+        }
+
+        .mock-topbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .mock-topbar i {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--border);
+        }
+
+        .mock-topbar .title {
+            margin-inline-start: auto;
+            font-size: 0.78rem;
+            color: var(--text-2);
+        }
+
+        .mock-body {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 14px;
+            position: relative;
+            z-index: 1;
+        }
+
+        @media (max-width:520px) {
+            .mock-body {
+                grid-template-columns: 1fr;
+            }
+
+            .mock-side {
+                display: none;
+            }
+        }
+
+        .mock-side {
+            background: var(--glass);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-md);
+            padding: 12px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .mock-side .item {
+            font-size: 0.72rem;
+            color: var(--text-2);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 8px;
+            border-radius: 8px;
+        }
+
+        .mock-side .item.active {
+            background: var(--glass-strong);
+            color: var(--text-0);
+        }
+
+        .mock-main {
+            background: var(--glass);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            min-height: 290px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mock-msg {
+            max-width: 82%;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 0.82rem;
+            margin-bottom: 10px;
+            animation: rise .5s ease both;
+        }
+
+        .mock-msg.user {
+            background: linear-gradient(135deg, var(--violet), var(--violet-2));
+            color: #fff;
+            align-self: flex-end;
+            border-bottom-left-radius: 4px;
+        }
+
+        .mock-msg.ai {
+            background: var(--glass-strong);
+            border: 1px solid var(--border-soft);
+            align-self: flex-start;
+            border-bottom-right-radius: 4px;
+            color: var(--text-1);
+        }
+
+        .mock-msg.ai .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 12px;
+            background: var(--violet-2);
+            margin-inline-start: 2px;
+            animation: blink 1s step-end infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes rise {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .mock-input {
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-0);
+            border: 1px solid var(--border-soft);
+            border-radius: 12px;
+            padding: 9px 12px;
+            font-size: 0.78rem;
+            color: var(--text-2);
+        }
+
+        .mock-input .send {
+            margin-inline-start: auto;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--violet), var(--violet-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.7rem;
+            flex-shrink: 0;
+        }
+
+        .stat-badge {
+            position: absolute;
+            bottom: -18px;
+            inset-inline-end: 24px;
+            background: var(--bg-1);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 12px 16px;
+            box-shadow: 0 16px 34px -10px rgba(0, 0, 0, 0.55);
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stat-badge .num {
+            font-weight: 800;
+            font-size: 1.15rem;
+        }
+
+        .stat-badge .lbl {
+            font-size: 0.72rem;
+            color: var(--text-2);
+        }
+
+        @media (max-width:520px) {
+            .stat-badge {
+                display: none;
+            }
+        }
+
+        section {
+            padding: 88px 0;
+        }
+
+        .section-head {
+            max-width: 640px;
+            margin-bottom: 52px;
+        }
+
+        .section-head.center {
+            margin-inline: auto;
+            text-align: center;
+        }
+
+        .kicker {
+            color: var(--violet-2);
+            font-weight: 700;
+            font-size: 0.88rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        h2.section-title {
+            font-size: clamp(1.6rem, 3vw, 2.3rem);
+            font-weight: 800;
+            margin-bottom: 14px;
+            letter-spacing: -0.4px;
+        }
+
+        p.section-sub {
+            color: var(--text-1);
+            font-size: 1.02rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        @media (max-width:900px) {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width:600px) {
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .feature-card {
+            background: var(--glass);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-md);
+            padding: 26px;
+            transition: border-color .2s, transform .2s;
+        }
+
+        .feature-card:hover {
+            border-color: var(--border);
+            transform: translateY(-3px);
+        }
+
+        .feature-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, rgba(139, 107, 255, 0.25), rgba(91, 141, 255, 0.18));
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.05rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .feature-card p {
+            color: var(--text-1);
+            font-size: 0.92rem;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width:900px) {
+            .steps {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width:520px) {
+            .steps {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .step {
+            position: relative;
+            padding: 24px 20px 20px;
+            background: var(--glass);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-md);
+        }
+
+        .step .step-num {
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
+            margin-bottom: 14px;
+            background: linear-gradient(135deg, var(--violet), var(--violet-2));
+            color: #fff;
+            font-weight: 800;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .step h4 {
+            font-size: 0.98rem;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        .step p {
+            color: var(--text-1);
+            font-size: 0.86rem;
+        }
+
+        .billing-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin-bottom: 44px;
+        }
+
+        .switch {
+            width: 52px;
+            height: 28px;
+            border-radius: 999px;
+            background: var(--glass-strong);
+            border: 1px solid var(--border);
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .switch .knob {
+            position: absolute;
+            top: 3px;
+            inset-inline-end: 3px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--violet), var(--violet-2));
+            transition: transform .25s ease;
+        }
+
+        html[dir="rtl"] .switch.on .knob {
+            transform: translateX(-24px);
+        }
+
+        html[dir="ltr"] .switch.on .knob {
+            transform: translateX(24px);
+        }
+
+        .save-chip {
+            background: rgba(61, 220, 151, 0.12);
+            color: var(--success);
+            border: 1px solid rgba(61, 220, 151, 0.3);
+            font-size: 0.74rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 999px;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        @media (max-width:900px) {
+            .pricing-grid {
+                grid-template-columns: 1fr;
+                max-width: 420px;
+                margin-inline: auto;
+            }
+        }
+
+        .price-card {
+            background: var(--glass);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-lg);
+            padding: 30px 26px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .price-card.featured {
+            background: linear-gradient(180deg, rgba(139, 107, 255, 0.12), var(--glass));
+            border: 1px solid rgba(139, 107, 255, 0.45);
+            box-shadow: 0 24px 60px -22px rgba(139, 107, 255, 0.5);
+            transform: translateY(-8px);
+        }
+
+        @media (max-width:900px) {
+            .price-card.featured {
+                transform: none;
+            }
+        }
+
+        .plan-badge {
+            position: absolute;
+            top: -14px;
+            inset-inline-end: 26px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-2));
+            color: #221604;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 5px 14px;
+            border-radius: 999px;
+        }
+
+        .plan-name {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .plan-desc {
+            color: var(--text-2);
+            font-size: 0.85rem;
+            margin-bottom: 22px;
+        }
+
+        .plan-price {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            margin-bottom: 22px;
+        }
+
+        .plan-price .amount {
+            font-size: 2.3rem;
+            font-weight: 800;
+        }
+
+        .plan-price .period {
+            color: var(--text-2);
+            font-size: 0.88rem;
+        }
+
+        .plan-list {
+            display: flex;
+            flex-direction: column;
+            gap: 11px;
+            margin-bottom: 26px;
+            flex: 1;
+        }
+
+        .plan-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 9px;
+            font-size: 0.88rem;
+            color: var(--text-1);
+        }
+
+        .plan-list li .check {
+            color: var(--success);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .trust-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width:900px) {
+            .trust-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width:520px) {
+            .trust-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .trust-card {
+            text-align: center;
+            padding: 26px 16px;
+            background: var(--glass);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-md);
+        }
+
+        .trust-card .ic {
+            font-size: 1.6rem;
+            margin-bottom: 12px;
+        }
+
+        .trust-card h4 {
+            font-size: 0.92rem;
+            margin-bottom: 6px;
+        }
+
+        .trust-card p {
+            font-size: 0.8rem;
+            color: var(--text-2);
+        }
+
+        .testi-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        @media (max-width:900px) {
+            .testi-grid {
+                grid-template-columns: 1fr;
+                max-width: 520px;
+                margin-inline: auto;
+            }
+        }
+
+        .testi-card {
+            background: var(--glass);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-md);
+            padding: 24px;
+        }
+
+        .stars {
+            color: var(--gold);
+            font-size: 0.9rem;
+            margin-bottom: 14px;
+            letter-spacing: 2px;
+        }
+
+        .testi-card p.quote {
+            font-size: 0.92rem;
+            color: var(--text-0);
+            margin-bottom: 18px;
+        }
+
+        .testi-person {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--violet), var(--violet-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.8rem;
+            color: #fff;
+        }
+
+        .testi-person .name {
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .testi-person .role {
+            font-size: 0.75rem;
+            color: var(--text-2);
+        }
+
+        .auth-section {
+            position: relative;
+            border-radius: 28px;
+            overflow: hidden;
+            background: radial-gradient(ellipse 700px 500px at 30% 20%, rgba(139, 107, 255, 0.35), transparent 60%), radial-gradient(ellipse 700px 500px at 80% 80%, rgba(91, 141, 255, 0.3), transparent 60%), linear-gradient(160deg, #17112c, #0b0918 70%);
+            border: 1px solid var(--border);
+            padding: 64px 28px;
+        }
+
+        .auth-grid {
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            gap: 40px;
+            align-items: center;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        @media (max-width:860px) {
+            .auth-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .auth-copy h2 {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-weight: 800;
+            margin-bottom: 14px;
+        }
+
+        .auth-copy p {
+            color: var(--text-1);
+            margin-bottom: 22px;
+            max-width: 420px;
+        }
+
+        .auth-copy ul {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .auth-copy li {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 0.9rem;
+            color: var(--text-1);
+        }
+
+        .auth-card {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: var(--radius-lg);
+            padding: 34px 30px;
+            box-shadow: 0 30px 70px -20px rgba(0, 0, 0, 0.6);
+        }
+
+        .auth-tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 999px;
+            padding: 4px;
+            margin-bottom: 24px;
+        }
+
+        .auth-tabs button {
+            flex: 1;
+            padding: 9px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-2);
+            background: transparent;
+            transition: all .2s;
+        }
+
+        .auth-tabs button.active {
+            background: linear-gradient(135deg, var(--violet), var(--violet-2));
+            color: #fff;
+        }
+
+        .field {
+            margin-bottom: 16px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-1);
+            margin-bottom: 7px;
+        }
+
+        .field input {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: var(--text-0);
+            font-size: 0.9rem;
+        }
+
+        :root[data-theme="light"] .field input {
+            background: rgba(0, 0, 0, 0.04);
+        }
+
+        .field input::placeholder {
+            color: var(--text-2);
+        }
+
+        .field-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-2);
+            margin-bottom: 20px;
+        }
+
+        .field-row label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+            color: var(--text-2);
+            font-size: 0.78rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .switch-mode {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 0.85rem;
+            color: var(--text-2);
+        }
+
+        .switch-mode a {
+            color: var(--violet-2);
+            font-weight: 700;
+        }
+
+        .pay-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+        }
+
+        @media (max-width:800px) {
+            .pay-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .pay-card {
+            background: var(--glass);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-lg);
+            padding: 30px;
+        }
+
+        .pay-card .pay-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .pay-logo {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.15rem;
+        }
+
+        .pay-logo.stripe {
+            background: linear-gradient(135deg, #635bff, #4a3cf0);
+            color: #fff;
+        }
+
+        .pay-logo.paypal {
+            background: linear-gradient(135deg, #00457C, #0079C1);
+            color: #fff;
+        }
+
+        .pay-card h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+        }
+
+        .pay-card .pay-sub {
+            font-size: 0.8rem;
+            color: var(--text-2);
+        }
+
+        .amount-row {
+            display: flex;
+            gap: 10px;
+            margin: 18px 0;
+            flex-wrap: wrap;
+        }
+
+        .amount-chip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: var(--glass-strong);
+            border: 1px solid var(--border);
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-1);
+            transition: .15s;
+            cursor: pointer;
+        }
+
+        .amount-chip.active {
+            background: linear-gradient(135deg, var(--violet), var(--violet-2));
+            color: #fff;
+            border-color: transparent;
+        }
+
+        .pay-note {
+            font-size: 0.78rem;
+            color: var(--text-2);
+            margin-top: 14px;
+            line-height: 1.7;
+        }
+
+        .pay-note code {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 1px 6px;
+            border-radius: 5px;
+            font-size: 0.75rem;
+        }
+
+        .faq-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 760px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: var(--glass);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .faq-q {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 18px 22px;
+            background: transparent;
+            color: var(--text-0);
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-align: start;
+        }
+
+        .faq-q .chev {
+            transition: transform .25s;
+            color: var(--text-2);
+            flex-shrink: 0;
+        }
+
+        .faq-item.open .faq-q .chev {
+            transform: rotate(180deg);
+        }
+
+        .faq-a {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .3s ease;
+        }
+
+        .faq-a p {
+            padding: 0 22px 20px;
+            color: var(--text-1);
+            font-size: 0.88rem;
+        }
+
+        .cta-final {
+            text-align: center;
+            border-radius: 28px;
+            padding: 70px 28px;
+            background: linear-gradient(135deg, rgba(139, 107, 255, 0.18), rgba(91, 141, 255, 0.14));
+            border: 1px solid var(--border);
+        }
+
+        .cta-final h2 {
+            font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .cta-final p {
+            color: var(--text-1);
+            margin-bottom: 30px;
+            max-width: 520px;
+            margin-inline: auto;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        footer {
+            border-top: 1px solid var(--border-soft);
+            padding: 50px 0 30px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.4fr repeat(3, 1fr);
+            gap: 32px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width:800px) {
+            .footer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width:520px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .footer-grid h5 {
+            font-size: 0.85rem;
+            margin-bottom: 16px;
+            color: var(--text-1);
+        }
+
+        .footer-grid ul {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .footer-grid a {
+            font-size: 0.86rem;
+            color: var(--text-2);
+            transition: color .15s;
+        }
+
+        .footer-grid a:hover {
+            color: var(--text-0);
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            color: var(--text-2);
+            font-size: 0.8rem;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-soft);
+        }
+
+        .socials {
+            display: flex;
+            gap: 10px;
+        }
+
+        .socials a {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 26px;
+            inset-inline-start: 50%;
+            transform: translateX(-50%) translateY(120%);
+            background: var(--bg-1);
+            border: 1px solid var(--border);
+            color: var(--text-0);
+            padding: 13px 22px;
+            border-radius: 12px;
+            font-size: 0.88rem;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
+            transition: transform .35s ease;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 90vw;
+            text-align: center;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="nav">
+        <div class="nav-inner">
+            <div class="brand"><span class="mark">⚡</span> <span data-i18n="brand"></span></div>
+            <nav class="links">
+                <a href="#features" data-i18n="nav.features"></a>
+                <a href="#how" data-i18n="nav.how"></a>
+                <a href="#pricing" data-i18n="nav.pricing"></a>
+                <a href="#faq" data-i18n="nav.faq"></a>
+            </nav>
+            <div class="nav-cta">
+                <button class="icon-btn lang-btn" id="langToggle">EN</button>
+                <button class="icon-btn" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">🌙</button>
+                <a href="#auth" class="btn btn-ghost btn-sm" style="display:inline-flex;" data-i18n="nav.login"></a>
+                <a href="#pricing" class="btn btn-primary btn-sm" data-i18n="nav.cta"></a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="wrap hero-grid">
+                <div>
+                    <span class="eyebrow"><span class="dot"></span> <span data-i18n="hero.eyebrow"></span></span>
+                    <h1 class="hero-title" data-i18n-html="hero.title"></h1>
+                    <p class="hero-sub" data-i18n="hero.sub"></p>
+                    <div class="hero-actions">
+                        <a href="#pricing" class="btn btn-primary" data-i18n="hero.ctaPrimary"></a>
+                        <a href="#how" class="btn btn-ghost" data-i18n="hero.ctaSecondary"></a>
+                    </div>
+                    <div class="hero-trust">
+                        <span data-i18n="hero.trust1"></span>
+                        <span data-i18n="hero.trust2"></span>
+                        <span data-i18n="hero.trust3"></span>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="mock">
+                        <div class="mock-topbar">
+                            <i></i><i></i><i></i>
+                            <span class="title" data-i18n="hero.mockTitle"></span>
+                        </div>
+                        <div class="mock-body">
+                            <div class="mock-side">
+                                <div class="item active" data-i18n="hero.sideChats"></div>
+                                <div class="item" data-i18n="hero.sideFiles"></div>
+                                <div class="item" data-i18n="hero.sideReports"></div>
+                                <div class="item" data-i18n="hero.sideSettings"></div>
+                            </div>
+                            <div class="mock-main">
+                                <div class="mock-msg user" data-i18n="hero.userMsg"></div>
+                                <div class="mock-msg ai" id="typingMsg"></div>
+                                <div class="mock-input"><span data-i18n="hero.inputPlaceholder"></span> <span
+                                        class="send">➤</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-badge">
+                        <div>
+                            <div class="num">+2,400</div>
+                            <div class="lbl" data-i18n="hero.statLabel"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features">
+            <div class="wrap">
+                <div class="section-head center">
+                    <span class="kicker" data-i18n="features.kicker"></span>
+                    <h2 class="section-title" data-i18n="features.title"></h2>
+                    <p class="section-sub" data-i18n="features.sub"></p>
+                </div>
+                <div class="features-grid" id="featuresGrid"></div>
+            </div>
+        </section>
+
+        <section id="how" style="background:var(--bg-1);">
+            <div class="wrap">
+                <div class="section-head center">
+                    <span class="kicker" data-i18n="how.kicker"></span>
+                    <h2 class="section-title" data-i18n="how.title"></h2>
+                </div>
+                <div class="steps" id="stepsGrid"></div>
+            </div>
+        </section>
+
+        <section id="pricing">
+            <div class="wrap">
+                <div class="section-head center">
+                    <span class="kicker" data-i18n="pricing.kicker"></span>
+                    <h2 class="section-title" data-i18n="pricing.title"></h2>
+                    <p class="section-sub" data-i18n="pricing.sub"></p>
+                </div>
+
+                <div class="billing-toggle">
+                    <span style="font-size:0.9rem; color:var(--text-1);" data-i18n="pricing.monthly"></span>
+                    <button class="switch" id="billingSwitch" aria-label="Toggle yearly billing"><span
+                            class="knob"></span></button>
+                    <span style="font-size:0.9rem; color:var(--text-1);" data-i18n="pricing.yearly"></span>
+                    <span class="save-chip" data-i18n="pricing.save"></span>
+                </div>
+
+                <div class="pricing-grid" id="pricingGrid"></div>
+            </div>
+        </section>
+
+        <section style="background:var(--bg-1);">
+            <div class="wrap">
+                <div class="section-head center">
+                    <span class="kicker" data-i18n="trust.kicker"></span>
+                    <h2 class="section-title" data-i18n="trust.title"></h2>
+                </div>
+                <div class="trust-grid" id="trustGrid"></div>
+            </div>
+        </section>
+
+        <section>
+            <div class="wrap">
+                <div class="section-head center">
+                    <span class="kicker" data-i18n="testi.kicker"></span>
+                    <h2 class="section-title" data-i18n="testi.title"></h2>
+                </div>
+                <div class="testi-grid" id="testiGrid"></div>
+            </div>
+        </section>
+
+        <section id="auth">
+            <div class="wrap">
+                <div class="auth-section">
+                    <div class="auth-grid">
+                        <div class="auth-copy">
+                            <span class="eyebrow"><span class="dot"></span> <span
+                                    data-i18n="auth.eyebrow"></span></span>
+                            <h2 data-i18n="auth.title"></h2>
+                            <p data-i18n="auth.sub"></p>
+                            <ul id="authList"></ul>
+                        </div>
+
+                        <div class="auth-card">
+                            <div class="auth-tabs">
+                                <button class="active" id="tabLogin" data-i18n="auth.tabLogin"></button>
+                                <button id="tabSignup" data-i18n="auth.tabSignup"></button>
+                            </div>
+
+                            <form id="authForm" onsubmit="return false;">
+                                <div class="field" id="nameField" style="display:none;">
+                                    <label for="companyName" data-i18n="auth.companyLabel"></label>
+                                    <input id="companyName" type="text">
+                                </div>
+                                <div class="field">
+                                    <label for="email" data-i18n="auth.emailLabel"></label>
+                                    <input id="email" type="email" placeholder="name@company.com">
+                                </div>
+                                <div class="field">
+                                    <label for="password" data-i18n="auth.passwordLabel"></label>
+                                    <input id="password" type="password" placeholder="••••••••">
+                                </div>
+                                <div class="field-row">
+                                    <label><input type="checkbox" checked style="accent-color:var(--violet);"> <span
+                                            data-i18n="auth.remember"></span></label>
+                                    <a href="#" data-i18n="auth.forgot"></a>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block" id="authSubmit"></button>
+                                <div class="divider" data-i18n="auth.or"></div>
+                                <button type="button" class="btn btn-ghost btn-block" data-i18n="auth.google"></button>
+                                <div class="switch-mode" id="switchModeText"></div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="wrap">
+                <div class="section-head center">
+                    <span class="kicker" data-i18n="pay.kicker"></span>
+                    <h2 class="section-title" data-i18n="pay.title"></h2>
+                    <p class="section-sub" data-i18n="pay.sub"></p>
+                </div>
+                <div class="pay-grid" style="grid-template-columns:1fr; max-width:520px; margin:0 auto;">
+                    <div class="pay-card">
+                        <div class="pay-head">
+                            <div class="pay-logo paypal">P</div>
+                            <div>
+                                <h3 data-i18n="pay.paypalTitle"></h3>
+                                <div class="pay-sub" data-i18n="pay.paypalSub"></div>
+                            </div>
+                        </div>
+                        <p style="color:var(--text-1); font-size:0.9rem;" data-i18n="pay.paypalDesc"></p>
+
+                        <div class="amount-row" id="paypalLinkRow">
+                            <a class="amount-chip active" data-plan="basic" target="_blank" rel="noopener">Basic $29</a>
+                            <a class="amount-chip" data-plan="pro" target="_blank" rel="noopener">Pro $79</a>
+                            <a class="amount-chip" data-plan="enterprise" target="_blank" rel="noopener">Enterprise
+                                $199</a>
+                        </div>
+
+                        <form id="paypalClaimForm" onsubmit="return false;"
+                            style="margin-top:16px; display:flex; flex-direction:column; gap:12px;">
+                            <div class="field" style="margin-bottom:0;">
+                                <label for="ppName" data-i18n="pay.nameLabel"></label>
+                                <input id="ppName" type="text" required>
+                            </div>
+                            <div class="field" style="margin-bottom:0;">
+                                <label for="ppEmail" data-i18n="pay.emailLabel"></label>
+                                <input id="ppEmail" type="email" required placeholder="name@company.com">
+                            </div>
+                            <div class="field" style="margin-bottom:0;">
+                                <label for="ppRef" data-i18n="pay.refLabel"></label>
+                                <input id="ppRef" type="text" placeholder="Transaction ID (optional)">
+                            </div>
+                            <button type="submit" class="btn btn-gold btn-block" id="paypalClaimBtn"
+                                data-i18n="pay.paypalClaimBtn"></button>
+                        </form>
+                        <p class="pay-note" data-i18n="pay.paypalNote"></p>
+                    </div>
+                </div>
+
+                <div id="apiKeyResult"
+                    style="display:none; max-width:640px; margin:26px auto 0; background:var(--glass); border:1px solid var(--border); border-radius:var(--radius-md); padding:22px 24px; text-align:center;">
+                    <div style="font-size:0.85rem; color:var(--text-2); margin-bottom:8px;"
+                        data-i18n="pay.keyReadyLabel"></div>
+                    <div style="display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap;">
+                        <code id="apiKeyValue"
+                            style="background:rgba(255,255,255,0.08); padding:8px 14px; border-radius:8px; font-size:0.9rem; word-break:break-all;"></code>
+                        <button class="btn btn-ghost btn-sm" id="copyKeyBtn" data-i18n="pay.copyBtn"></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="faq" style="background:var(--bg-1);">
+            <div class="wrap">
+                <div class="section-head center">
+                    <span class="kicker" data-i18n="faq.kicker"></span>
+                    <h2 class="section-title" data-i18n="faq.title"></h2>
+                </div>
+                <div class="faq-list" id="faqList"></div>
+            </div>
+        </section>
+
+        <section>
+            <div class="wrap">
+                <div class="cta-final">
+                    <h2 data-i18n="ctaFinal.title"></h2>
+                    <p data-i18n="ctaFinal.sub"></p>
+                    <div class="cta-buttons">
+                        <a href="#pricing" class="btn btn-primary" data-i18n="ctaFinal.primary"></a>
+                        <a href="#auth" class="btn btn-ghost" data-i18n="ctaFinal.secondary"></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="wrap">
+            <div class="footer-grid">
+                <div>
+                    <div class="brand" style="margin-bottom:14px;"><span class="mark">⚡</span> <span
+                            data-i18n="brand"></span></div>
+                    <p style="color:var(--text-2); font-size:0.85rem; max-width:280px;" data-i18n="footer.desc"></p>
+                    <div class="socials" style="margin-top:18px;">
+                        <a href="#" aria-label="Twitter">🐦</a>
+                        <a href="#" aria-label="LinkedIn">💼</a>
+                        <a href="#" aria-label="Email">✉️</a>
+                    </div>
+                </div>
+                <div>
+                    <h5 data-i18n="footer.product"></h5>
+                    <ul>
+                        <li><a href="#features" data-i18n="nav.features"></a></li>
+                        <li><a href="#pricing" data-i18n="nav.pricing"></a></li>
+                        <li><a href="#how" data-i18n="nav.how"></a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 data-i18n="footer.company"></h5>
+                    <ul>
+                        <li><a href="#" data-i18n="footer.about"></a></li>
+                        <li><a href="#" data-i18n="footer.contact"></a></li>
+                        <li><a href="#" data-i18n="footer.careers"></a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 data-i18n="footer.legal"></h5>
+                    <ul>
+                        <li><a href="#" data-i18n="footer.privacy"></a></li>
+                        <li><a href="#" data-i18n="footer.terms"></a></li>
+                        <li><a href="#faq" data-i18n="nav.faq"></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span data-i18n="footer.copyright"></span>
+                <span data-i18n="footer.tagline"></span>
+            </div>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ---------------- CONFIG: EDIT THIS ----------------
+        // بعد نشر main.py على سيرفر حقيقي، غيّر هذا الرابط ليطابق رابط الخادم الفعلي
+        // After deploying main.py to a real server, update this to your server's URL
+        const API_BASE_URL = "https://ai-landing-page-production-b2bd.up.railway.app";
+
+        // روابط PayPal الثابتة لكل باقة (نفس الروابط الموجودة في main.py)
+        const PAYPAL_LINKS = {
+            basic: "https://www.paypal.com/ncp/payment/23V3WQK4NVTG4",
+            pro: "https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6",
+            enterprise: "https://www.paypal.com/ncp/payment/CS59KMKAETBFC",
+        };
+        // -----------------------------------------------------
+
+        const T = {
+            ar: {
+                brand: "منصّة",
+                nav: { features: "المميزات", how: "كيف تعمل", pricing: "الأسعار", faq: "الأسئلة الشائعة", login: "تسجيل الدخول", cta: "ابدأ مجانًا" },
+                hero: {
+                    eyebrow: "نسخة تجريبية مجانية لمدة 14 يومًا",
+                    title: 'ذكاء اصطناعي خاص بشركتك<br><span class="grad">يجيب، يحلّل، ويعمل نيابة عنك</span>',
+                    sub: "ارفع بيانات شركتك، واحصل على مساعد ذكاء اصطناعي يجاوب عملاءك وفريقك على مدار الساعة، مبني على واجهة API آمنة وسريعة التكامل.",
+                    ctaPrimary: "جرّب المنصّة الآن", ctaSecondary: "شاهد كيف تعمل",
+                    trust1: "✅ بدون بطاقة ائتمان للتجربة", trust2: "🔒 تشفير كامل للبيانات", trust3: "⚡ تكامل خلال دقائق",
+                    mockTitle: "مساعد شركتك الذكي",
+                    sideChats: "💬 المحادثات", sideFiles: "📁 الملفات", sideReports: "📊 التقارير", sideSettings: "⚙️ الإعدادات",
+                    userMsg: "ما هي سياسة الاسترجاع لدينا؟",
+                    inputPlaceholder: "اسأل أي شيء عن شركتك…",
+                    statLabel: "استفسار تمت معالجته اليوم",
+                    typing: "بالتأكيد! سياسة الاسترجاع لديكم تسمح باسترجاع الأموال خلال 14 يومًا من تاريخ الشراء، بحسب الملف الذي تم رفعه."
+                },
+                features: {
+                    kicker: "المميزات", title: "كل ما تحتاجه لأتمتة خدمة عملائك", sub: "من رفع الملفات إلى الرد الذكي، مصمم ليتكامل مع عملك الحالي دون تعقيد.",
+                    items: [
+                        { icon: "🧠", title: "فهم بيانات شركتك", text: "ارفع ملفاتك ووثائقك، ويقوم المساعد بالإجابة بناءً على محتواها الفعلي فقط." },
+                        { icon: "🔑", title: "مفتاح API خاص بك", text: "كل شركة تحصل على مفتاح API فريد للوصول الآمن إلى جميع نقاط النظام." },
+                        { icon: "💳", title: "دفع واشتراكات مرنة", text: "تكامل مباشر مع PayPal لإدارة الاشتراكات واستلام مفتاح API فوري بعد الدفع." },
+                        { icon: "📈", title: "لوحة تحكم شاملة", text: "راقب عدد الاستفسارات، استخدام الباقة، وأداء المساعد من مكان واحد." },
+                        { icon: "🛡️", title: "أمان على مستوى المؤسسات", text: "تشفير للبيانات أثناء النقل والتخزين، مع صلاحيات وصول قابلة للتخصيص." },
+                        { icon: "🌐", title: "دعم متعدد اللغات", text: "واجهة وردود بالعربية والإنجليزية، قابلة للتوسعة للغات إضافية." }
+                    ]
+                },
+                how: {
+                    kicker: "كيف تعمل", title: "من التسجيل إلى أول إجابة في أقل من 5 دقائق",
+                    steps: [
+                        { title: "أنشئ حسابك", text: "سجّل شركتك واختر الباقة المناسبة لحجم فريقك." },
+                        { title: "ارفع بياناتك", text: "حمّل ملفات شركتك ليتم تحليلها واستخدامها في الإجابات." },
+                        { title: "احصل على مفتاحك", text: "يتولد مفتاح API خاص بك جاهز للربط مع أنظمتك." },
+                        { title: "ابدأ الاستخدام", text: "وجّه الاستفسارات إلى المساعد واحصل على ردود فورية." }
+                    ]
+                },
+                pricing: {
+                    kicker: "الأسعار", title: "باقات تناسب كل حجم شركة", sub: "ابدأ صغيرًا وارتقِ بباقتك في أي وقت. لا رسوم خفية.",
+                    monthly: "شهري", yearly: "سنوي", save: "وفّر 20%",
+                    plans: [
+                        {
+                            name: "الباقة الأساسية", desc: "مثالية للشركات الناشئة وفرق العمل الصغيرة", m: 29, y: 23, badge: null, cta: "ابدأ بالأساسية", btnClass: "btn-ghost",
+                            feats: ["مساعد ذكي مخصص لشركة واحدة", "رفع ملف بيانات واحد", "حتى 500 استفسار شهريًا", "استجابة سريعة", "دعم عبر البريد الإلكتروني"]
+                        },
+                        {
+                            name: "الباقة الاحترافية", desc: "للشركات المتوسطة التي تحتاج مرونة أكبر", m: 79, y: 63, badge: "الأكثر طلبًا", cta: "ابدأ بالاحترافية", btnClass: "btn-primary",
+                            feats: ["مساعد ذكي متطور جدًا", "ملفات بيانات متعددة", "استفسارات غير محدودة", "أولوية قصوى في المعالجة", "تقارير أداء أسبوعية", "دعم فني عبر الدردشة المباشرة"]
+                        },
+                        {
+                            name: "باقة المؤسسات", desc: "للشركات الكبرى ذات الاحتياجات الخاصة", m: 199, y: 159, badge: null, cta: "تواصل مع المبيعات", btnClass: "btn-ghost",
+                            feats: ["ذكاء اصطناعي غير محدود", "ربط بأنظمة الشركة الحالية (API/Webhooks)", "عدد مستخدمين غير محدود", "مدير حساب مخصص", "اتفاقية مستوى خدمة (SLA)", "دعم فني خاص 24/7"]
+                        }
+                    ],
+                    perMonth: "/ شهريًا", perMonthYearly: "/ شهريًا (فوترة سنوية)"
+                },
+                trust: {
+                    kicker: "الثقة والأمان", title: "بياناتك محمية في كل خطوة",
+                    items: [
+                        { ic: "🔐", title: "تشفير من طرف إلى طرف", text: "جميع البيانات تُشفّر أثناء النقل والتخزين" },
+                        { ic: "🕒", title: "ضمان استرجاع 14 يومًا", text: "إن لم تقتنع، نعيد أموالك بالكامل" },
+                        { ic: "📶", title: "وقت تشغيل %99.9", text: "بنية تحتية موثوقة تعمل دون توقف" },
+                        { ic: "🧾", title: "فوترة شفافة", text: "بدون رسوم خفية أو التزامات طويلة الأمد" }
+                    ]
+                },
+                testi: {
+                    kicker: "آراء العملاء", title: "شركات تثق في منصّتنا يوميًا",
+                    items: [
+                        { q: "خفّضنا وقت الرد على استفسارات العملاء من ساعات إلى ثوانٍ. التكامل كان أسهل مما توقعنا.", n: "هبة السعدي", r: "مديرة عمليات، متجر إلكتروني", i: "هـ.س" },
+                        { q: "مفتاح API واضح والتوثيق ممتاز. فريقنا التقني ربطه بالمنتج الحالي خلال يوم واحد فقط.", n: "محمد العلي", r: "مطوّر أول، شركة برمجيات", i: "م.ع" },
+                        { q: "الباقة الاحترافية تستحق كل دولار. الدعم سريع والمساعد يفهم بيانات شركتنا بدقة عالية.", n: "رنا النجار", r: "مؤسسة، وكالة تسويق", i: "ر.ن" }
+                    ]
+                },
+                auth: {
+                    eyebrow: "جاهز خلال دقائق", title: "ابدأ رحلتك مع الذكاء الاصطناعي لشركتك",
+                    sub: "أنشئ حسابًا واحصل على مفتاح API فوري، أو سجّل الدخول لمتابعة إدارة مساعدك الذكي.",
+                    list: ["✅ إعداد فوري بدون خبرة تقنية", "✅ إلغاء الاشتراك في أي وقت", "✅ دعم عربي كامل"],
+                    tabLogin: "تسجيل الدخول", tabSignup: "إنشاء حساب",
+                    companyLabel: "اسم الشركة", emailLabel: "البريد الإلكتروني", passwordLabel: "كلمة المرور",
+                    remember: "تذكرني", forgot: "نسيت كلمة المرور؟", or: "أو", google: "المتابعة عبر Google",
+                    submitLogin: "تسجيل الدخول", submitSignup: "إنشاء الحساب",
+                    haveAccount: "ليس لديك حساب؟", noAccount: "لديك حساب بالفعل؟", signupLink: "أنشئ حسابًا", loginLink: "سجّل الدخول",
+                    toastSubmit: "هذا نموذج عرض تصميمي — يجب ربطه بواجهة API الخاصة بالخادم"
+                },
+                pay: {
+                    kicker: "طرق الدفع", title: "اشترك عبر PayPal بخطوتين", sub: "ادفع بأمان عبر PayPal، واستلم مفتاح API فورًا لتبدأ الاستخدام مباشرة.",
+                    paypalTitle: "الدفع عبر PayPal", paypalSub: "ادفع أولًا ثم فعّل حسابك فورًا",
+                    paypalDesc: "اضغط على الباقة المناسبة لإتمام الدفع عبر PayPal، ثم عبّئ النموذج أدناه لاستلام مفتاح API فورًا.",
+                    nameLabel: "اسم الشركة", emailLabel: "البريد الإلكتروني", planLabel: "الباقة",
+                    refLabel: "رقم عملية PayPal (اختياري)",
+                    paypalClaimBtn: "استلم مفتاح API الآن",
+                    paypalNote: "⚠️ يتم إصدار المفتاح فورًا لتسريع تجربتك، وتتم مراجعة الدفعة يدويًا من حساب PayPal خلال ساعات العمل. أي حساب غير مؤكَّد قد يُوقف.",
+                    keyReadyLabel: "تم تفعيل حسابكم! هذا مفتاح الـ API الخاص بكم:",
+                    copyBtn: "نسخ",
+                    paypalClaimError: "حدث خطأ أثناء إصدار المفتاح. حاول مرة أخرى."
+                },
+                faq: {
+                    kicker: "الأسئلة الشائعة", title: "كل ما تحتاج معرفته قبل البدء",
+                    items: [
+                        { q: "هل أحتاج إلى خبرة تقنية للبدء؟", a: "لا. يمكنك التسجيل والحصول على مفتاح API الخاص بك خلال دقائق، ودمجه باتباع خطوات التوثيق البسيطة." },
+                        { q: "هل يمكنني تغيير الباقة لاحقًا؟", a: "نعم، يمكنك الترقية أو التخفيض في أي وقت من لوحة التحكم دون فقدان بياناتك." },
+                        { q: "ما هي طرق الدفع المتاحة؟", a: "ندعم الدفع عبر PayPal حاليًا. تدفع الاشتراك، ثم تستلم مفتاح API فورًا لتبدأ الاستخدام." },
+                        { q: "هل بياناتي آمنة؟", a: "جميع البيانات مشفّرة أثناء النقل والتخزين، ولا تتم مشاركتها مع أي طرف ثالث." },
+                        { q: "هل يوجد ضمان استرجاع الأموال؟", a: "نعم، نوفر ضمان استرجاع كامل خلال أول 14 يومًا من الاشتراك في أي باقة." }
+                    ]
+                },
+                ctaFinal: {
+                    title: "جاهز لأتمتة شركتك بالذكاء الاصطناعي؟", sub: "انضم اليوم واحصل على 14 يومًا مجانًا لتجربة جميع مميزات المنصّة دون أي التزام.",
+                    primary: "ابدأ تجربتك المجانية", secondary: "تسجيل الدخول"
+                },
+                footer: {
+                    desc: "منصّة ذكاء اصطناعي للشركات تساعدك على أتمتة الردود وخدمة العملاء بأمان وسرعة.",
+                    product: "المنتج", company: "الشركة", about: "من نحن", contact: "تواصل معنا", careers: "الوظائف",
+                    legal: "قانوني", privacy: "سياسة الخصوصية", terms: "شروط الاستخدام",
+                    copyright: "© 2026 منصّة. جميع الحقوق محفوظة.", tagline: "صُنع بعناية لخدمة الشركات العربية"
+                }
+            },
+            en: {
+                brand: "Platform",
+                nav: { features: "Features", how: "How it works", pricing: "Pricing", faq: "FAQ", login: "Log in", cta: "Start free" },
+                hero: {
+                    eyebrow: "Free 14-day trial",
+                    title: 'AI built for your company<br><span class="grad">that answers, analyzes, and works for you</span>',
+                    sub: "Upload your company data and get an AI assistant that answers your customers and team around the clock, powered by a secure, fast-to-integrate API.",
+                    ctaPrimary: "Try the platform", ctaSecondary: "See how it works",
+                    trust1: "✅ No credit card for trial", trust2: "🔒 Full data encryption", trust3: "⚡ Integrate in minutes",
+                    mockTitle: "Your company's AI assistant",
+                    sideChats: "💬 Chats", sideFiles: "📁 Files", sideReports: "📊 Reports", sideSettings: "⚙️ Settings",
+                    userMsg: "What's our refund policy?",
+                    inputPlaceholder: "Ask anything about your company…",
+                    statLabel: "queries handled today",
+                    typing: "Sure! Your refund policy allows a full refund within 14 days of purchase, based on the uploaded policy document."
+                },
+                features: {
+                    kicker: "Features", title: "Everything you need to automate customer support", sub: "From uploading files to smart replies — built to fit into your existing workflow without friction.",
+                    items: [
+                        { icon: "🧠", title: "Understands your data", text: "Upload your files and documents — the assistant answers strictly based on their actual content." },
+                        { icon: "🔑", title: "Your own API key", text: "Every company gets a unique API key for secure access to all endpoints." },
+                        { icon: "💳", title: "Flexible billing", text: "Direct PayPal integration to manage subscriptions and issue your API key instantly after payment." },
+                        { icon: "📈", title: "Full dashboard", text: "Track query volume, plan usage, and assistant performance from one place." },
+                        { icon: "🛡️", title: "Enterprise-grade security", text: "Data encrypted in transit and at rest, with customizable access permissions." },
+                        { icon: "🌐", title: "Multilingual support", text: "Interface and replies in Arabic and English, extensible to more languages." }
+                    ]
+                },
+                how: {
+                    kicker: "How it works", title: "From sign-up to your first answer in under 5 minutes",
+                    steps: [
+                        { title: "Create your account", text: "Register your company and pick the plan that fits your team size." },
+                        { title: "Upload your data", text: "Add your company files so they can be analyzed and used in answers." },
+                        { title: "Get your API key", text: "A unique API key is generated instantly, ready to connect to your systems." },
+                        { title: "Start using it", text: "Send queries to the assistant and get instant, accurate responses." }
+                    ]
+                },
+                pricing: {
+                    kicker: "Pricing", title: "Plans for every company size", sub: "Start small and upgrade anytime. No hidden fees.",
+                    monthly: "Monthly", yearly: "Yearly", save: "Save 20%",
+                    plans: [
+                        {
+                            name: "Basic", desc: "Perfect for startups and small teams", m: 29, y: 23, badge: null, cta: "Start with Basic", btnClass: "btn-ghost",
+                            feats: ["Dedicated AI assistant for one company", "1 data file upload", "Up to 500 queries / month", "Fast response times", "Email support"]
+                        },
+                        {
+                            name: "Pro", desc: "For growing companies that need more flexibility", m: 79, y: 63, badge: "Most popular", cta: "Start with Pro", btnClass: "btn-primary",
+                            feats: ["Highly advanced AI assistant", "Multiple data files", "Unlimited queries", "Top-priority processing", "Weekly performance reports", "Live chat support"]
+                        },
+                        {
+                            name: "Enterprise", desc: "For large companies with custom needs", m: 199, y: 159, badge: null, cta: "Talk to sales", btnClass: "btn-ghost",
+                            feats: ["Unlimited AI usage", "Integrate with your existing systems (API/Webhooks)", "Unlimited team members", "Dedicated account manager", "Service-level agreement (SLA)", "24/7 priority support"]
+                        }
+                    ],
+                    perMonth: "/ month", perMonthYearly: "/ month (billed yearly)"
+                },
+                trust: {
+                    kicker: "Trust & security", title: "Your data is protected at every step",
+                    items: [
+                        { ic: "🔐", title: "End-to-end encryption", text: "All data is encrypted in transit and at rest" },
+                        { ic: "🕒", title: "14-day money-back guarantee", text: "Not convinced? Get a full refund" },
+                        { ic: "📶", title: "99.9% uptime", text: "Reliable infrastructure that stays online" },
+                        { ic: "🧾", title: "Transparent billing", text: "No hidden fees or long-term commitments" }
+                    ]
+                },
+                testi: {
+                    kicker: "Customer stories", title: "Companies that trust our platform every day",
+                    items: [
+                        { q: "We cut our customer response time from hours to seconds. Integration was easier than we expected.", n: "Heba Al-Saadi", r: "Operations Manager, E-commerce", i: "HS" },
+                        { q: "The API key is straightforward and the docs are excellent. Our engineers connected it to our product in a single day.", n: "Mohammed Al-Ali", r: "Senior Developer, Software company", i: "MA" },
+                        { q: "The Pro plan is worth every dollar. Support is fast and the assistant understands our company data precisely.", n: "Rana Al-Najjar", r: "Founder, Marketing agency", i: "RN" }
+                    ]
+                },
+                auth: {
+                    eyebrow: "Ready in minutes", title: "Start your journey with AI built for your company",
+                    sub: "Create an account and get an instant API key, or log in to keep managing your AI assistant.",
+                    list: ["✅ Instant setup, no tech skills needed", "✅ Cancel anytime", "✅ Full Arabic & English support"],
+                    tabLogin: "Log in", tabSignup: "Sign up",
+                    companyLabel: "Company name", emailLabel: "Email", passwordLabel: "Password",
+                    remember: "Remember me", forgot: "Forgot password?", or: "or", google: "Continue with Google",
+                    submitLogin: "Log in", submitSignup: "Create account",
+                    haveAccount: "Don't have an account?", noAccount: "Already have an account?", signupLink: "Sign up", loginLink: "Log in",
+                    toastSubmit: "This is a design demo — connect it to your backend API"
+                },
+                pay: {
+                    kicker: "Payment methods", title: "Subscribe via PayPal in two steps", sub: "Pay securely through PayPal and get your API key instantly to start using the platform.",
+                    paypalTitle: "Pay with PayPal", paypalSub: "Pay first, then activate instantly",
+                    paypalDesc: "Click the matching plan to pay via PayPal, then fill the form below to get your API key instantly.",
+                    nameLabel: "Company name", emailLabel: "Email", planLabel: "Plan",
+                    refLabel: "PayPal transaction ID (optional)",
+                    paypalClaimBtn: "Get my API key now",
+                    paypalNote: "⚠️ Your key is issued instantly to speed up onboarding, and the payment is manually verified against our PayPal account during business hours. Unverified accounts may be suspended.",
+                    keyReadyLabel: "Your account is active! Here's your API key:",
+                    copyBtn: "Copy",
+                    paypalClaimError: "Something went wrong issuing your key. Please try again."
+                },
+                faq: {
+                    kicker: "FAQ", title: "Everything you need to know before you start",
+                    items: [
+                        { q: "Do I need technical experience to get started?", a: "No. You can sign up and get your API key in minutes, then integrate it by following our simple docs." },
+                        { q: "Can I change my plan later?", a: "Yes, you can upgrade or downgrade anytime from your dashboard without losing your data." },
+                        { q: "What payment methods are available?", a: "We currently support PayPal. Pay for your plan and get your API key instantly to start using the platform." },
+                        { q: "Is my data secure?", a: "All data is encrypted in transit and at rest, and is never shared with third parties." },
+                        { q: "Is there a money-back guarantee?", a: "Yes, we offer a full refund within the first 14 days of any plan." }
+                    ]
+                },
+                ctaFinal: {
+                    title: "Ready to automate your company with AI?", sub: "Join today and get 14 days free to try every feature of the platform, no commitment.",
+                    primary: "Start your free trial", secondary: "Log in"
+                },
+                footer: {
+                    desc: "An enterprise AI platform that helps you automate replies and customer support, securely and fast.",
+                    product: "Product", company: "Company", about: "About", contact: "Contact", careers: "Careers",
+                    legal: "Legal", privacy: "Privacy Policy", terms: "Terms of Service",
+                    copyright: "© 2026 Platform. All rights reserved.", tagline: "Built with care for businesses everywhere"
+                }
+            }
+        };
+
+        let lang = 'ar';
+
+        function get(obj, path) { return path.split('.').reduce((o, k) => (o || {})[k], obj); }
+
+        function renderDynamic(dict) {
+            // Features
+            document.getElementById('featuresGrid').innerHTML = dict.features.items.map(f => `
+      <div class="feature-card">
+        <div class="feature-icon">${f.icon}</div>
+        <h3>${f.title}</h3>
+        <p>${f.text}</p>
+      </div>`).join('');
+
+            // Steps
+            document.getElementById('stepsGrid').innerHTML = dict.how.steps.map((s, i) => `
+      <div class="step">
+        <div class="step-num">${i + 1}</div>
+        <h4>${s.title}</h4>
+        <p>${s.text}</p>
+      </div>`).join('');
+
+            // Pricing
+            document.getElementById('pricingGrid').innerHTML = dict.pricing.plans.map(p => `
+      <div class="price-card ${p.badge ? 'featured' : ''}">
+        ${p.badge ? `<span class="plan-badge">${p.badge}</span>` : ''}
+        <div class="plan-name">${p.name}</div>
+        <div class="plan-desc">${p.desc}</div>
+        <div class="plan-price"><span class="amount" data-monthly="${p.m}" data-yearly="${p.y}">$${p.m}</span><span class="period">${dict.pricing.perMonth}</span></div>
+        <ul class="plan-list">${p.feats.map(f => `<li><span class="check">✔</span> ${f}</li>`).join('')}</ul>
+        <a href="#auth" class="btn ${p.btnClass} btn-block">${p.cta}</a>
+      </div>`).join('');
+
+            // Trust
+            document.getElementById('trustGrid').innerHTML = dict.trust.items.map(t => `
+      <div class="trust-card"><div class="ic">${t.ic}</div><h4>${t.title}</h4><p>${t.text}</p></div>`).join('');
+
+            // Testimonials
+            document.getElementById('testiGrid').innerHTML = dict.testi.items.map(t => `
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <p class="quote">"${t.q}"</p>
+        <div class="testi-person"><div class="avatar">${t.i}</div><div><div class="name">${t.n}</div><div class="role">${t.r}</div></div></div>
+      </div>`).join('');
+
+            // Auth list
+            document.getElementById('authList').innerHTML = dict.auth.list.map(l => `<li>${l}</li>`).join('');
+
+            // FAQ
+            document.getElementById('faqList').innerHTML = dict.faq.items.map(f => `
+      <div class="faq-item">
+        <button class="faq-q">${f.q} <span class="chev">⌄</span></button>
+        <div class="faq-a"><p>${f.a}</p></div>
+      </div>`).join('');
+            bindFaq();
+            bindBillingAmounts(dict);
+        }
+
+        function bindFaq() {
+            document.querySelectorAll('.faq-item').forEach(item => {
+                const q = item.querySelector('.faq-q');
+                const a = item.querySelector('.faq-a');
+                q.addEventListener('click', () => {
+                    const isOpen = item.classList.contains('open');
+                    document.querySelectorAll('.faq-item.open').forEach(o => {
+                        o.classList.remove('open');
+                        o.querySelector('.faq-a').style.maxHeight = null;
+                    });
+                    if (!isOpen) {
+                        item.classList.add('open');
+                        a.style.maxHeight = a.scrollHeight + 'px';
+                    }
+                });
+            });
+        }
+
+        let yearly = false;
+        function bindBillingAmounts(dict) {
+            document.querySelectorAll('.plan-price .amount').forEach(el => {
+                const val = yearly ? el.dataset.yearly : el.dataset.monthly;
+                el.textContent = '$' + val;
+            });
+            document.querySelectorAll('.plan-price .period').forEach(el => {
+                el.textContent = yearly ? dict.pricing.perMonthYearly : dict.pricing.perMonth;
+            });
+        }
+
+        function applyStatic(dict) {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                const val = get(dict, key);
+                if (val !== undefined) el.textContent = val;
+            });
+            document.querySelectorAll('[data-i18n-html]').forEach(el => {
+                const key = el.getAttribute('data-i18n-html');
+                const val = get(dict, key);
+                if (val !== undefined) el.innerHTML = val;
+            });
+        }
+
+        function setAuthMode(mode, dict) {
+            const isSignup = mode === 'signup';
+            document.getElementById('tabLogin').classList.toggle('active', !isSignup);
+            document.getElementById('tabSignup').classList.toggle('active', isSignup);
+            document.getElementById('nameField').style.display = isSignup ? 'block' : 'none';
+            document.getElementById('authSubmit').textContent = isSignup ? dict.auth.submitSignup : dict.auth.submitLogin;
+            const switchText = isSignup
+                ? `${dict.auth.noAccount} <a href="#" id="modeLink">${dict.auth.loginLink}</a>`
+                : `${dict.auth.haveAccount} <a href="#" id="modeLink">${dict.auth.signupLink}</a>`;
+            document.getElementById('switchModeText').innerHTML = switchText;
+            document.getElementById('modeLink').addEventListener('click', (e) => {
+                e.preventDefault();
+                setAuthMode(isSignup ? 'login' : 'signup', currentDict());
+            });
+        }
+
+        let authMode = 'login';
+
+        function currentDict() { return T[lang]; }
+
+        function setLanguage(l) {
+            lang = l;
+            const dict = T[lang];
+            const html = document.documentElement;
+            html.lang = lang;
+            html.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            document.title = lang === 'ar' ? 'منصّة | الذكاء الاصطناعي للشركات' : 'Platform | Enterprise AI';
+            document.getElementById('langToggle').textContent = lang === 'ar' ? 'EN' : 'AR';
+            applyStatic(dict);
+            renderDynamic(dict);
+            setAuthMode(authMode, dict);
+            resetTyping(dict);
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            setLanguage(lang === 'ar' ? 'en' : 'ar');
+        });
+
+        // Theme toggle
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            const root = document.documentElement;
+            const isLight = root.getAttribute('data-theme') === 'light';
+            root.setAttribute('data-theme', isLight ? 'dark' : 'light');
+            themeToggle.textContent = isLight ? '🌙' : '☀️';
+        });
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+        }
+
+        // Hero typing animation
+        let typingTimer = null;
+        let typingToken = 0;
+        function resetTyping(dict) {
+            typingToken++;
+            const myToken = typingToken;
+            const el = document.getElementById('typingMsg');
+            const text = dict.hero.typing;
+            let ci = 0;
+            clearTimeout(typingTimer);
+            function loop() {
+                if (myToken !== typingToken) return;
+                if (ci <= text.length) {
+                    el.innerHTML = text.slice(0, ci) + '<span class="cursor"></span>';
+                    ci++;
+                    typingTimer = setTimeout(loop, 26);
+                } else {
+                    typingTimer = setTimeout(() => { ci = 0; loop(); }, 3500);
+                }
+            }
+            loop();
+        }
+
+        // Billing switch
+        document.getElementById('billingSwitch').addEventListener('click', () => {
+            yearly = !yearly;
+            document.getElementById('billingSwitch').classList.toggle('on', yearly);
+            bindBillingAmounts(currentDict());
+        });
+
+        // Auth tabs
+        document.getElementById('tabLogin').addEventListener('click', () => { authMode = 'login'; setAuthMode('login', currentDict()); });
+        document.getElementById('tabSignup').addEventListener('click', () => { authMode = 'signup'; setAuthMode('signup', currentDict()); });
+        document.getElementById('authForm').addEventListener('submit', () => showToast(currentDict().auth.toastSubmit));
+
+        // Payment
+        // --- Wire the PayPal per-plan buttons to the real payment links ---
+        document.querySelectorAll('#paypalLinkRow .amount-chip').forEach(a => {
+            a.href = PAYPAL_LINKS[a.dataset.plan];
+            a.addEventListener('click', () => {
+                document.querySelectorAll('#paypalLinkRow .amount-chip').forEach(c => c.classList.remove('active'));
+                a.classList.add('active');
+                selectedPaypalPlan = a.dataset.plan;
+            });
+        });
+        let selectedPaypalPlan = 'basic';
+
+        function showApiKey(key) {
+            document.getElementById('apiKeyValue').textContent = key;
+            document.getElementById('apiKeyResult').style.display = 'block';
+            document.getElementById('apiKeyResult').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.getElementById('copyKeyBtn').addEventListener('click', () => {
+            navigator.clipboard.writeText(document.getElementById('apiKeyValue').textContent);
+            showToast(lang === 'ar' ? 'تم النسخ' : 'Copied');
+        });
+
+        // --- Real PayPal claim: sends the request to your backend for manual review.
+        //     No API key is issued instantly — the backend returns {status:"pending", message}.
+        document.getElementById('paypalClaimForm').addEventListener('submit', async () => {
+            const name = document.getElementById('ppName').value.trim();
+            const email = document.getElementById('ppEmail').value.trim();
+            const paypal_reference = document.getElementById('ppRef').value.trim();
+            if (!name || !email) {
+                showToast(lang === 'ar' ? 'يرجى تعبئة اسم الشركة والبريد الإلكتروني' : 'Please fill in company name and email');
+                return;
+            }
+
+            const btn = document.getElementById('paypalClaimBtn');
+            const originalText = btn.textContent;
+            btn.textContent = '...'; btn.disabled = true;
+            try {
+                const res = await fetch(`${API_BASE_URL}/enterprise/paypal/claim`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, plan: selectedPaypalPlan, paypal_reference })
+                });
+                let data = null;
+                try { data = await res.json(); } catch (parseErr) { data = null; }
+
+                if (!res.ok) {
+                    const detail = data && data.detail ? data.detail : currentDict().pay.paypalClaimError;
+                    showToast(detail);
+                    return;
+                }
+
+                // Backend intentionally does NOT return an api_key here (pending-approval flow).
+                // Show its confirmation message instead of trying to display a key.
+                showToast(data && data.message ? data.message : currentDict().pay.paypalClaimError);
+                document.getElementById('paypalClaimForm').reset();
+            } catch (err) {
+                // Network error (backend unreachable, CORS, wrong API_BASE_URL, etc.)
+                showToast(lang === 'ar'
+                    ? 'تعذّر الاتصال بالخادم. تحقق من اتصالك بالإنترنت وحاول مجددًا.'
+                    : 'Could not reach the server. Check your connection and try again.');
+            } finally {
+                btn.textContent = originalText; btn.disabled = false;
+            }
+        });
+
+        // Init
+        setLanguage('ar');
+    </script>
+
+</body>
+
+</html>
