@@ -2229,10 +2229,9 @@
         // Init
         setLanguage('ar');
         // -----------------------------------------------------
-        // تفعيل زر Google + إخفاء نموذج الدخول وإظهار كارت الحساب
+        // 1. تنبيه زر Google
         // -----------------------------------------------------
         document.addEventListener('DOMContentLoaded', function () {
-            // 1. تنبيه زر Google
             const googleBtns = document.querySelectorAll('.btn-google, [data-i18n="auth.google"]');
             googleBtns.forEach(btn => {
                 btn.addEventListener('click', function (e) {
@@ -2240,70 +2239,117 @@
                     e.stopPropagation();
                     if (typeof showToast === 'function') {
                         showToast('خدمة المتابعة عبر Google سوف تتوفر قريباً!');
-                    } else {
-                        alert('خدمة المتابعة عبر Google سوف تتوفر قريباً!');
                     }
                 });
             });
 
-            // 2. تحديث حالة تسجيل الدخول
-            function updateAuthState() {
-                const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-                const savedEmail = localStorage.getItem('userEmail') || 'user@company.com';
+            // -----------------------------------------------------
+            // 2. فحص حالة الجلسة عند فتح الصفحة
+            // -----------------------------------------------------
+            function checkSavedSession() {
+                const savedEmail = localStorage.getItem('userEmail');
+                const savedKey = localStorage.getItem('userApiKey');
 
-                const authCard = document.querySelector('.auth-card') || document.getElementById('auth');
-                const navLoginBtn = document.querySelector('a[href="#auth"]');
-
-                if (isLoggedIn) {
-                    if (navLoginBtn) navLoginBtn.innerText = 'حسابي 👤';
-
-                    const authTabs = document.querySelector('.auth-tabs');
-                    const forms = document.querySelectorAll('form, .auth-form');
-                    if (authTabs) authTabs.style.display = 'none';
-                    forms.forEach(f => f.style.display = 'none');
-
-                    let userCard = document.getElementById('userProfileCard');
-                    if (!userCard && authCard) {
-                        userCard = document.createElement('div');
-                        userCard.id = 'userProfileCard';
-                        userCard.style.cssText = 'text-align: center; padding: 25px; background: rgba(255,255,255,0.05); border-radius: 12px; margin-top: 15px; border: 1px solid rgba(255,255,255,0.1);';
-                        userCard.innerHTML = `
-                            <div style="font-size: 45px; margin-bottom: 10px;">👤</div>
-                            <h3 style="margin-bottom: 8px;">مرحباً بك! تم تسجيل الدخول</h3>
-                            <p style="opacity: 0.85; dir: ltr; font-weight: bold;">${savedEmail}</p>
-                            <p style="color: #4CAF50; margin-top: 10px; font-size: 0.9em;">✅ الحساب نشط</p>
-                            <button id="logoutBtn" class="btn btn-ghost" style="margin-top: 20px; color: #ff4d4d; border-color: #ff4d4d; width: 100%;">تسجيل الخروج</button>
-                        `;
-                        authCard.appendChild(userCard);
-
-                        document.getElementById('logoutBtn').addEventListener('click', function () {
-                            localStorage.removeItem('isLoggedIn');
-                            localStorage.removeItem('userEmail');
-                            location.reload();
-                        });
-                    }
+                if (savedEmail && savedKey) {
+                    showLoggedInCard(savedEmail, savedKey);
                 }
             }
 
-            const authForms = document.querySelectorAll('form');
+            // -----------------------------------------------------
+            // 3. عرض كارت الحساب الحقيقي مع مفتاح API
+            // -----------------------------------------------------
+            function showLoggedInCard(email, apiKey) {
+                const authCard = document.querySelector('.auth-card') || document.getElementById('auth');
+                const navLoginBtn = document.querySelector('a[href="#auth"]');
+
+                if (navLoginBtn) navLoginBtn.innerText = 'حسابي 👤';
+
+                const authTabs = document.querySelector('.auth-tabs');
+                const forms = document.querySelectorAll('form:not(#paypalclaimForm), .auth-form');
+                if (authTabs) authTabs.style.display = 'none';
+                forms.forEach(f => f.style.display = 'none');
+
+                let userCard = document.getElementById('userProfileCard');
+                if (!userCard && authCard) {
+                    userCard = document.createElement('div');
+                    userCard.id = 'userProfileCard';
+                    userCard.style.cssText = 'text-align: center; padding: 25px; background: rgba(255,255,255,0.05); border-radius: 12px; margin-top: 15px; border: 1px solid rgba(255,255,255,0.1);';
+                    userCard.innerHTML = `
+                        <div style="font-size: 45px; margin-bottom: 10px;">👤</div>
+                        <h3 style="margin-bottom: 8px;">مرحباً بك في حسابك</h3>
+                        <p style="opacity: 0.85; dir: ltr; font-weight: bold; margin-bottom: 15px;">${email}</p>
+                        
+                        <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin: 15px 0; border: 1px dashed rgba(255,255,255,0.2);">
+                            <span style="font-size: 0.85em; opacity: 0.8; display: block; margin-bottom: 5px;">مفتاح الـ API الخاص بك:</span>
+                            <code style="color: #4caf50; font-family: monospace; font-size: 1.1em; word-break: break-all;">${apiKey}</code>
+                        </div>
+
+                        <p style="color: #4CAF50; font-size: 0.9em;">✅ الحساب نشط ومعتمد</p>
+                        <button id="logoutBtn" class="btn btn-ghost" style="margin-top: 20px; color: #ff4d4d; border-color: #ff4d4d; width: 100%;">تسجيل الخروج</button>
+                    `;
+                    authCard.appendChild(userCard);
+
+                    document.getElementById('logoutBtn').addEventListener('click', function () {
+                        localStorage.removeItem('userEmail');
+                        localStorage.removeItem('userApiKey');
+                        location.reload();
+                    });
+                }
+            }
+
+            // -----------------------------------------------------
+            // 4. ربط نموذج الدخول بالسيرفر الحقيقي (Railway)
+            // -----------------------------------------------------
+            const authForms = document.querySelectorAll('form:not(#paypalclaimForm)');
             authForms.forEach(form => {
-                form.addEventListener('submit', function (e) {
+                form.addEventListener('submit', async function (e) {
                     e.preventDefault();
+
                     const emailInput = form.querySelector('input[type="email"]');
-                    const emailVal = emailInput ? emailInput.value : 'user@company.com';
+                    const emailVal = emailInput ? emailInput.value.trim() : '';
 
-                    localStorage.setItem('isLoggedIn', 'true');
-                    localStorage.setItem('userEmail', emailVal);
-
-                    if (typeof showToast === 'function') {
-                        showToast('تم تسجيل الدخول بنجاح!');
+                    if (!emailVal) {
+                        if (typeof showToast === 'function') showToast('يرجى إدخال البريد الإلكتروني');
+                        return;
                     }
 
-                    updateAuthState();
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    const originalBtnText = submitBtn ? submitBtn.textContent : '';
+                    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'جاري التحقق...'; }
+
+                    try {
+                        // إرسال طلب حقيقي لسيرفر Railway للتحقق من وجود مفتاح للبريد
+                        const res = await fetch(`${API_BASE_URL}/claim-key`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: emailVal, company_name: "Login Check", plan: "check" })
+                        });
+
+                        const data = await res.json();
+
+                        if (res.ok && (data.api_key || data.key)) {
+                            const key = data.api_key || data.key;
+                            localStorage.setItem('userEmail', emailVal);
+                            localStorage.setItem('userApiKey', key);
+                            showLoggedInCard(emailVal, key);
+                            if (typeof showToast === 'function') showToast('تم تسجيل الدخول بنجاح!');
+                        } else {
+                            // إظهار تنبيه في حال عدم وجود اشتراك للبريد
+                            if (typeof showToast === 'function') {
+                                showToast(data.detail || data.message || 'لم يتم العثور على اشتراك مرتبط بهذا البريد');
+                            }
+                        }
+                    } catch (err) {
+                        if (typeof showToast === 'function') {
+                            showToast('تعذر الاتصال بالسيرفر، يرجى المحاولة لاحقاً');
+                        }
+                    } finally {
+                        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = originalBtnText; }
+                    }
                 });
             });
 
-            updateAuthState();
+            checkSavedSession();
         });
 
     </script>
