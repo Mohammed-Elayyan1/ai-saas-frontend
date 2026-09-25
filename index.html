@@ -1588,10 +1588,17 @@
                         <p style="color:var(--text-1); font-size:0.9rem;" data-i18n="pay.paypalDesc"></p>
 
                         <div class="amount-row" id="paypalLinkRow">
-                            <a class="amount-chip active" data-plan="basic" target="_blank" rel="noopener">Basic $29</a>
-                            <a class="amount-chip" data-plan="pro" target="_blank" rel="noopener">Pro $79</a>
-                            <a class="amount-chip" data-plan="enterprise" target="_blank" rel="noopener">Enterprise
-                                $199</a>
+                            <div class="amount-row" id="paypalLinkRow">
+                                <a class="amount-chip active" data-plan="basic"
+                                    href="https://www.paypal.com/ncp/payment/23V3WQK4NVTG4" target="_blank"
+                                    rel="noopener">Basic $29</a>
+                                <a class="amount-chip" data-plan="pro"
+                                    href="https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6" target="_blank"
+                                    rel="noopener">Pro $79</a>
+                                <a class="amount-chip" data-plan="enterprise"
+                                    href="https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6" target="_blank"
+                                    rel="noopener">Enterprise $199</a>
+                            </div>
                         </div>
 
                         <form id="paypalClaimForm" onsubmit="return false;"
