@@ -1599,40 +1599,40 @@
                                     href="https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6" target="_blank"
                                     rel="noopener">Enterprise $199</a>
                             </div>
+
+                            <form id="paypalClaimForm" onsubmit="return false;"
+                                style="margin-top:16px; display:flex; flex-direction:column; gap:12px;">
+                                <div class="field" style="margin-bottom:0;">
+                                    <label for="ppName" data-i18n="pay.nameLabel"></label>
+                                    <input id="ppName" type="text" required>
+                                </div>
+                                <div class="field" style="margin-bottom:0;">
+                                    <label for="ppEmail" data-i18n="pay.emailLabel"></label>
+                                    <input id="ppEmail" type="email" required placeholder="name@company.com">
+                                </div>
+                                <div class="field" style="margin-bottom:0;">
+                                    <label for="ppRef" data-i18n="pay.refLabel"></label>
+                                    <input id="ppRef" type="text" placeholder="Transaction ID (optional)">
+                                </div>
+                                <button type="submit" class="btn btn-gold btn-block" id="paypalClaimBtn"
+                                    data-i18n="pay.paypalClaimBtn"></button>
+                            </form>
+                            <p class="pay-note" data-i18n="pay.paypalNote"></p>
                         </div>
+                    </div>
 
-                        <form id="paypalClaimForm" onsubmit="return false;"
-                            style="margin-top:16px; display:flex; flex-direction:column; gap:12px;">
-                            <div class="field" style="margin-bottom:0;">
-                                <label for="ppName" data-i18n="pay.nameLabel"></label>
-                                <input id="ppName" type="text" required>
-                            </div>
-                            <div class="field" style="margin-bottom:0;">
-                                <label for="ppEmail" data-i18n="pay.emailLabel"></label>
-                                <input id="ppEmail" type="email" required placeholder="name@company.com">
-                            </div>
-                            <div class="field" style="margin-bottom:0;">
-                                <label for="ppRef" data-i18n="pay.refLabel"></label>
-                                <input id="ppRef" type="text" placeholder="Transaction ID (optional)">
-                            </div>
-                            <button type="submit" class="btn btn-gold btn-block" id="paypalClaimBtn"
-                                data-i18n="pay.paypalClaimBtn"></button>
-                        </form>
-                        <p class="pay-note" data-i18n="pay.paypalNote"></p>
+                    <div id="apiKeyResult"
+                        style="display:none; max-width:640px; margin:26px auto 0; background:var(--glass); border:1px solid var(--border); border-radius:var(--radius-md); padding:22px 24px; text-align:center;">
+                        <div style="font-size:0.85rem; color:var(--text-2); margin-bottom:8px;"
+                            data-i18n="pay.keyReadyLabel"></div>
+                        <div
+                            style="display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap;">
+                            <code id="apiKeyValue"
+                                style="background:rgba(255,255,255,0.08); padding:8px 14px; border-radius:8px; font-size:0.9rem; word-break:break-all;"></code>
+                            <button class="btn btn-ghost btn-sm" id="copyKeyBtn" data-i18n="pay.copyBtn"></button>
+                        </div>
                     </div>
                 </div>
-
-                <div id="apiKeyResult"
-                    style="display:none; max-width:640px; margin:26px auto 0; background:var(--glass); border:1px solid var(--border); border-radius:var(--radius-md); padding:22px 24px; text-align:center;">
-                    <div style="font-size:0.85rem; color:var(--text-2); margin-bottom:8px;"
-                        data-i18n="pay.keyReadyLabel"></div>
-                    <div style="display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap;">
-                        <code id="apiKeyValue"
-                            style="background:rgba(255,255,255,0.08); padding:8px 14px; border-radius:8px; font-size:0.9rem; word-break:break-all;"></code>
-                        <button class="btn btn-ghost btn-sm" id="copyKeyBtn" data-i18n="pay.copyBtn"></button>
-                    </div>
-                </div>
-            </div>
         </section>
 
         <section id="faq" style="background:var(--bg-1);">
@@ -1652,7 +1652,7 @@
                     <p data-i18n="ctaFinal.sub"></p>
                     <div class="cta-buttons">
                         <a href="#pricing" class="btn btn-primary" data-i18n="ctaFinal.primary"></a>
-                        <a href="#auth" class="btn btn-ghost" data-i18n="ctaFinal.secondary"></a>
+                        <a href="#pricing" class="btn btn-ghost" data-i18n="ctaFinal.secondary"></a>
                     </div>
                 </div>
             </div>
@@ -1984,7 +1984,7 @@
         <div class="plan-desc">${p.desc}</div>
         <div class="plan-price"><span class="amount" data-monthly="${p.m}" data-yearly="${p.y}">$${p.m}</span><span class="period">${dict.pricing.perMonth}</span></div>
         <ul class="plan-list">${p.feats.map(f => `<li><span class="check">✔</span> ${f}</li>`).join('')}</ul>
-        <a href="#auth" class="btn ${p.btnClass} btn-block">${p.cta}</a>
+        <a href="${p.id === 'basic' || p.plan === 'basic' ? 'https://www.paypal.com/ncp/payment/23V3WQK4NVTG4' : 'https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6'}" target="_blank" class="btn ${p.btnClass} btn-block">${p.cta}</a>
       </div>`).join('');
 
             // Trust
