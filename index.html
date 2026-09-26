@@ -1560,7 +1560,8 @@
                                 </div>
                                 <button type="submit" class="btn btn-primary btn-block" id="authSubmit"></button>
                                 <div class="divider" data-i18n="auth.or"></div>
-                                <button type="button" class="btn btn-ghost btn-block" data-i18n="auth.google"></button>
+                                <button type="button" class="btn btn-ghost btn-block" id="googleBtn"
+                                    data-i18n="auth.google"></button>
                                 <div class="switch-mode" id="switchModeText"></div>
                             </form>
                         </div>
@@ -1716,7 +1717,7 @@
         const T = {
             ar: {
                 brand: "منصّة",
-                nav: { features: "المميزات", how: "كيف تعمل", pricing: "الأسعار", faq: "الأسئلة الشائعة", login: "تسجيل الدخول", cta: "ابدأ مجانًا" },
+                nav: { features: "المميزات", how: "كيف تعمل", pricing: "الأسعار", faq: "الأسئلة الشائعة", login: "تسجيل الدخول", cta: "ابدأ رحلتك الآن" },
                 hero: {
                     eyebrow: "نسخة تجريبية مجانية لمدة 14 يومًا",
                     title: 'ذكاء اصطناعي خاص بشركتك<br><span class="grad">يجيب، يحلّل، ويعمل نيابة عنك</span>',
@@ -1795,7 +1796,10 @@
                     remember: "تذكرني", forgot: "نسيت كلمة المرور؟", or: "أو", google: "المتابعة عبر Google",
                     submitLogin: "تسجيل الدخول", submitSignup: "إنشاء الحساب",
                     haveAccount: "ليس لديك حساب؟", noAccount: "لديك حساب بالفعل؟", signupLink: "أنشئ حسابًا", loginLink: "سجّل الدخول",
-                    toastSubmit: "هذا نموذج عرض تصميمي — يجب ربطه بواجهة API الخاصة بالخادم"
+                    toastSubmit: "هذا نموذج عرض تصميمي — يجب ربطه بواجهة API الخاصة بالخادم",
+                    loginNotAvailable: "تسجيل الدخول بالحساب سيتوفر قريبًا. جرّب إنشاء حساب تجريبي مجاني الآن.",
+                    googleComingSoon: "سيتوفر تسجيل الدخول عبر Google قريبًا.",
+                    signupNetworkError: "تعذّر الاتصال بالخادم. تحقق من اتصالك بالإنترنت وحاول مجددًا."
                 },
                 pay: {
                     kicker: "طرق الدفع", title: "اشترك عبر PayPal بخطوتين", sub: "ادفع بأمان عبر PayPal، واستلم مفتاح API فورًا لتبدأ الاستخدام مباشرة.",
@@ -1832,7 +1836,7 @@
             },
             en: {
                 brand: "Platform",
-                nav: { features: "Features", how: "How it works", pricing: "Pricing", faq: "FAQ", login: "Log in", cta: "Start free" },
+                nav: { features: "Features", how: "How it works", pricing: "Pricing", faq: "FAQ", login: "Log in", cta: "Start your journey now" },
                 hero: {
                     eyebrow: "Free 14-day trial",
                     title: 'AI built for your company<br><span class="grad">that answers, analyzes, and works for you</span>',
@@ -1911,7 +1915,10 @@
                     remember: "Remember me", forgot: "Forgot password?", or: "or", google: "Continue with Google",
                     submitLogin: "Log in", submitSignup: "Create account",
                     haveAccount: "Don't have an account?", noAccount: "Already have an account?", signupLink: "Sign up", loginLink: "Log in",
-                    toastSubmit: "This is a design demo — connect it to your backend API"
+                    toastSubmit: "This is a design demo — connect it to your backend API",
+                    loginNotAvailable: "Account login is coming soon. Try creating a free trial account now.",
+                    googleComingSoon: "Google sign-in is coming soon.",
+                    signupNetworkError: "Could not reach the server. Check your connection and try again."
                 },
                 pay: {
                     kicker: "Payment methods", title: "Subscribe via PayPal in two steps", sub: "Pay securely through PayPal and get your API key instantly to start using the platform.",
@@ -1970,26 +1977,15 @@
       </div>`).join('');
 
             // Pricing
-            document.getElementById('pricingGrid').innerHTML = dict.pricing.plans.map((p, i) => {
-                const paypalUrls = [
-                    'https://www.paypal.com/ncp/payment/23V3WQK4NVTG4',      // الباقة الأساسية ($29)
-                    'https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6',      // الباقة الاحترافية ($79)
-                    'https://www.paypal.com/ncp/payment/CS59KMKAETBFC'     // باقة المؤسسات ($199)
-                ];
-                const paypalUrl = paypalUrls[i] || 'https://www.paypal.com';
-
-                return `
+            document.getElementById('pricingGrid').innerHTML = dict.pricing.plans.map(p => `
       <div class="price-card ${p.badge ? 'featured' : ''}">
         ${p.badge ? `<span class="plan-badge">${p.badge}</span>` : ''}
         <div class="plan-name">${p.name}</div>
         <div class="plan-desc">${p.desc}</div>
         <div class="plan-price"><span class="amount" data-monthly="${p.m}" data-yearly="${p.y}">$${p.m}</span><span class="period">${dict.pricing.perMonth}</span></div>
         <ul class="plan-list">${p.feats.map(f => `<li><span class="check">✔</span> ${f}</li>`).join('')}</ul>
-        <div style="text-align: center; margin-top: 20px;">
-            <button type="button" onclick="window.open('${paypalUrl}', '_blank');" class="btn ${p.btnClass}" style="border-radius: 50px !important; padding: 12px 32px; display: inline-block; border: none; cursor: pointer; width: auto !important;">${p.cta}</button>
-        </div>
-      </div>`;
-            }).join('');
+        <a href="#auth" class="btn ${p.btnClass} btn-block">${p.cta}</a>
+      </div>`).join('');
 
             // Trust
             document.getElementById('trustGrid').innerHTML = dict.trust.items.map(t => `
@@ -2146,7 +2142,52 @@
         // Auth tabs
         document.getElementById('tabLogin').addEventListener('click', () => { authMode = 'login'; setAuthMode('login', currentDict()); });
         document.getElementById('tabSignup').addEventListener('click', () => { authMode = 'signup'; setAuthMode('signup', currentDict()); });
-        document.getElementById('authForm').addEventListener('submit', () => showToast(currentDict().auth.toastSubmit));
+        document.getElementById('authForm').addEventListener('submit', async () => {
+            const dict = currentDict();
+
+            if (authMode === 'login') {
+                // No real account/password system exists yet — say so honestly instead of pretending to log in.
+                showToast(dict.auth.loginNotAvailable);
+                return;
+            }
+
+            // Signup: this actually saves the company + email to the backend and issues
+            // a real free-trial API key immediately (no payment involved, so instant issuance is fine).
+            const name = document.getElementById('companyName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            if (!name || !email) {
+                showToast(lang === 'ar' ? 'يرجى تعبئة اسم الشركة والبريد الإلكتروني' : 'Please fill in company name and email');
+                return;
+            }
+
+            const btn = document.getElementById('authSubmit');
+            const originalText = btn.textContent;
+            btn.textContent = '...'; btn.disabled = true;
+            try {
+                const body = new URLSearchParams({ name, email });
+                const res = await fetch(`${API_BASE_URL}/enterprise/register-trial`, { method: 'POST', body });
+                let data = null;
+                try { data = await res.json(); } catch (parseErr) { data = null; }
+
+                if (!res.ok) {
+                    showToast(data && data.detail ? data.detail : dict.auth.signupNetworkError);
+                    return;
+                }
+
+                if (data && data.api_key) {
+                    showApiKey(data.api_key);
+                }
+                document.getElementById('authForm').reset();
+            } catch (err) {
+                showToast(dict.auth.signupNetworkError);
+            } finally {
+                btn.textContent = originalText; btn.disabled = false;
+            }
+        });
+
+        document.getElementById('googleBtn').addEventListener('click', () => {
+            showToast(currentDict().auth.googleComingSoon);
+        });
 
         // Payment
         // --- Wire the PayPal per-plan buttons to the real payment links ---
@@ -2212,132 +2253,10 @@
             } finally {
                 btn.textContent = originalText; btn.disabled = false;
             }
+        });
 
-            // Init
-            setLanguage('ar');
-            // -----------------------------------------------------
-            // 1. تنبيه زر Google
-            // -----------------------------------------------------
-            document.addEventListener('DOMContentLoaded', function () {
-                const googleBtns = document.querySelectorAll('.btn-google, [data-i18n="auth.google"]');
-                googleBtns.forEach(btn => {
-                    btn.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        if (typeof showToast === 'function') {
-                            showToast('خدمة المتابعة عبر Google سوف تتوفر قريباً!');
-                        }
-                    });
-                });
-
-                // -----------------------------------------------------
-                // 2. فحص حالة الجلسة عند فتح الصفحة
-                // -----------------------------------------------------
-                function checkSavedSession() {
-                    const savedEmail = localStorage.getItem('userEmail');
-                    const savedKey = localStorage.getItem('userApiKey');
-
-                    if (savedEmail && savedKey) {
-                        showLoggedInCard(savedEmail, savedKey);
-                    }
-                }
-
-                // -----------------------------------------------------
-                // 3. عرض كارت الحساب الحقيقي مع مفتاح API
-                // -----------------------------------------------------
-                function showLoggedInCard(email, apiKey) {
-                    const authCard = document.querySelector('.auth-card') || document.getElementById('auth');
-                    const navLoginBtn = document.querySelector('a[href="#auth"]');
-
-                    if (navLoginBtn) navLoginBtn.innerText = 'حسابي 👤';
-
-                    const authTabs = document.querySelector('.auth-tabs');
-                    const forms = document.querySelectorAll('form:not(#paypalclaimForm), .auth-form');
-                    if (authTabs) authTabs.style.display = 'none';
-                    forms.forEach(f => f.style.display = 'none');
-
-                    let userCard = document.getElementById('userProfileCard');
-                    if (!userCard && authCard) {
-                        userCard = document.createElement('div');
-                        userCard.id = 'userProfileCard';
-                        userCard.style.cssText = 'text-align: center; padding: 25px; background: rgba(255,255,255,0.05); border-radius: 12px; margin-top: 15px; border: 1px solid rgba(255,255,255,0.1);';
-                        userCard.innerHTML = `
-                        <div style="font-size: 45px; margin-bottom: 10px;">👤</div>
-                        <h3 style="margin-bottom: 8px;">مرحباً بك في حسابك</h3>
-                        <p style="opacity: 0.85; dir: ltr; font-weight: bold; margin-bottom: 15px;">${email}</p>
-                        
-                        <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin: 15px 0; border: 1px dashed rgba(255,255,255,0.2);">
-                            <span style="font-size: 0.85em; opacity: 0.8; display: block; margin-bottom: 5px;">مفتاح الـ API الخاص بك:</span>
-                            <code style="color: #4caf50; font-family: monospace; font-size: 1.1em; word-break: break-all;">${apiKey}</code>
-                        </div>
-
-                        <p style="color: #4CAF50; font-size: 0.9em;">✅ الحساب نشط ومعتمد</p>
-                        <button id="logoutBtn" class="btn btn-ghost" style="margin-top: 20px; color: #ff4d4d; border-color: #ff4d4d; width: 100%;">تسجيل الخروج</button>
-                    `;
-                        authCard.appendChild(userCard);
-
-                        document.getElementById('logoutBtn').addEventListener('click', function () {
-                            localStorage.removeItem('userEmail');
-                            localStorage.removeItem('userApiKey');
-                            location.reload();
-                        });
-                    }
-                }
-
-                // -----------------------------------------------------
-                // 4. ربط نموذج الدخول بالسيرفر الحقيقي (Railway)
-                // -----------------------------------------------------
-                const authForms = document.querySelectorAll('form:not(#paypalclaimForm)');
-                authForms.forEach(form => {
-                    form.addEventListener('submit', async function (e) {
-                        e.preventDefault();
-
-                        const emailInput = form.querySelector('input[type="email"]');
-                        const emailVal = emailInput ? emailInput.value.trim() : '';
-
-                        if (!emailVal) {
-                            if (typeof showToast === 'function') showToast('يرجى إدخال البريد الإلكتروني');
-                            return;
-                        }
-
-                        const submitBtn = form.querySelector('button[type="submit"]');
-                        const originalBtnText = submitBtn ? submitBtn.textContent : '';
-                        if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'جاري التحقق...'; }
-
-                        try {
-                            // إرسال طلب حقيقي لسيرفر Railway للتحقق من وجود مفتاح للبريد
-                            const res = await fetch(`${API_BASE_URL}/claim-key`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ email: emailVal, company_name: "Login Check", plan: "check" })
-                            });
-
-                            const data = await res.json();
-
-                            if (res.ok && (data.api_key || data.key)) {
-                                const key = data.api_key || data.key;
-                                localStorage.setItem('userEmail', emailVal);
-                                localStorage.setItem('userApiKey', key);
-                                showLoggedInCard(emailVal, key);
-                                if (typeof showToast === 'function') showToast('تم تسجيل الدخول بنجاح!');
-                            } else {
-                                // إظهار تنبيه في حال عدم وجود اشتراك للبريد
-                                if (typeof showToast === 'function') {
-                                    showToast(data.detail || data.message || 'لم يتم العثور على اشتراك مرتبط بهذا البريد');
-                                }
-                            }
-                        } catch (err) {
-                            if (typeof showToast === 'function') {
-                                showToast('تعذر الاتصال بالسيرفر، يرجى المحاولة لاحقاً');
-                            }
-                        } finally {
-                            if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = originalBtnText; }
-                        }
-                    });
-                });
-
-                checkSavedSession();
-            });
+        // Init
+        setLanguage('ar');
     </script>
 
 </body>
