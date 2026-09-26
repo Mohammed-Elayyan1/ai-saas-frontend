@@ -2254,7 +2254,66 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
+        // === نظام تسجيل الدخول وحالة مراجعة الدفع ===
+        (function () {
+            // 1. دالة لتحديث شكل الموقع وإخفاء أزرار الدخول إذا كان مسجلاً
+            function updateAuthState() {
+                const isLoggedIn = localStorage.getItem('is_logged_in');
+                if (isLoggedIn) {
+                    // البحث عن أزرار الدخول وإخفائها (بشرط ألا تكون داخل نموذج/فورم)
+                    document.querySelectorAll('a, button, div').forEach(el => {
+                        const text = el.textContent.trim();
+                        if ((text === 'تسجيل الدخول' || text === 'ابدأ رحلتك الآن' || text === 'إنشاء حساب') && !el.closest('form')) {
+                            el.style.display = 'none';
+                        }
+                    });
+                }
+            }
 
+            // تشغيل تحديث القائمة فور تحميل الصفحة وعند التنقل داخل الموقع
+            document.addEventListener('DOMContentLoaded', updateAuthState);
+            window.addEventListener('hashchange', updateAuthState);
+            // تكرار التشغيل بعد ثانية لضمان تطبيقها على العناصر التي تظهر ببطء
+            setTimeout(updateAuthState, 500);
+            setTimeout(updateAuthState, 1500);
+
+            // 2. اعتراض عمليات الإرسال في الموقع (نماذج الدخول + طلب المفتاح)
+            document.addEventListener('submit', function (e) {
+                const form = e.target;
+
+                // --- أ. معالجة نموذج تسجيل الدخول أو إنشاء الحساب ---
+                const emailInput = form.querySelector('input[type="email"]');
+                const passInput = form.querySelector('input[type="password"]');
+
+                if (emailInput && passInput && form.id !== 'paypalclaimForm') {
+                    e.preventDefault(); // منع إعادة تحميل الصفحة
+
+                    // حفظ حالة تسجيل الدخول في المتصفح
+                    localStorage.setItem('is_logged_in', 'true');
+
+                    alert('تم تسجيل الدخول بنجاح!');
+                    window.location.hash = '#'; // إغلاق نافذة الدخول والعودة للرئيسية
+                    updateAuthState(); // إخفاء أزرار تسجيل الدخول من القائمة العلوية فوراً
+                    return;
+                }
+
+                // --- ب. معالجة نموذج طلب مفتاح الـ API (زر استلم المفتاح) ---
+                if (form.id === 'paypalclaimForm' || (form.textContent && form.textContent.includes('مفتاح'))) {
+                    e.preventDefault(); // منع الكود الأصلي من إظهار المفتاح
+                    e.stopPropagation();
+
+                    // استبدال مكان زر الطلب بالرسالة المطلوبة
+                    const container = form.parentElement;
+                    container.innerHTML = `
+                <div style="padding: 20px; background: rgba(255, 193, 7, 0.1); color: #fff; border-radius: 10px; text-align: center; border: 1px solid #ffc107; margin-top: 20px;">
+                    <h3 style="color: #ffc107; margin-bottom: 10px; font-size: 20px;">⏳ قيد المراجعة</h3>
+                    <p style="font-size: 16px; margin: 0;">وصل طلبك، يرجى الانتظار حتى نتحقق من الدفع.</p>
+                </div>
+            `;
+                }
+            }, true);
+        })();
+        // ==========================================
         // Init
         setLanguage('ar');
     </script>
