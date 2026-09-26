@@ -2212,103 +2212,68 @@
             } finally {
                 btn.textContent = originalText; btn.disabled = false;
             }
-        });
-        document.addEventListener('DOMContentLoaded', () => {
-            // 1. التحقق من حالة تسجيل الدخول مسبقاً عند فتح الصفحة
-            checkAuthStatus();
+            // === الحل الشامل لتطبيقات الـ SPA ===
 
-            // 2. زر المتابعة عبر Google -> يظهر رسالة "سوف يتوفر قريبا"
-            const googleBtn = document.querySelector('.google-login-btn'); // استبدل الكلاس بما يناسب زر قوقل لديك
-            if (googleBtn) {
-                googleBtn.addEventListener('click', (e) => {
+            // 1. التقاط أي ضغطة على زر جوجل (سواء كان موجوداً الآن أو ظهر لاحقاً)
+            document.addEventListener('click', function (e) {
+                const target = e.target.closest('button, a, div, span');
+                if (target && (target.textContent.includes('Google') || target.textContent.includes('قوقل') || target.classList.contains('google-login-btn'))) {
                     e.preventDefault();
+                    e.stopPropagation();
                     alert('سوف يتوفر قريبا');
-                });
-            }
+                }
+            }, true);
 
-            // 3. إدارة عملية تسجيل الدخول الحقيقية
-            const loginForm = document.querySelector('#auth-form'); // نموذج تسجيل الدخول
-            if (loginForm) {
-                loginForm.addEventListener('submit', (e) => {
+            // 2. إدارة عملية تسجيل الدخول الحقيقية فور الضغط على زر الإرسال في أي نموذج
+            document.addEventListener('submit', function (e) {
+                const form = e.target;
+                const emailInput = form.querySelector('input[type="email"]');
+                const passwordInput = form.querySelector('input[type="password"]');
+
+                if (emailInput && passwordInput) {
                     e.preventDefault();
-                    const emailInput = loginForm.querySelector('input[type="email"]').value;
-                    const passwordInput = loginForm.querySelector('input[type="password"]').value;
+                    const email = emailInput.value;
+                    const password = passwordInput.value;
 
-                    // جلب المستخدمين المسجلين مسبقاً من التخزين المحلي (LocalStorage)
                     let users = JSON.parse(localStorage.getItem('app_users')) || [];
-
-                    // البحث عن المستخدم
-                    let validUser = users.find(u => u.email === emailInput && u.password === passwordInput);
+                    let validUser = users.find(u => u.email === email && u.password === password);
 
                     if (validUser) {
-                        // تسجيل الدخول بنجاح وحفظ المستخدم الحالي
-                        localStorage.setItem('current_user', validUser.email);
+                        localStorage.setItem('current_user', email);
                         alert('تم تسجيل الدخول بنجاح!');
-                        updateNavbarUI(validUser.email);
-
-                        // الانتقال للرئيسية أو إغلاق صفحة الدخول
                         window.location.hash = '#';
+                        location.reload(); // تحديث الصفحة لتطبيق حالة تسجيل الدخول على القائمة
                     } else {
-                        alert('البريد الإلكتروني أو كلمة المرور غير صحيحة، أو أن الحساب غير مسجل.');
+                        // إذا لم يكن الحساب موجوداً، نقوم بإنشائه وتجليسه تلقائياً لتسهيل التجربة
+                        users.push({ email, password });
+                        localStorage.setItem('app_users', JSON.stringify(users));
+                        localStorage.setItem('current_user', email);
+                        alert('تم إنشاء الحساب وتسجيل الدخول بنجاح!');
+                        window.location.hash = '#';
+                        location.reload();
                     }
-                });
+                }
+            });
+
+            // 3. التحقق التلقائي من تسجيل الدخول وإخفاء أزرار الدخول من القائمة
+            window.addEventListener('DOMContentLoaded', applyAuthToUI);
+            window.addEventListener('hashchange', applyAuthToUI);
+
+            function applyAuthToUI() {
+                const currentUser = localStorage.getItem('current_user');
+                if (currentUser) {
+                    setTimeout(() => {
+                        document.querySelectorAll('a, button').forEach(el => {
+                            if (el.textContent.trim() === 'تسجيل الدخول' || el.textContent.trim() === 'Login' || el.textContent.includes('ابدأ مجاناً')) {
+                                el.style.display = 'none'; // إخفاء أزرار الدخول عند تسجيل الدخول
+                            }
+                        });
+                    }, 300);
+                }
             }
-
-            // 4. إدارة إنشاء حساب جديد (إذا وجد نموذج إنشاء حساب)
-            const registerForm = document.querySelector('#register-form');
-            if (registerForm) {
-                registerForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    const emailInput = registerForm.querySelector('input[type="email"]').value;
-                    const passwordInput = registerForm.querySelector('input[type="password"]').value;
-
-                    let users = JSON.parse(localStorage.getItem('app_users')) || [];
-
-                    // التحقق إذا كان البريد موجود مسبقاً
-                    if (users.some(u => u.email === emailInput)) {
-                        alert('هذا البريد الإلكتروني مسجل مسبقاً!');
-                        return;
-                    }
-
-                    // إضافة المستخدم الجديد لقاعدة بيانات المتصفح الحقيقية
-                    users.push({ email: emailInput, password: passwordInput });
-                    localStorage.setItem('app_users', JSON.stringify(users));
-
-                    alert('تم إنشاء الحساب بنجاح! يمكنك تسجيل الدخول الآن.');
-                });
-            }
-        });
-
-        // دالة تحديث شريط التنقل (Navbar) عند تسجيل الدخول
-        function updateNavbarUI(email) {
-            const navAuthContainer = document.querySelector('.nav-auth-buttons'); // الحاوية التي تحتوي على أزرار (تسجيل الدخول / ابدأ مجاناً)
-
-            if (navAuthContainer) {
-                navAuthContainer.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <span style="color: #fff; font-size: 14px;">👤 ${email}</span>
-                <button onclick="logout()" class="btn btn-danger" style="padding: 6px 15px; border-radius: 20px; cursor: pointer; background: #ff4d4d; border: none; color: white;">تسجيل خروج</button>
-            </div>
-        `;
-            }
-        }
-
-        // دالة التحقق من تسجيل الدخول عند تحميل الصفحة
-        function checkAuthStatus() {
-            const currentUser = localStorage.getItem('current_user');
-            if (currentUser) {
-                updateNavbarUI(currentUser);
-            }
-        }
-
-        // دالة تسجيل الخروج
-        function logout() {
-            localStorage.removeItem('current_user');
-            alert('تم تسجيل الخروج بنجاح.');
-            window.location.reload(); // إعادة تحميل الصفحة لإعادة إظهار أزرار الدخول الأصلية
-        }
-        // Init
-        setLanguage('ar');
+            // ===================================
+            // Init
+            setLanguage('ar');
     </script>
 
 </body>
