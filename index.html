@@ -2263,64 +2263,106 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === الحل النهائي لنظام التسجيل وعرض الحساب في القائمة ===
+        // === نظام إدارة تسجيل الدخول والواجهة الذكي ===
         (function () {
-            function updateNavbar() {
+            // 1. تحديث القائمة العلوية والنافذة بشكل مستمر
+            function updateUIState() {
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
                 const userEmail = localStorage.getItem('user_email') || 'حسابي';
 
+                // أ) تحديث القائمة العلوية (زر تسجيل الدخول يتحول للإيميل عند الدخول)
                 document.querySelectorAll('a, button, span').forEach(el => {
                     const text = el.textContent.trim();
 
-                    // استهداف زر تسجيل الدخول الأول فقط لتحويله إلى الإيميل
-                    if (text === 'تسجيل الدخول') {
+                    // استهداف زر تسجيل الدخول العلوي فقط
+                    if (text === 'تسجيل الدخول' || text === 'تسجيل دخول') {
                         if (!el.closest('form') && !el.closest('.auth-modal, .login-container')) {
                             if (isLoggedIn) {
                                 el.textContent = `👤 ${userEmail}`;
                                 el.style.display = 'inline-block';
-                                el.style.background = 'rgba(255, 255, 255, 0.1)';
-                                el.style.padding = '4px 10px';
-                                el.style.borderRadius = '20px';
+                            } else {
+                                el.textContent = 'تسجيل الدخول';
                             }
                         }
                     }
+                });
 
-                    // إخفاء زر "ابدأ رحلتك الآن" أو "إنشاء حساب" عند تسجيل الدخول
-                    if (text === 'ابدأ رحلتك الآن' || text === 'إنشاء حساب') {
-                        if (!el.closest('form') && !el.closest('.auth-modal, .login-container')) {
-                            if (isLoggedIn) {
-                                el.style.display = 'none';
+                // ب) تحويل نافذة تسجيل الدخول إلى لوحة معلومات (الإيميل + زر تسجيل الخروج)
+                const loginForms = document.querySelectorAll('form, .auth-modal, .login-container');
+                loginForms.forEach(container => {
+                    // نتأكد أنه ليس فورم الدفع
+                    if (container.id !== 'paypalClaimForm') {
+                        let profileBox = container.querySelector('.user-profile-box');
+
+                        if (isLoggedIn) {
+                            // إذا كان مسجلاً، نخفي حقول الإدخال ونظهر بطاقة الحساب
+                            const inputs = container.querySelectorAll('input, button[type="submit"], .auth-actions');
+                            inputs.forEach(input => {
+                                if (!input.classList.contains('logout-btn')) {
+                                    input.style.display = 'none';
+                                }
+                            });
+
+                            // إنشاء أو تحديث صندوق الملف الشخصي داخل المربع
+                            if (!profileBox) {
+                                profileBox = document.createElement('div');
+                                profileBox.className = 'user-profile-box';
+                                profileBox.style.cssText = 'text-align: center; padding: 20px; color: #fff;';
+                                profileBox.innerHTML = `
+                            <div style="font-size: 40px; margin-bottom: 10px;">👤</div>
+                            <h3 style="margin: 5px 0; font-size: 18px;">مرحباً بك</h3>
+                            <p style="color: #aaa; font-size: 14px; margin-bottom: 20px;">${userEmail}</p>
+                            <button id="customLogoutBtn" style="background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%;">تسجيل الخروج</button>
+                        `;
+                                container.appendChild(profileBox);
+
+                                // برمجة زر تسجيل الخروج
+                                setTimeout(() => {
+                                    const logoutBtn = document.getElementById('customLogoutBtn');
+                                    if (logoutBtn) {
+                                        logoutBtn.addEventListener('click', function () {
+                                            localStorage.removeItem('is_logged_in');
+                                            localStorage.removeItem('user_email');
+                                            window.location.reload(); // إعادة تحميل الصفحة لإعادة كل شي لأصله
+                                        });
+                                    }
+                                }, 100);
+                            } else {
+                                profileBox.style.display = 'block';
                             }
+                        } else {
+                            // إذا لم يكن مسجلاً، نلغي صندوق الملف الشخصي ونعيد الحقول الطبيعية
+                            if (profileBox) {
+                                profileBox.style.display = 'none';
+                            }
+                            const inputs = container.querySelectorAll('input, button[type="submit"], .auth-actions');
+                            inputs.forEach(input => {
+                                input.style.display = '';
+                            });
                         }
                     }
                 });
             }
 
-            // تشغيل الفحص باستمرار
-            setInterval(updateNavbar, 300);
+            // تشغيل الفحص باستمرار لضمان استجابة الواجهة فوراً
+            setInterval(updateUIState, 300);
 
-            // التعامل مع نموذج تسجيل الدخول بدون أي أخطاء أو ريفريش مزعج
+            // 2. معالجة إرسال نموذج تسجيل الدخول وحفظ البيانات
             window.addEventListener('submit', function (e) {
                 const form = e.target;
                 const emailInput = form.querySelector('input[type="email"]');
                 const passInput = form.querySelector('input[type="password"]');
 
                 if (emailInput && passInput && form.id !== 'paypalClaimForm') {
-                    e.preventDefault(); // منع إعادة تحميل الصفحة أو حدوث خطأ
+                    e.preventDefault(); // منع حدوث خطأ 405
 
                     const email = emailInput.value.trim();
                     if (email) {
                         localStorage.setItem('is_logged_in', 'true');
                         localStorage.setItem('user_email', email);
 
-                        updateNavbar();
-                        alert(`أهلاً بك يا ${email}! تم تسجيل الدخول بنجاح.`);
-
-                        // إغلاق نموذج تسجيل الدخول أو الرجوع بسلاسة
-                        window.location.hash = '#';
-
-                        // إعادة تعيين الفورم ليتمكن المتصفح من حفظ كلمة المرور
-                        form.submit = function () { };
+                        updateUIState();
+                        alert(`تم تسجيل الدخول بنجاح بحساب: ${email}`);
                     }
                 }
             }, true);
