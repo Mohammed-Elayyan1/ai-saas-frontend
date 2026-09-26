@@ -2255,6 +2255,44 @@
             }
         });
 
+        // === دالة عرض لوحة التحكم ومفتاح الـ API ===
+        function renderDashboard() {
+            // ابحث عن العنصر المخصص لعرض محتوى لوحة التحكم لديك (تأكد من الـ ID أو Class الصحيح)
+            const dashboardContainer = document.querySelector('#dashboard-content, .dashboard-view, .api-key-section');
+            if (!dashboardContainer) return;
+
+            // التحقق هل قام المستخدم بالدفع أم لا؟
+            const isPaid = localStorage.getItem('is_paid') === 'true';
+
+            if (isPaid) {
+                // إذا كان قد دفع: اعرض له مفتاح الـ API الحقيقي
+                let apiKey = localStorage.getItem('user_api_key');
+                if (!apiKey) {
+                    apiKey = 'sk_live_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                    localStorage.setItem('user_api_key', apiKey);
+                }
+
+                dashboardContainer.innerHTML = `
+                        <div style="padding: 20px; background: #111; color: #fff; border-radius: 10px; margin-top: 20px;">
+                            <h3 style="color: #00ffcc;">لوحة التحكم الخاصة بك</h3>
+                            <p>مرحباً بك! أنت مشترك في الباقة المدفوعة.</p>
+                            <div style="margin-top: 15px;">
+                                <label style="display:block; margin-bottom:5px;">مفتاح الـ API الخاص بك:</label>
+                                <input type="text" readonly value="${apiKey}" style="width: 100%; padding: 10px; background: #222; color: #00ffcc; border: 1px solid #444; border-radius: 5px;" />
+                            </div>
+                        </div>
+                    `;
+            } else {
+                // إذا لم يدفع: امنعه من رؤية المفتاح واطلب منه الاشتراك
+                dashboardContainer.innerHTML = `
+                        <div style="padding: 30px; text-align: center; background: #111; color: #fff; border-radius: 10px; margin-top: 20px;">
+                            <h3 style="color: #ff4d4d;">⚠️ تنبيه: الحساب غير مشترك</h3>
+                            <p style="color: #aaa; margin: 10px 0;">يجب عليك إتمام عملية الدفع لإظهار مفتاح الـ API الخاص بك وتفعيل الخدمات.</p>
+                            <a href="#pricing" class="btn btn-primary" style="padding: 10px 25px; background: #0070ba; color: white; border-radius: 20px; text-decoration: none; display: inline-block; margin-top: 10px;">اختر باقة واشترك الآن</a>
+                        </div>
+                    `;
+            }
+        }
         // Init
         setLanguage('ar');
     </script>
