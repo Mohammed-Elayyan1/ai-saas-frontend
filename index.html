@@ -2263,16 +2263,23 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === النظام المُصحح: حماية القائمة العلوية وإدارة التجربة المجانية والـ API Key ===
+        // === نظام التجربة المجانية، حماية القائمة، وتوجيه أزرار الباقات لروابط PayPal ===
         (function () {
             const TRIAL_DAYS = 7; // مدة التجربة المجانية
+
+            // روابط باي بال المعتمدة للباقات
+            const PAYPAL_LINKS = {
+                starter: 'https://www.paypal.com/ncp/payment/23V3WQK4NVTG4',     // باقة Starter (29$)
+                pro: 'https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6',         // باقة Pro (79$)
+                enterprise: 'https://www.paypal.com/ncp/payment/CS59KMKAETBFC'  // باقة Enterprise (199$)
+            };
 
             function updateUIState() {
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
                 const userEmail = localStorage.getItem('user_email') || 'حسابي';
                 const companyName = localStorage.getItem('company_name') || '';
 
-                // إدارة أيام التجربة المجانية
+                // إدارة أيام التجربة المجانية (لا تعود للبداية أبداً بل تتناقص بمرور الوقت)
                 let trialStart = localStorage.getItem('trial_start_date');
                 if (!trialStart && isLoggedIn) {
                     trialStart = new Date().toISOString();
@@ -2295,7 +2302,7 @@
                     localStorage.setItem('user_api_key', userApiKey);
                 }
 
-                // 1. تحديث زر تسجيل الدخول في القائمة العلوية فقط دون المساس بروابط الموقع الأخرى (المميزات، الأسعار، إلخ)
+                // 1. تحديث زر تسجيل الدخول في القائمة العلوية
                 document.querySelectorAll('a, button').forEach(el => {
                     const text = el.textContent.trim();
                     if (text === 'تسجيل الدخول' || text === 'تسجيل دخول') {
@@ -2311,7 +2318,7 @@
                     }
                 });
 
-                // 2. إخفاء أزرار الـ CTA الكبيرة فقط (مثل ابدأ تجربتك المجانية أو ابدأ رحلتك الآن) عند تسجيل الدخول
+                // 2. إخفاء أزرار الـ CTA الكبيرة عند تسجيل الدخول
                 document.querySelectorAll('a, button').forEach(el => {
                     const text = el.textContent.trim();
                     const isCta = text.includes('ابدأ تجربتك المجانية') || text.includes('ابداً تجربتك المجانية') || text.includes('ابدأ رحلتك الآن') || text.includes('ابداً رحلتك الآن') || text.includes('إنشاء حساب');
@@ -2320,7 +2327,7 @@
                     }
                 });
 
-                // 3. إدارة نماذج الدخول وبطاقة الملف الشخصي والمفتاح
+                // 3. إدارة نماذج الدخول وبطاقة الملف الشخصي ومفتاح الـ API
                 const authForms = document.querySelectorAll('form, .auth-modal, .login-container');
 
                 authForms.forEach(form => {
@@ -2331,12 +2338,10 @@
                         let profileBox = targetBox.querySelector('.user-profile-box');
 
                         if (isLoggedIn) {
-                            // إزالة أي بطاقات مكررة
                             document.querySelectorAll('.user-profile-box').forEach(box => {
                                 if (box !== profileBox) box.remove();
                             });
 
-                            // إخفاء عناصر النموذج القديمة
                             Array.from(targetBox.children).forEach(child => {
                                 if (!child.classList.contains('user-profile-box')) {
                                     child.style.setProperty('display', 'none', 'important');
@@ -2346,7 +2351,6 @@
                                 form.style.setProperty('display', 'none', 'important');
                             }
 
-                            // بناء بطاقة الملف الشخصي مع مفتاح API والعداد
                             if (!profileBox) {
                                 profileBox = document.createElement('div');
                                 profileBox.className = 'user-profile-box';
@@ -2357,7 +2361,7 @@
                             ${companyName ? `<p style="color: #fff; font-size: 15px; margin-bottom: 3px; font-weight: bold;">🏢 ${companyName}</p>` : ''}
                             <p style="color: #4da6ff; font-size: 14px; margin-bottom: 15px; direction: ltr;">${userEmail}</p>
                             
-                            <!-- عداد الأيام المتبقية -->
+                            <!-- عداد الأيام المتبقية (يتناقص بمرور الوقت ولا يعود للبداية) -->
                             <div style="background: rgba(241, 196, 15, 0.15); border: 1px solid rgba(241, 196, 15, 0.3); padding: 8px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; color: #f1c40f;">
                                 ⏳ التجربة المجانية نشطة: متبقي <b>${remainingDays}</b> أيام من أصل ${TRIAL_DAYS} أيام.
                             </div>
@@ -2375,7 +2379,6 @@
                         `;
                                 targetBox.appendChild(profileBox);
 
-                                // برمجة زر نسخ المفتاح
                                 setTimeout(() => {
                                     const copyBtn = document.getElementById('copyApiKeyBtn');
                                     if (copyBtn) {
@@ -2414,7 +2417,34 @@
 
             setInterval(updateUIState, 300);
 
-            // 4. تفعيل زر تسجيل الخروج
+            // 4. توجيه أزرار الباقات لروابط الدفع في PayPal مباشرة عند الضغط عليها
+            document.addEventListener('click', function (e) {
+                const target = e.target.closest('a, button');
+                if (!target) return;
+
+                const text = target.textContent.trim();
+
+                // التحقق من أزرار الباقات
+                const isStarterBtn = text.includes('الأساسية') || text.includes('Starter') || text.includes('29');
+                const isProBtn = text.includes('احترافية') || text.includes('Pro') || text.includes('79');
+                const isEnterpriseBtn = text.includes('Enterprise') || text.includes('الشركات') || text.includes('199') || text.includes('مبيعات') || text.includes('تواصل');
+
+                if (isStarterBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.location.href = PAYPAL_LINKS.starter;
+                } else if (isProBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.location.href = PAYPAL_LINKS.pro;
+                } else if (isEnterpriseBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.location.href = PAYPAL_LINKS.enterprise;
+                }
+            }, true);
+
+            // 5. تفعيل زر تسجيل الخروج
             document.addEventListener('click', function (e) {
                 if (e.target && e.target.classList.contains('globalLogoutBtn')) {
                     e.preventDefault();
@@ -2428,7 +2458,7 @@
                 }
             });
 
-            // 5. معالجة إرسال النموذج وحفظ الحساب
+            // 6. معالجة إرسال النموذج وحفظ الحساب
             window.addEventListener('submit', function (e) {
                 const form = e.target;
                 if (form.id === 'paypalClaimForm') return;
