@@ -2263,7 +2263,7 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === الحل النهائي والجذري لتنظيف الواجهة وإلغاء الصناديق العائمة والمتداخلة ===
+        // === الحل الهندسي الدقيق: استهداف حاوية تسجيل الدخول فقط ومنع أي تكرار ===
         (function () {
             function updateUIState() {
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
@@ -2284,38 +2284,38 @@
                     }
                 });
 
-                // 2. إدارة الحاويات وإزالة أي تداخل أو صناديق منبثقة عائمة
-                const containers = document.querySelectorAll('form, .auth-modal, .login-container, div');
+                // 2. استهداف نماذج وحاويات تسجيل الدخول الحقيقية فقط (تجنب الـ div العشوائية)
+                const authForms = document.querySelectorAll('form, .auth-modal, .login-container');
 
-                containers.forEach(container => {
-                    const hasAuthElements = container.innerHTML.includes('البريد الإلكتروني') || container.innerHTML.includes('كلمة المرور') || container.innerHTML.includes('إنشاء حساب') || container.innerHTML.includes('ليس لديك حساب') || container.innerHTML.includes('سيتوفر قريباً');
+                authForms.forEach(form => {
+                    const emailInput = form.querySelector('input[type="email"]');
 
-                    if (hasAuthElements && container.id !== 'paypalClaimForm' && !container.closest('header')) {
-
-                        // تنظيف أي بطاقات مكررة فوراً
-                        const existingBoxes = container.querySelectorAll('.user-profile-box');
-                        if (existingBoxes.length > 0) {
-                            for (let i = 1; i < existingBoxes.length; i++) {
-                                existingBoxes[i].remove();
-                            }
-                        }
-
-                        let profileBox = container.querySelector('.user-profile-box');
-                        const allChildElements = container.querySelectorAll('input, button:not(.globalLogoutBtn), a, label, span, p, h2, h3, .auth-actions, .social-login');
+                    if (emailInput && form.id !== 'paypalClaimForm') {
+                        // تحديد الحاوية الرئيسية للنموذج
+                        const targetBox = form.closest('.auth-modal, .login-container') || form;
+                        let profileBox = targetBox.querySelector('.user-profile-box');
 
                         if (isLoggedIn) {
-                            // إخفاء كافة عناصر الدخول والنصوص والمربعات القديمة تماماً
-                            allChildElements.forEach(el => {
-                                if (!el.closest('.user-profile-box')) {
-                                    el.style.setProperty('display', 'none', 'important');
-                                }
+                            // إزالة أي بطاقات مكررة قديمة بالكامل
+                            document.querySelectorAll('.user-profile-box').forEach(box => {
+                                if (box !== profileBox) box.remove();
                             });
 
-                            // إنشاء بطاقة الترحيب بداخل الصندوق الرئيسي مرة واحدة فقط
+                            // إخفاء كافة عناصر الفورم القديمة وأزرار التسجيل داخل الصندوق
+                            Array.from(targetBox.children).forEach(child => {
+                                if (!child.classList.contains('user-profile-box')) {
+                                    child.style.setProperty('display', 'none', 'important');
+                                }
+                            });
+                            if (form !== targetBox) {
+                                form.style.setProperty('display', 'none', 'important');
+                            }
+
+                            // إنشاؤها مرة واحدة فقط داخل الصندوق الصحيح
                             if (!profileBox) {
                                 profileBox = document.createElement('div');
                                 profileBox.className = 'user-profile-box';
-                                profileBox.style.cssText = 'text-align: center; padding: 40px 20px; color: #fff; width: 100%; display: block !important; position: relative; z-index: 10;';
+                                profileBox.style.cssText = 'text-align: center; padding: 40px 20px; color: #fff; width: 100%; display: block !important; position: relative; z-index: 99;';
                                 profileBox.innerHTML = `
                             <div style="font-size: 60px; margin-bottom: 15px;">👤</div>
                             <h3 style="margin: 0 0 8px 0; font-size: 24px; color: #fff;">أهلاً بك مجدداً</h3>
@@ -2323,7 +2323,7 @@
                             <p style="color: #4da6ff; font-size: 15px; margin-bottom: 30px; direction: ltr;">${userEmail}</p>
                             <button type="button" class="globalLogoutBtn" style="background: #e74c3c; color: white; border: none; padding: 14px 30px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; transition: 0.3s; box-shadow: 0 4px 12px rgba(231,76,60,0.4);">تسجيل الخروج</button>
                         `;
-                                container.appendChild(profileBox);
+                                targetBox.appendChild(profileBox);
                             } else {
                                 profileBox.style.display = 'block';
                             }
@@ -2331,11 +2331,15 @@
                             if (profileBox) {
                                 profileBox.remove();
                             }
-                            allChildElements.forEach(el => {
-                                if (!el.closest('.user-profile-box')) {
-                                    el.style.display = '';
+                            // إعادة إظهار عناصر النموذج عند تسجيل الخروج
+                            Array.from(targetBox.children).forEach(child => {
+                                if (!child.classList.contains('user-profile-box')) {
+                                    child.style.display = '';
                                 }
                             });
+                            if (form !== targetBox) {
+                                form.style.display = '';
+                            }
                         }
                     }
                 });
