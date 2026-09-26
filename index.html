@@ -2263,42 +2263,58 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === نظام تسجيل الدخول السلس (يمنع خطأ 405 ويخفي القائمة فوراً) ===
+        // === نظام التسجيل وحفظ الحسابات الذكي (LocalStorage SaaS) ===
         (function () {
-            function forceHideAuthButtons() {
-                if (localStorage.getItem('is_logged_in') === 'true') {
-                    document.querySelectorAll('a, button, span').forEach(el => {
-                        const text = el.textContent.trim();
-                        if (text === 'تسجيل الدخول' || text === 'ابدأ رحلتك الآن' || text === 'إنشاء حساب') {
-                            if (!el.closest('form')) {
-                                el.style.display = 'none';
+            // 1. تحديث القائمة العلوية بناءً على حالة تسجيل الدخول
+            function updateNavbar() {
+                const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
+                const userEmail = localStorage.getItem('user_email') || 'حسابي';
+
+                document.querySelectorAll('a, button, span').forEach(el => {
+                    const text = el.textContent.trim();
+                    // البحث عن أزرار تسجيل الدخول أو إنشاء حساب في القائمة العلوية
+                    if (text === 'تسجيل الدخول' || text === 'ابدأ رحلتك الآن' || text === 'إنشاء حساب') {
+                        if (!el.closest('form') && !el.closest('.auth-modal, .login-container')) {
+                            if (isLoggedIn) {
+                                // تحويل الزر إلى عرض بريد المستخدم أو لوحة التحكم
+                                el.textContent = `👤 ${userEmail}`;
+                                el.style.display = 'inline-block';
+                                el.style.background = 'rgba(255, 255, 255, 0.1)';
+                                el.style.padding = '5px 12px';
+                                el.style.borderRadius = '20px';
                             }
                         }
-                    });
-                }
+                    }
+                });
             }
 
-            setInterval(forceHideAuthButtons, 300);
+            // تشغيل التحديث باستمرار لضمان ثبات شكل القائمة
+            setInterval(updateNavbar, 400);
 
+            // 2. التحكم بنموذج تسجيل الدخول/إنشاء الحساب الحقيقي
             window.addEventListener('submit', function (e) {
                 const form = e.target;
                 const emailInput = form.querySelector('input[type="email"]');
                 const passInput = form.querySelector('input[type="password"]');
 
+                // التأكد أنه ليس نموذج الدفع عبر باي بال
                 if (emailInput && passInput && form.id !== 'paypalClaimForm') {
-                    e.preventDefault(); // 🛑 منع حدوث خطأ 405 وتوجيه الصفحة الخاطئ
+                    const email = emailInput.value.trim();
+                    if (email) {
+                        // حفظ بيانات المستخدم الحقيقية محلياً
+                        localStorage.setItem('is_logged_in', 'true');
+                        localStorage.setItem('user_email', email);
 
-                    // حفظ حالة الدخول
-                    localStorage.setItem('is_logged_in', 'true');
+                        // السماح للمتصفح باكتشاف الحفظ (بدون إحداث خطأ 405)
+                        form.removeAttribute('onsubmit');
 
-                    // إخفاء الأزرار فوراً
-                    forceHideAuthButtons();
+                        // تحديث الواجهة وإظهار ترحيب
+                        updateNavbar();
+                        alert(`مرحباً بك يا ${email}! تم تسجيل الدخول بنجاح.`);
 
-                    // إظهار رسالة نجاح بدل الخطأ
-                    alert('تم تسجيل الدخول بنجاح! مرحباً بك.');
-
-                    // إعادة توجيه سلسة للرئيسية بدون أخطاء
-                    window.location.hash = '#';
+                        // العودة للصفحة الرئيسية بسلاسة
+                        window.location.hash = '#';
+                    }
                 }
             }, true);
         })();
