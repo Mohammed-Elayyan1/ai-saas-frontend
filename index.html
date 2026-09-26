@@ -2263,16 +2263,16 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === نظام إدارة التجربة المجانية وتسجيل الدخول الموحد ===
+        // === نظام التجربة المجانية وتوليد مفتاح API تلقائياً للمستخدم ===
         (function () {
-            const TRIAL_DAYS = 7; // تحديد مدة التجربة المجانية (يمكنك تعديلها إلى 14 متى شئت)
+            const TRIAL_DAYS = 7; // مدة التجربة المجانية
 
             function updateUIState() {
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
                 const userEmail = localStorage.getItem('user_email') || 'حسابي';
                 const companyName = localStorage.getItem('company_name') || '';
 
-                // إدارة وتحديث أيام التجربة المجانية
+                // إدارة أيام التجربة المجانية
                 let trialStart = localStorage.getItem('trial_start_date');
                 if (!trialStart && isLoggedIn) {
                     trialStart = new Date().toISOString();
@@ -2288,7 +2288,14 @@
                     remainingDays = Math.max(0, TRIAL_DAYS - diffDays);
                 }
 
-                // 1. تحديث النصوص في الموقع (مثل تبديل 14 يوماً إلى المدة المحددة وتحديث العداد)
+                // توليد مفتاح API فريد للمستخدم عند تسجيل الدخول إذا لم يكن موجوداً
+                let userApiKey = localStorage.getItem('user_api_key');
+                if (!userApiKey && isLoggedIn) {
+                    userApiKey = 'ai_saas_' + Math.random().toString(36).substring(2, 10) + '_' + Math.random().toString(36).substring(2, 10);
+                    localStorage.setItem('user_api_key', userApiKey);
+                }
+
+                // 1. تحديث النصوص في الموقع
                 document.querySelectorAll('p, span, h2, h3, div').forEach(el => {
                     if (el.textContent.includes('14 يوماً مجانًا') || el.textContent.includes('يومًا مجانًا')) {
                         el.innerHTML = el.innerHTML.replace(/14\s*يوماً\s*مجانًا|14\s*يومًا\s*مجانًا/g, `${TRIAL_DAYS} أيام مجانًا`);
@@ -2309,7 +2316,7 @@
                     }
                 });
 
-                // 3. إدارة الحاويات ونماذج تسجيل الدخول ومنع التكرار نهائياً
+                // 3. إدارة الحاويات ونماذج تسجيل الدخول ومنع التكرار
                 const authForms = document.querySelectorAll('form, .auth-modal, .login-container');
 
                 authForms.forEach(form => {
@@ -2335,22 +2342,52 @@
                                 form.style.setProperty('display', 'none', 'important');
                             }
 
-                            // إنشاء بطاقة الملف الشخصي ومعلومات التجربة المجانية مرة واحدة فقط
+                            // بناء بطاقة الملف الشخصي مع مفتاح API والعداد
                             if (!profileBox) {
                                 profileBox = document.createElement('div');
                                 profileBox.className = 'user-profile-box';
-                                profileBox.style.cssText = 'text-align: center; padding: 40px 20px; color: #fff; width: 100%; display: block !important; position: relative; z-index: 99;';
+                                profileBox.style.cssText = 'text-align: center; padding: 30px 20px; color: #fff; width: 100%; display: block !important; position: relative; z-index: 99;';
                                 profileBox.innerHTML = `
-                            <div style="font-size: 60px; margin-bottom: 15px;">👤</div>
-                            <h3 style="margin: 0 0 8px 0; font-size: 24px; color: #fff;">أهلاً بك مجدداً</h3>
-                            ${companyName ? `<p style="color: #fff; font-size: 16px; margin-bottom: 5px; font-weight: bold;">🏢 ${companyName}</p>` : ''}
-                            <p style="color: #4da6ff; font-size: 15px; margin-bottom: 15px; direction: ltr;">${userEmail}</p>
-                            <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; color: #f1c40f;">
+                            <div style="font-size: 50px; margin-bottom: 10px;">👤</div>
+                            <h3 style="margin: 0 0 5px 0; font-size: 22px; color: #fff;">أهلاً بك مجدداً</h3>
+                            ${companyName ? `<p style="color: #fff; font-size: 15px; margin-bottom: 3px; font-weight: bold;">🏢 ${companyName}</p>` : ''}
+                            <p style="color: #4da6ff; font-size: 14px; margin-bottom: 15px; direction: ltr;">${userEmail}</p>
+                            
+                            <!-- عداد الأيام المتبقية -->
+                            <div style="background: rgba(241, 196, 15, 0.15); border: 1px solid rgba(241, 196, 15, 0.3); padding: 8px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; color: #f1c40f;">
                                 ⏳ التجربة المجانية نشطة: متبقي <b>${remainingDays}</b> أيام من أصل ${TRIAL_DAYS} أيام.
                             </div>
-                            <button type="button" class="globalLogoutBtn" style="background: #e74c3c; color: white; border: none; padding: 14px 30px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; transition: 0.3s; box-shadow: 0 4px 12px rgba(231,76,60,0.4);">تسجيل الخروج</button>
+
+                            <!-- صندوق عرض مفتاح API مع زر النسخ -->
+                            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: right; border: 1px solid rgba(255,255,255,0.1);">
+                                <p style="color: #aaa; font-size: 12px; margin: 0 0 6px 0;">🔑 مفتاح الوصول (API Key):</p>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="text" readonly value="${userApiKey}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 6px 10px; border-radius: 6px; width: 100%; font-family: monospace; font-size: 11px; direction: ltr;" id="userApiKeyField">
+                                    <button type="button" id="copyApiKeyBtn" style="background: #3498db; color: white; border: none; padding: 7px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; white-space: nowrap; font-weight: bold;">نسخ</button>
+                                </div>
+                            </div>
+
+                            <button type="button" class="globalLogoutBtn" style="background: #e74c3c; color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; transition: 0.3s; box-shadow: 0 4px 12px rgba(231,76,60,0.4);">تسجيل الخروج</button>
                         `;
                                 targetBox.appendChild(profileBox);
+
+                                // برمجة زر نسخ المفتاح
+                                setTimeout(() => {
+                                    const copyBtn = document.getElementById('copyApiKeyBtn');
+                                    if (copyBtn) {
+                                        copyBtn.onclick = function () {
+                                            const field = document.getElementById('userApiKeyField');
+                                            navigator.clipboard.writeText(field.value);
+                                            copyBtn.textContent = 'تم النسخ! ✓';
+                                            copyBtn.style.background = '#2ecc71';
+                                            setTimeout(() => {
+                                                copyBtn.textContent = 'نسخ';
+                                                copyBtn.style.background = '#3498db';
+                                            }, 2000);
+                                        };
+                                    }
+                                }, 50);
+
                             } else {
                                 profileBox.style.display = 'block';
                             }
@@ -2373,7 +2410,7 @@
 
             setInterval(updateUIState, 300);
 
-            // 4. تفعيل زر تسجيل الخروج الفوري
+            // 4. تفعيل زر تسجيل الخروج
             document.addEventListener('click', function (e) {
                 if (e.target && e.target.classList.contains('globalLogoutBtn')) {
                     e.preventDefault();
@@ -2382,11 +2419,12 @@
                     localStorage.removeItem('user_email');
                     localStorage.removeItem('company_name');
                     localStorage.removeItem('trial_start_date');
+                    localStorage.removeItem('user_api_key');
                     window.location.reload();
                 }
             });
 
-            // 5. معالجة إرسال نموذج تسجيل الدخول أو بدء التجربة
+            // 5. معالجة إرسال النموذج وحفظ الحساب
             window.addEventListener('submit', function (e) {
                 const form = e.target;
                 if (form.id === 'paypalClaimForm') return;
@@ -2398,7 +2436,6 @@
                 if (emailInput) {
                     e.preventDefault();
                     const email = emailInput.value.trim();
-                    const pass = passInput ? passInput.value.trim() : '123456'; // دعم النماذج السريعة بالبريد فقط
                     const company = companyInput ? companyInput.value.trim() : '';
 
                     if (email) {
