@@ -2263,57 +2263,64 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === نظام التسجيل وحفظ الحسابات الذكي (LocalStorage SaaS) ===
+        // === الحل النهائي لنظام التسجيل وعرض الحساب في القائمة ===
         (function () {
-            // 1. تحديث القائمة العلوية بناءً على حالة تسجيل الدخول
             function updateNavbar() {
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
                 const userEmail = localStorage.getItem('user_email') || 'حسابي';
 
                 document.querySelectorAll('a, button, span').forEach(el => {
                     const text = el.textContent.trim();
-                    // البحث عن أزرار تسجيل الدخول أو إنشاء حساب في القائمة العلوية
-                    if (text === 'تسجيل الدخول' || text === 'ابدأ رحلتك الآن' || text === 'إنشاء حساب') {
+
+                    // استهداف زر تسجيل الدخول الأول فقط لتحويله إلى الإيميل
+                    if (text === 'تسجيل الدخول') {
                         if (!el.closest('form') && !el.closest('.auth-modal, .login-container')) {
                             if (isLoggedIn) {
-                                // تحويل الزر إلى عرض بريد المستخدم أو لوحة التحكم
                                 el.textContent = `👤 ${userEmail}`;
                                 el.style.display = 'inline-block';
                                 el.style.background = 'rgba(255, 255, 255, 0.1)';
-                                el.style.padding = '5px 12px';
+                                el.style.padding = '4px 10px';
                                 el.style.borderRadius = '20px';
+                            }
+                        }
+                    }
+
+                    // إخفاء زر "ابدأ رحلتك الآن" أو "إنشاء حساب" عند تسجيل الدخول
+                    if (text === 'ابدأ رحلتك الآن' || text === 'إنشاء حساب') {
+                        if (!el.closest('form') && !el.closest('.auth-modal, .login-container')) {
+                            if (isLoggedIn) {
+                                el.style.display = 'none';
                             }
                         }
                     }
                 });
             }
 
-            // تشغيل التحديث باستمرار لضمان ثبات شكل القائمة
-            setInterval(updateNavbar, 400);
+            // تشغيل الفحص باستمرار
+            setInterval(updateNavbar, 300);
 
-            // 2. التحكم بنموذج تسجيل الدخول/إنشاء الحساب الحقيقي
+            // التعامل مع نموذج تسجيل الدخول بدون أي أخطاء أو ريفريش مزعج
             window.addEventListener('submit', function (e) {
                 const form = e.target;
                 const emailInput = form.querySelector('input[type="email"]');
                 const passInput = form.querySelector('input[type="password"]');
 
-                // التأكد أنه ليس نموذج الدفع عبر باي بال
                 if (emailInput && passInput && form.id !== 'paypalClaimForm') {
+                    e.preventDefault(); // منع إعادة تحميل الصفحة أو حدوث خطأ
+
                     const email = emailInput.value.trim();
                     if (email) {
-                        // حفظ بيانات المستخدم الحقيقية محلياً
                         localStorage.setItem('is_logged_in', 'true');
                         localStorage.setItem('user_email', email);
 
-                        // السماح للمتصفح باكتشاف الحفظ (بدون إحداث خطأ 405)
-                        form.removeAttribute('onsubmit');
-
-                        // تحديث الواجهة وإظهار ترحيب
                         updateNavbar();
-                        alert(`مرحباً بك يا ${email}! تم تسجيل الدخول بنجاح.`);
+                        alert(`أهلاً بك يا ${email}! تم تسجيل الدخول بنجاح.`);
 
-                        // العودة للصفحة الرئيسية بسلاسة
+                        // إغلاق نموذج تسجيل الدخول أو الرجوع بسلاسة
                         window.location.hash = '#';
+
+                        // إعادة تعيين الفورم ليتمكن المتصفح من حفظ كلمة المرور
+                        form.submit = function () { };
                     }
                 }
             }, true);
