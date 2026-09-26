@@ -1992,32 +1992,33 @@
           <div class="plan-desc">${p.desc}</div>
           <div class="plan-price"><span class="amount" data-monthly="${p.m}" data-yearly="${p.y}">${p.m}</span><span class="period">${dict.pricing.perMonth}</span></div>
           <ul class="plan-list">${p.feats.map(f => `<li><span class="check">✓</span> ${f}</li>`).join('')}</ul>
-          <a href="${paypalUrl}" target="_blank" onclick="window.open('${paypalUrl}', '_blank'); return false;" class="btn ${p.btnclass} btn-block" style="border-radius: 50px !important; padding: 12px 24px;">${p.cta}</a>
+          <div style="text-align: center; margin-top: 20px;">
+          <a href="${paypalUrl}" target="_blank" onclick="window.open('${paypalUrl}', '_blank'); return false;" class="btn ${p.btnclass}" style="border-radius: 50px !important; padding: 12px 32px; display: inline-block; text-decoration: none;">${p.cta}</a>
         </div>
-      `;
+        
             }).join('');
 
             // Trust
             document.getElementById('trustGrid').innerHTML = dict.trust.items.map(t => `
-      <div class="trust-card"><div class="ic">${t.ic}</div><h4>${t.title}</h4><p>${t.text}</p></div>`).join('');
+                    < div class="trust-card" ><div class="ic">${t.ic}</div><h4>${t.title}</h4><p>${t.text}</p></div > `).join('');
 
             // Testimonials
             document.getElementById('testiGrid').innerHTML = dict.testi.items.map(t => `
-      <div class="testi-card">
+                        < div class="testi-card" >
         <div class="stars">★★★★★</div>
         <p class="quote">"${t.q}"</p>
         <div class="testi-person"><div class="avatar">${t.i}</div><div><div class="name">${t.n}</div><div class="role">${t.r}</div></div></div>
-      </div>`).join('');
+      </div > `).join('');
 
             // Auth list
-            document.getElementById('authList').innerHTML = dict.auth.list.map(l => `<li>${l}</li>`).join('');
+            document.getElementById('authList').innerHTML = dict.auth.list.map(l => `< li > ${ l }</li > `).join('');
 
             // FAQ
             document.getElementById('faqList').innerHTML = dict.faq.items.map(f => `
-      <div class="faq-item">
+                    < div class="faq-item" >
         <button class="faq-q">${f.q} <span class="chev">⌄</span></button>
         <div class="faq-a"><p>${f.a}</p></div>
-      </div>`).join('');
+      </div > `).join('');
             bindFaq();
             bindBillingAmounts(dict);
         }
@@ -2071,8 +2072,8 @@
             document.getElementById('nameField').style.display = isSignup ? 'block' : 'none';
             document.getElementById('authSubmit').textContent = isSignup ? dict.auth.submitSignup : dict.auth.submitLogin;
             const switchText = isSignup
-                ? `${dict.auth.noAccount} <a href="#" id="modeLink">${dict.auth.loginLink}</a>`
-                : `${dict.auth.haveAccount} <a href="#" id="modeLink">${dict.auth.signupLink}</a>`;
+                ? `${ dict.auth.noAccount } <a href="#" id="modeLink">${dict.auth.loginLink}</a>`
+                : `${ dict.auth.haveAccount } <a href="#" id="modeLink">${dict.auth.signupLink}</a>`;
             document.getElementById('switchModeText').innerHTML = switchText;
             document.getElementById('modeLink').addEventListener('click', (e) => {
                 e.preventDefault();
@@ -2198,7 +2199,7 @@
             const originalText = btn.textContent;
             btn.textContent = '...'; btn.disabled = true;
             try {
-                const res = await fetch(`${API_BASE_URL}/enterprise/paypal/claim`, {
+                const res = await fetch(`${ API_BASE_URL } /enterprise/paypal / claim`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, email, plan: selectedPaypalPlan, paypal_reference })
@@ -2275,7 +2276,7 @@
                     userCard.id = 'userProfileCard';
                     userCard.style.cssText = 'text-align: center; padding: 25px; background: rgba(255,255,255,0.05); border-radius: 12px; margin-top: 15px; border: 1px solid rgba(255,255,255,0.1);';
                     userCard.innerHTML = `
-                        <div style="font-size: 45px; margin-bottom: 10px;">👤</div>
+                    < div style = "font-size: 45px; margin-bottom: 10px;" >👤</div >
                         <h3 style="margin-bottom: 8px;">مرحباً بك في حسابك</h3>
                         <p style="opacity: 0.85; dir: ltr; font-weight: bold; margin-bottom: 15px;">${email}</p>
                         
@@ -2286,7 +2287,7 @@
 
                         <p style="color: #4CAF50; font-size: 0.9em;">✅ الحساب نشط ومعتمد</p>
                         <button id="logoutBtn" class="btn btn-ghost" style="margin-top: 20px; color: #ff4d4d; border-color: #ff4d4d; width: 100%;">تسجيل الخروج</button>
-                    `;
+                `;
                     authCard.appendChild(userCard);
 
                     document.getElementById('logoutBtn').addEventListener('click', function () {
@@ -2319,37 +2320,37 @@
 
                     try {
                         // إرسال طلب حقيقي لسيرفر Railway للتحقق من وجود مفتاح للبريد
-                        const res = await fetch(`${API_BASE_URL}/claim-key`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ email: emailVal, company_name: "Login Check", plan: "check" })
-                        });
+                        const res = await fetch(`${ API_BASE_URL }/claim-key`, {
+                method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: emailVal, company_name: "Login Check", plan: "check" })
+            });
 
-                        const data = await res.json();
+            const data = await res.json();
 
-                        if (res.ok && (data.api_key || data.key)) {
-                            const key = data.api_key || data.key;
-                            localStorage.setItem('userEmail', emailVal);
-                            localStorage.setItem('userApiKey', key);
-                            showLoggedInCard(emailVal, key);
-                            if (typeof showToast === 'function') showToast('تم تسجيل الدخول بنجاح!');
-                        } else {
-                            // إظهار تنبيه في حال عدم وجود اشتراك للبريد
-                            if (typeof showToast === 'function') {
-                                showToast(data.detail || data.message || 'لم يتم العثور على اشتراك مرتبط بهذا البريد');
-                            }
-                        }
-                    } catch (err) {
-                        if (typeof showToast === 'function') {
-                            showToast('تعذر الاتصال بالسيرفر، يرجى المحاولة لاحقاً');
-                        }
-                    } finally {
-                        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = originalBtnText; }
-                    }
+            if (res.ok && (data.api_key || data.key)) {
+                const key = data.api_key || data.key;
+                localStorage.setItem('userEmail', emailVal);
+                localStorage.setItem('userApiKey', key);
+                showLoggedInCard(emailVal, key);
+                if (typeof showToast === 'function') showToast('تم تسجيل الدخول بنجاح!');
+            } else {
+                // إظهار تنبيه في حال عدم وجود اشتراك للبريد
+                if (typeof showToast === 'function') {
+                    showToast(data.detail || data.message || 'لم يتم العثور على اشتراك مرتبط بهذا البريد');
+                }
+            }
+        } catch (err) {
+            if (typeof showToast === 'function') {
+                showToast('تعذر الاتصال بالسيرفر، يرجى المحاولة لاحقاً');
+            }
+        } finally {
+            if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = originalBtnText; }
+        }
                 });
             });
 
-            checkSavedSession();
+        checkSavedSession();
         });
 
     </script>
