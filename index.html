@@ -1992,7 +1992,7 @@
           <div class="plan-desc">${p.desc}</div>
           <div class="plan-price"><span class="amount" data-monthly="${p.m}" data-yearly="${p.y}">${p.m}</span><span class="period">${dict.pricing.perMonth}</span></div>
           <ul class="plan-list">${p.feats.map(f => `<li><span class="check">✓</span> ${f}</li>`).join('')}</ul>
-          <a href="${paypalUrl}" target="_blank" onclick="window.open('${paypalUrl}', '_blank'); return false;" class="btn ${p.btnclass} btn-block">${p.cta}</a>
+          <a href="${paypalUrl}" target="_blank" onclick="window.open('${paypalUrl}', '_blank'); return false;" class="btn ${p.btnclass} btn-block rounded-pill" style="border-radius: 50px;">${p.cta}</a>
         </div>
       `;
             }).join('');
