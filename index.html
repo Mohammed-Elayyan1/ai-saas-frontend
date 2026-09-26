@@ -2254,47 +2254,7 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === 1. حماية نموذج طلب المفتاح (رسالة قيد المراجعة) ===
-        document.getElementById('paypalClaimForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            this.innerHTML = `
-        <div style="padding: 20px; background: rgba(255, 193, 7, 0.1); color: #fff; border-radius: 10px; text-align: center; border: 1px solid #ffc107; margin-top: 20px;">
-            <h3 style="color: #ffc107; margin-bottom: 10px; font-size: 20px; font-weight: bold;">⏳ قيد المراجعة</h3>
-            <p style="font-size: 16px; margin: 0; line-height: 1.5;">وصل طلبك بنجاح.<br>يرجى الانتظار حتى نتحقق من عملية الدفع وسنقوم بتفعيل المفتاح قريباً.</p>
-        </div>
-    `;
-        });
 
-        // === 2. نظام تسجيل الدخول الحقيقي وإخفاء الأزرار ===
-        (function () {
-            function forceHideAuthButtons() {
-                if (localStorage.getItem('is_logged_in') === 'true') {
-                    document.querySelectorAll('a, button, span').forEach(el => {
-                        const text = el.textContent.trim();
-                        if (text === 'تسجيل الدخول' || text === 'ابدأ رحلتك الآن' || text === 'إنشاء حساب') {
-                            if (!el.closest('form')) {
-                                el.style.display = 'none';
-                            }
-                        }
-                    });
-                }
-            }
-
-            setInterval(forceHideAuthButtons, 500);
-
-            window.addEventListener('submit', function (e) {
-                const form = e.target;
-                const emailInput = form.querySelector('input[type="email"]');
-                const passInput = form.querySelector('input[type="password"]');
-
-                if (emailInput && passInput && form.id !== 'paypalClaimForm') {
-                    form.removeAttribute('onsubmit');
-                    form.action = "?login=success";
-                    form.method = "POST";
-                    localStorage.setItem('is_logged_in', 'true');
-                }
-            }, true);
-        })();
         // Init
         setLanguage('ar');
     </script>
