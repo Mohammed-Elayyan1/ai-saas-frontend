@@ -2253,38 +2253,33 @@
             } finally {
                 btn.textContent = originalText; btn.disabled = false;
             }
-            // === منع توليد المفتاح نهائياً إلا بإدخال رقم المعاملة (Transaction ID) ===
-            document.addEventListener('submit', function (e) {
-                const form = e.target;
+            // === حماية صارمة لنموذج paypalclaimForm ===
+            document.addEventListener('click', function (e) {
+                const submitBtn = e.target.closest('#paypalclaimForm button, #paypalclaimForm input[type="submit"]');
+                if (submitBtn) {
+                    const form = submitBtn.closest('#paypalclaimForm');
+                    if (form) {
+                        // البحث عن حقل رقم المعاملة (أي حقل نصي داخل الفورم لا يمثل الاسم أو الإيميل)
+                        const textInputs = form.querySelectorAll('input[type="text"]');
+                        let txValue = '';
 
-                // التحقق من أن النموذج هو نموذج استلام المفتاح
-                if (form && (form.id === 'paypalclaimForm' || form.querySelector('button').textContent.includes('مفتاح'))) {
-                    e.preventDefault();
+                        textInputs.forEach(input => {
+                            if (input.id !== 'ppName') { // استثناء حقل الاسم
+                                txValue = input.value.trim();
+                            }
+                        });
 
-                    // البحث عن حقل إدخال رقم المعاملة
-                    const txInput = form.querySelector('input[type="text"]');
-                    const txValue = txInput ? txInput.value.trim() : '';
-
-                    // إذا كان الحقل فارغاً، امنعه من المتابعة وأظهر تنبيه
-                    if (!txValue) {
-                        alert('⚠️ عذراً، لا يمكن منح المفتاح. يجب إتمام الدفع عبر PayPal وإدخال رقم المعاملة (Transaction ID) في الحقل أولاً!');
-                        return;
-                    }
-
-                    // إذا قام بإدخال رقم معاملة، قم بإظهار المفتاح الحقيقي (وليس التجريبي)
-                    let keyContainer = form.nextElementSibling || document.querySelector('#apiKeyResult');
-                    if (keyContainer) {
-                        let realKey = 'sk_live_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-                        keyContainer.innerHTML = `
-                <div style="padding: 15px; background: #111; color: #00ffcc; border-radius: 8px; margin-top: 15px; border: 1px solid #333;">
-                    <p style="margin-bottom: 5px; color: #fff;">تم التحقق من الدفع بنجاح! هذا هو مفتاح الـ API الخاص بك:</p>
-                    <input type="text" readonly value="${realKey}" style="width: 100%; padding: 8px; background: #222; color: #00ffcc; border: 1px solid #444; border-radius: 4px;" />
-                </div>
-            `;
-                        keyContainer.style.display = 'block';
+                        // إذا كان حقل رقم المعاملة فارغاً
+                        if (!txValue) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            e.stopImmediatePropagation();
+                            alert('⚠️ عذراً، لا يمكن منح المفتاح! يجب إتمام الدفع وإدخال رقم المعاملة (Transaction ID) في الحقل المخصص أولاً.');
+                            return false;
+                        }
                     }
                 }
-            });
+            }, true);
             // Init
             setLanguage('ar');
     </script>
