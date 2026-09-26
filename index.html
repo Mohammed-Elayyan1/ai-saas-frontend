@@ -1406,8 +1406,11 @@
             <div class="nav-cta">
                 <button class="icon-btn lang-btn" id="langToggle">EN</button>
                 <button class="icon-btn" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">🌙</button>
-                <a href="#auth" class="btn btn-ghost btn-sm" style="display:inline-flex;" data-i18n="nav.login"></a>
-                <a href="#pricing" class="btn btn-primary btn-sm" data-i18n="nav.cta"></a>
+                <a href="#auth" class="btn btn-ghost btn-sm" id="navLoginBtn" style="display:inline-flex;"
+                    data-i18n="nav.login"></a>
+                <a href="#pricing" class="btn btn-primary btn-sm" id="navCtaBtn" data-i18n="nav.cta"></a>
+                <button class="btn btn-ghost btn-sm" id="navLogoutBtn" style="display:none;"
+                    data-i18n="nav.logout"></button>
             </div>
         </div>
     </header>
@@ -1540,24 +1543,28 @@
                                 <button id="tabSignup" data-i18n="auth.tabSignup"></button>
                             </div>
 
-                            <form id="authForm" onsubmit="return false;">
+                            <!-- Real <form> with autocomplete so browsers offer to save passwords -->
+                            <form id="authForm" method="post" action="#" autocomplete="on">
                                 <div class="field" id="nameField" style="display:none;">
                                     <label for="companyName" data-i18n="auth.companyLabel"></label>
-                                    <input id="companyName" type="text">
+                                    <input id="companyName" name="organization" type="text" autocomplete="organization">
                                 </div>
                                 <div class="field">
                                     <label for="email" data-i18n="auth.emailLabel"></label>
-                                    <input id="email" type="email" placeholder="name@company.com">
+                                    <input id="email" name="email" type="email" placeholder="name@company.com"
+                                        autocomplete="email" required>
                                 </div>
                                 <div class="field">
                                     <label for="password" data-i18n="auth.passwordLabel"></label>
-                                    <input id="password" type="password" placeholder="••••••••">
+                                    <input id="password" name="password" type="password" placeholder="••••••••"
+                                        autocomplete="current-password" required minlength="6">
                                 </div>
                                 <div class="field-row">
                                     <label><input type="checkbox" checked style="accent-color:var(--violet);"> <span
                                             data-i18n="auth.remember"></span></label>
                                     <a href="#" data-i18n="auth.forgot"></a>
                                 </div>
+                                <!-- type="submit" is essential for browsers to trigger the save-password dialog -->
                                 <button type="submit" class="btn btn-primary btn-block" id="authSubmit"></button>
                                 <div class="divider" data-i18n="auth.or"></div>
                                 <button type="button" class="btn btn-ghost btn-block" id="googleBtn"
@@ -1589,10 +1596,12 @@
                         <p style="color:var(--text-1); font-size:0.9rem;" data-i18n="pay.paypalDesc"></p>
 
                         <div class="amount-row" id="paypalLinkRow">
-                            <a class="amount-chip active" data-plan="basic" target="_blank" rel="noopener">Basic $29</a>
-                            <a class="amount-chip" data-plan="pro" target="_blank" rel="noopener">Pro $79</a>
-                            <a class="amount-chip" data-plan="enterprise" target="_blank" rel="noopener">Enterprise
-                                $199</a>
+                            <a class="amount-chip active" href="https://www.paypal.com/ncp/payment/23V3WQK4NVTG4"
+                                data-plan="basic" target="_blank" rel="noopener noreferrer">Basic $29</a>
+                            <a class="amount-chip" href="https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6"
+                                data-plan="pro" target="_blank" rel="noopener noreferrer">Pro $79</a>
+                            <a class="amount-chip" href="https://www.paypal.com/ncp/payment/CS59KMKAETBFC"
+                                data-plan="enterprise" target="_blank" rel="noopener noreferrer">Enterprise $199</a>
                         </div>
 
                         <form id="paypalClaimForm" onsubmit="return false;"
@@ -1717,7 +1726,7 @@
         const T = {
             ar: {
                 brand: "منصّة",
-                nav: { features: "المميزات", how: "كيف تعمل", pricing: "الأسعار", faq: "الأسئلة الشائعة", login: "تسجيل الدخول", cta: "ابدأ رحلتك الآن" },
+                nav: { features: "المميزات", how: "كيف تعمل", pricing: "الأسعار", faq: "الأسئلة الشائعة", login: "تسجيل الدخول", cta: "ابدأ رحلتك الآن", logout: "تسجيل الخروج" },
                 hero: {
                     eyebrow: "نسخة تجريبية مجانية لمدة 14 يومًا",
                     title: 'ذكاء اصطناعي خاص بشركتك<br><span class="grad">يجيب، يحلّل، ويعمل نيابة عنك</span>',
@@ -1836,7 +1845,7 @@
             },
             en: {
                 brand: "Platform",
-                nav: { features: "Features", how: "How it works", pricing: "Pricing", faq: "FAQ", login: "Log in", cta: "Start your journey now" },
+                nav: { features: "Features", how: "How it works", pricing: "Pricing", faq: "FAQ", login: "Log in", cta: "Start your journey now", logout: "Log out" },
                 hero: {
                     eyebrow: "Free 14-day trial",
                     title: 'AI built for your company<br><span class="grad">that answers, analyzes, and works for you</span>',
