@@ -2263,7 +2263,7 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === نظام التجربة المجانية وإخفاء أزرار التسجيل والتجربة بعد الدخول ===
+        // === النظام المُصحح: حماية القائمة العلوية وإدارة التجربة المجانية والـ API Key ===
         (function () {
             const TRIAL_DAYS = 7; // مدة التجربة المجانية
 
@@ -2295,44 +2295,32 @@
                     localStorage.setItem('user_api_key', userApiKey);
                 }
 
-                // 1. تحديث النصوص العامة في الموقع
-                document.querySelectorAll('p, span, h2, h3, div').forEach(el => {
-                    if (el.textContent.includes('14 يوماً مجانًا') || el.textContent.includes('يومًا مجانًا')) {
-                        el.innerHTML = el.innerHTML.replace(/14\s*يوماً\s*مجانًا|14\s*يومًا\s*مجانًا/g, `${TRIAL_DAYS} أيام مجانًا`);
-                    }
-                });
-
-                // 2. تحديث القائمة العلوية
-                document.querySelectorAll('a, button, span').forEach(el => {
+                // 1. تحديث زر تسجيل الدخول في القائمة العلوية فقط دون المساس بروابط الموقع الأخرى (المميزات، الأسعار، إلخ)
+                document.querySelectorAll('a, button').forEach(el => {
                     const text = el.textContent.trim();
                     if (text === 'تسجيل الدخول' || text === 'تسجيل دخول') {
-                        if (!el.closest('form') && !el.closest('.auth-modal, .login-container')) {
+                        if (!el.closest('.user-profile-box')) {
                             if (isLoggedIn) {
                                 el.textContent = `👤 ${companyName ? companyName : userEmail}`;
+                                el.style.display = '';
                             } else {
                                 el.textContent = 'تسجيل الدخول';
+                                el.style.display = '';
                             }
                         }
                     }
                 });
 
-                // 3. إخفاء أزرار "إنشاء حساب" و "ابدأ تجربتك المجانية" و "ابداً رحلتك الآن" بالكامل عند تسجيل الدخول
-                document.querySelectorAll('a, button, .btn, div, span').forEach(el => {
-                    const txt = el.textContent.trim();
-                    if (isLoggedIn) {
-                        if (txt.includes('إنشاء حساب') || txt.includes('ابدأ تجربتك المجانية') || txt.includes('ابداً تجربتك المجانية') || txt.includes('ابدأ رحلتك الآن') || txt.includes('ابداً رحلتك الآن')) {
-                            if (!el.closest('.user-profile-box')) {
-                                el.style.setProperty('display', 'none', 'important');
-                            }
-                        }
-                    } else {
-                        if (txt.includes('إنشاء حساب') || txt.includes('ابدأ تجربتك المجانية') || txt.includes('ابداً تجربتك المجانية') || txt.includes('ابدأ رحلتك الآن') || txt.includes('ابداً رحلتك الآن')) {
-                            el.style.display = '';
-                        }
+                // 2. إخفاء أزرار الـ CTA الكبيرة فقط (مثل ابدأ تجربتك المجانية أو ابدأ رحلتك الآن) عند تسجيل الدخول
+                document.querySelectorAll('a, button').forEach(el => {
+                    const text = el.textContent.trim();
+                    const isCta = text.includes('ابدأ تجربتك المجانية') || text.includes('ابداً تجربتك المجانية') || text.includes('ابدأ رحلتك الآن') || text.includes('ابداً رحلتك الآن') || text.includes('إنشاء حساب');
+                    if (isCta && !el.closest('.user-profile-box') && !el.closest('form')) {
+                        el.style.display = isLoggedIn ? 'none' : '';
                     }
                 });
 
-                // 4. إدارة الحاويات ونماذج تسجيل الدخول ومنع التكرار
+                // 3. إدارة نماذج الدخول وبطاقة الملف الشخصي والمفتاح
                 const authForms = document.querySelectorAll('form, .auth-modal, .login-container');
 
                 authForms.forEach(form => {
@@ -2426,7 +2414,7 @@
 
             setInterval(updateUIState, 300);
 
-            // 5. تفعيل زر تسجيل الخروج
+            // 4. تفعيل زر تسجيل الخروج
             document.addEventListener('click', function (e) {
                 if (e.target && e.target.classList.contains('globalLogoutBtn')) {
                     e.preventDefault();
@@ -2440,7 +2428,7 @@
                 }
             });
 
-            // 6. معالجة إرسال النموذج وحفظ الحساب
+            // 5. معالجة إرسال النموذج وحفظ الحساب
             window.addEventListener('submit', function (e) {
                 const form = e.target;
                 if (form.id === 'paypalClaimForm') return;
