@@ -2263,7 +2263,7 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === الحل النهائي والجذري لمنع التكرار وتفعيل زر الخروج بشكل قاطع ===
+        // === الحل النهائي والجذري لتنظيف الواجهة وإلغاء الصناديق العائمة والمتداخلة ===
         (function () {
             function updateUIState() {
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
@@ -2284,18 +2284,17 @@
                     }
                 });
 
-                // 2. إدارة الحاويات ومنع التكرار نهائياً
+                // 2. إدارة الحاويات وإزالة أي تداخل أو صناديق منبثقة عائمة
                 const containers = document.querySelectorAll('form, .auth-modal, .login-container, div');
 
                 containers.forEach(container => {
-                    const hasAuthElements = container.innerHTML.includes('البريد الإلكتروني') || container.innerHTML.includes('كلمة المرور') || container.innerHTML.includes('إنشاء حساب') || container.innerHTML.includes('ليس لديك حساب');
+                    const hasAuthElements = container.innerHTML.includes('البريد الإلكتروني') || container.innerHTML.includes('كلمة المرور') || container.innerHTML.includes('إنشاء حساب') || container.innerHTML.includes('ليس لديك حساب') || container.innerHTML.includes('سيتوفر قريباً');
 
                     if (hasAuthElements && container.id !== 'paypalClaimForm' && !container.closest('header')) {
 
-                        // تنظيف أي بطاقات مكررة قديمة داخل هذا العنصر فوراً
+                        // تنظيف أي بطاقات مكررة فوراً
                         const existingBoxes = container.querySelectorAll('.user-profile-box');
                         if (existingBoxes.length > 0) {
-                            // الاحتفاظ بواحدة فقط وحذف الباقي إن وجد
                             for (let i = 1; i < existingBoxes.length; i++) {
                                 existingBoxes[i].remove();
                             }
@@ -2305,18 +2304,18 @@
                         const allChildElements = container.querySelectorAll('input, button:not(.globalLogoutBtn), a, label, span, p, h2, h3, .auth-actions, .social-login');
 
                         if (isLoggedIn) {
-                            // إخفاء حقول الدخول والنصوص القديمة
+                            // إخفاء كافة عناصر الدخول والنصوص والمربعات القديمة تماماً
                             allChildElements.forEach(el => {
                                 if (!el.closest('.user-profile-box')) {
                                     el.style.setProperty('display', 'none', 'important');
                                 }
                             });
 
-                            // إنشاؤها مرة واحدة فقط إذا لم تكن موجودة
+                            // إنشاء بطاقة الترحيب بداخل الصندوق الرئيسي مرة واحدة فقط
                             if (!profileBox) {
                                 profileBox = document.createElement('div');
                                 profileBox.className = 'user-profile-box';
-                                profileBox.style.cssText = 'text-align: center; padding: 40px 20px; color: #fff; width: 100%; display: block !important;';
+                                profileBox.style.cssText = 'text-align: center; padding: 40px 20px; color: #fff; width: 100%; display: block !important; position: relative; z-index: 10;';
                                 profileBox.innerHTML = `
                             <div style="font-size: 60px; margin-bottom: 15px;">👤</div>
                             <h3 style="margin: 0 0 8px 0; font-size: 24px; color: #fff;">أهلاً بك مجدداً</h3>
@@ -2330,7 +2329,7 @@
                             }
                         } else {
                             if (profileBox) {
-                                profileBox.remove(); // إزالة البطاقة عند تسجيل الخروج
+                                profileBox.remove();
                             }
                             allChildElements.forEach(el => {
                                 if (!el.closest('.user-profile-box')) {
@@ -2344,7 +2343,7 @@
 
             setInterval(updateUIState, 300);
 
-            // 3. تفعيل زر تسجيل الخروج بنظام Event Delegation ليعمل 100%
+            // 3. تفعيل زر تسجيل الخروج الفوري
             document.addEventListener('click', function (e) {
                 if (e.target && e.target.classList.contains('globalLogoutBtn')) {
                     e.preventDefault();
@@ -2356,7 +2355,7 @@
                 }
             });
 
-            // 4. معالجة إرسال النموذج وحفظ الحساب والدخول
+            // 4. معالجة إرسال نموذج تسجيل الدخول
             window.addEventListener('submit', function (e) {
                 const form = e.target;
                 if (form.id === 'paypalClaimForm') return;
