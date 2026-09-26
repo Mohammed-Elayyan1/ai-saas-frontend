@@ -1588,51 +1588,44 @@
                         <p style="color:var(--text-1); font-size:0.9rem;" data-i18n="pay.paypalDesc"></p>
 
                         <div class="amount-row" id="paypalLinkRow">
-                            <div class="amount-row" id="paypalLinkRow">
-                                <a class="amount-chip active" data-plan="basic"
-                                    href="https://www.paypal.com/ncp/payment/23V3WQK4NVTG4" target="_blank"
-                                    rel="noopener">Basic $29</a>
-                                <a class="amount-chip" data-plan="pro"
-                                    href="https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6" target="_blank"
-                                    rel="noopener">Pro $79</a>
-                                <a class="amount-chip" data-plan="enterprise"
-                                    href="https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6" target="_blank"
-                                    rel="noopener">Enterprise $199</a>
+                            <a class="amount-chip active" data-plan="basic" target="_blank" rel="noopener">Basic $29</a>
+                            <a class="amount-chip" data-plan="pro" target="_blank" rel="noopener">Pro $79</a>
+                            <a class="amount-chip" data-plan="enterprise" target="_blank" rel="noopener">Enterprise
+                                $199</a>
+                        </div>
+
+                        <form id="paypalClaimForm" onsubmit="return false;"
+                            style="margin-top:16px; display:flex; flex-direction:column; gap:12px;">
+                            <div class="field" style="margin-bottom:0;">
+                                <label for="ppName" data-i18n="pay.nameLabel"></label>
+                                <input id="ppName" type="text" required>
                             </div>
-
-                            <form id="paypalClaimForm" onsubmit="return false;"
-                                style="margin-top:16px; display:flex; flex-direction:column; gap:12px;">
-                                <div class="field" style="margin-bottom:0;">
-                                    <label for="ppName" data-i18n="pay.nameLabel"></label>
-                                    <input id="ppName" type="text" required>
-                                </div>
-                                <div class="field" style="margin-bottom:0;">
-                                    <label for="ppEmail" data-i18n="pay.emailLabel"></label>
-                                    <input id="ppEmail" type="email" required placeholder="name@company.com">
-                                </div>
-                                <div class="field" style="margin-bottom:0;">
-                                    <label for="ppRef" data-i18n="pay.refLabel"></label>
-                                    <input id="ppRef" type="text" placeholder="Transaction ID (optional)">
-                                </div>
-                                <button type="submit" class="btn btn-gold btn-block" id="paypalClaimBtn"
-                                    data-i18n="pay.paypalClaimBtn"></button>
-                            </form>
-                            <p class="pay-note" data-i18n="pay.paypalNote"></p>
-                        </div>
-                    </div>
-
-                    <div id="apiKeyResult"
-                        style="display:none; max-width:640px; margin:26px auto 0; background:var(--glass); border:1px solid var(--border); border-radius:var(--radius-md); padding:22px 24px; text-align:center;">
-                        <div style="font-size:0.85rem; color:var(--text-2); margin-bottom:8px;"
-                            data-i18n="pay.keyReadyLabel"></div>
-                        <div
-                            style="display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap;">
-                            <code id="apiKeyValue"
-                                style="background:rgba(255,255,255,0.08); padding:8px 14px; border-radius:8px; font-size:0.9rem; word-break:break-all;"></code>
-                            <button class="btn btn-ghost btn-sm" id="copyKeyBtn" data-i18n="pay.copyBtn"></button>
-                        </div>
+                            <div class="field" style="margin-bottom:0;">
+                                <label for="ppEmail" data-i18n="pay.emailLabel"></label>
+                                <input id="ppEmail" type="email" required placeholder="name@company.com">
+                            </div>
+                            <div class="field" style="margin-bottom:0;">
+                                <label for="ppRef" data-i18n="pay.refLabel"></label>
+                                <input id="ppRef" type="text" placeholder="Transaction ID (optional)">
+                            </div>
+                            <button type="submit" class="btn btn-gold btn-block" id="paypalClaimBtn"
+                                data-i18n="pay.paypalClaimBtn"></button>
+                        </form>
+                        <p class="pay-note" data-i18n="pay.paypalNote"></p>
                     </div>
                 </div>
+
+                <div id="apiKeyResult"
+                    style="display:none; max-width:640px; margin:26px auto 0; background:var(--glass); border:1px solid var(--border); border-radius:var(--radius-md); padding:22px 24px; text-align:center;">
+                    <div style="font-size:0.85rem; color:var(--text-2); margin-bottom:8px;"
+                        data-i18n="pay.keyReadyLabel"></div>
+                    <div style="display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap;">
+                        <code id="apiKeyValue"
+                            style="background:rgba(255,255,255,0.08); padding:8px 14px; border-radius:8px; font-size:0.9rem; word-break:break-all;"></code>
+                        <button class="btn btn-ghost btn-sm" id="copyKeyBtn" data-i18n="pay.copyBtn"></button>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <section id="faq" style="background:var(--bg-1);">
@@ -1652,7 +1645,7 @@
                     <p data-i18n="ctaFinal.sub"></p>
                     <div class="cta-buttons">
                         <a href="#pricing" class="btn btn-primary" data-i18n="ctaFinal.primary"></a>
-                        <a href="#pricing" class="btn btn-ghost" data-i18n="ctaFinal.secondary"></a>
+                        <a href="#auth" class="btn btn-ghost" data-i18n="ctaFinal.secondary"></a>
                     </div>
                 </div>
             </div>
@@ -1723,7 +1716,7 @@
         const T = {
             ar: {
                 brand: "منصّة",
-                nav: { features: "المميزات", how: "كيف تعمل", pricing: "الأسعار", faq: "الأسئلة الشائعة", login: "تسجيل الدخول", cta: "ابدأ رحلتك الان" },
+                nav: { features: "المميزات", how: "كيف تعمل", pricing: "الأسعار", faq: "الأسئلة الشائعة", login: "تسجيل الدخول", cta: "ابدأ مجانًا" },
                 hero: {
                     eyebrow: "نسخة تجريبية مجانية لمدة 14 يومًا",
                     title: 'ذكاء اصطناعي خاص بشركتك<br><span class="grad">يجيب، يحلّل، ويعمل نيابة عنك</span>',
@@ -1802,7 +1795,7 @@
                     remember: "تذكرني", forgot: "نسيت كلمة المرور؟", or: "أو", google: "المتابعة عبر Google",
                     submitLogin: "تسجيل الدخول", submitSignup: "إنشاء الحساب",
                     haveAccount: "ليس لديك حساب؟", noAccount: "لديك حساب بالفعل؟", signupLink: "أنشئ حسابًا", loginLink: "سجّل الدخول",
-                    toastSubmit: "تم إنشاء الحساب بنجاح! جاري توجيهك إلى خيارات الدفع..."
+                    toastSubmit: "هذا نموذج عرض تصميمي — يجب ربطه بواجهة API الخاصة بالخادم"
                 },
                 pay: {
                     kicker: "طرق الدفع", title: "اشترك عبر PayPal بخطوتين", sub: "ادفع بأمان عبر PayPal، واستلم مفتاح API فورًا لتبدأ الاستخدام مباشرة.",
@@ -1811,7 +1804,7 @@
                     nameLabel: "اسم الشركة", emailLabel: "البريد الإلكتروني", planLabel: "الباقة",
                     refLabel: "رقم عملية PayPal (اختياري)",
                     paypalClaimBtn: "استلم مفتاح API الآن",
-                    paypalNote: "⚠️ تتم مراجعة الدفعة وإرسال المفتاح فور التأكيد خلال وقت قصير.",
+                    paypalNote: "⚠️ يتم إصدار المفتاح فورًا لتسريع تجربتك، وتتم مراجعة الدفعة يدويًا من حساب PayPal خلال ساعات العمل. أي حساب غير مؤكَّد قد يُوقف.",
                     keyReadyLabel: "تم تفعيل حسابكم! هذا مفتاح الـ API الخاص بكم:",
                     copyBtn: "نسخ",
                     paypalClaimError: "حدث خطأ أثناء إصدار المفتاح. حاول مرة أخرى."
@@ -1977,50 +1970,37 @@
       </div>`).join('');
 
             // Pricing
-            document.getElementById('pricingGrid').innerHTML = dict.pricing.plans.map((p, i) => {
-                const links = [
-                    PAYPAL_LINKS.basic,      // Basic ($29)
-                    PAYPAL_LINKS.pro,        // Pro ($79)
-                    PAYPAL_LINKS.enterprise  // Enterprise ($199)
-                ];
-                const paypalUrl = links[i] || PAYPAL_LINKS.basic;
-
-                return `
-<div class="price-card ${p.badge ? 'featured' : ''}">
-    ${p.badge ? `<span class="plan-badge">${p.badge}</span>` : ''}
-    <div class="plan-name">${p.name}</div>
-    <div class="plan-desc">${p.desc}</div>
-    <div class="plan-price"><span class="amount" data-monthly="${p.m}" data-yearly="${p.y}">$${p.m}</span> / شهرياً</div>
-    <ul class="plan-list">${p.feats.map(f => `<li><span class="check">✓</span>${f}</li>`).join('')}</ul>
-    <div style="text-align: center; margin-top: 20px;">
-        <a href="${paypalUrl}" target="_blank" onclick="window.open('${paypalUrl}', '_blank'); return false;" class="btn ${p.btnclass}" style="border-radius: 50px !important; padding: 12px 32px; display: inline-block; text-decoration: none;">${p.cta}</a>
-    </div>
-</div>
-`;
-
-            }).join('');
+            document.getElementById('pricingGrid').innerHTML = dict.pricing.plans.map(p => `
+      <div class="price-card ${p.badge ? 'featured' : ''}">
+        ${p.badge ? `<span class="plan-badge">${p.badge}</span>` : ''}
+        <div class="plan-name">${p.name}</div>
+        <div class="plan-desc">${p.desc}</div>
+        <div class="plan-price"><span class="amount" data-monthly="${p.m}" data-yearly="${p.y}">$${p.m}</span><span class="period">${dict.pricing.perMonth}</span></div>
+        <ul class="plan-list">${p.feats.map(f => `<li><span class="check">✔</span> ${f}</li>`).join('')}</ul>
+        <a href="#auth" class="btn ${p.btnClass} btn-block">${p.cta}</a>
+      </div>`).join('');
 
             // Trust
             document.getElementById('trustGrid').innerHTML = dict.trust.items.map(t => `
-                    < div class="trust-card" ><div class="ic">${t.ic}</div><h4>${t.title}</h4><p>${t.text}</p></div > `).join('');
+      <div class="trust-card"><div class="ic">${t.ic}</div><h4>${t.title}</h4><p>${t.text}</p></div>`).join('');
 
             // Testimonials
             document.getElementById('testiGrid').innerHTML = dict.testi.items.map(t => `
-                        < div class="testi-card" >
+      <div class="testi-card">
         <div class="stars">★★★★★</div>
         <p class="quote">"${t.q}"</p>
         <div class="testi-person"><div class="avatar">${t.i}</div><div><div class="name">${t.n}</div><div class="role">${t.r}</div></div></div>
-      </div > `).join('');
+      </div>`).join('');
 
             // Auth list
-            document.getElementById('authList').innerHTML = dict.auth.list.map(l => `< li > ${l}</li > `).join('');
+            document.getElementById('authList').innerHTML = dict.auth.list.map(l => `<li>${l}</li>`).join('');
 
             // FAQ
             document.getElementById('faqList').innerHTML = dict.faq.items.map(f => `
-                    < div class="faq-item" >
+      <div class="faq-item">
         <button class="faq-q">${f.q} <span class="chev">⌄</span></button>
         <div class="faq-a"><p>${f.a}</p></div>
-      </div > `).join('');
+      </div>`).join('');
             bindFaq();
             bindBillingAmounts(dict);
         }
@@ -2155,14 +2135,8 @@
         // Auth tabs
         document.getElementById('tabLogin').addEventListener('click', () => { authMode = 'login'; setAuthMode('login', currentDict()); });
         document.getElementById('tabSignup').addEventListener('click', () => { authMode = 'signup'; setAuthMode('signup', currentDict()); });
-        document.getElementById('authForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            showToast(currentDict().toastSubmit);
+        document.getElementById('authForm').addEventListener('submit', () => showToast(currentDict().auth.toastSubmit));
 
-            // إغلاق النافذة المنبثقة وتحويل المستخدم لقسم الأسعار والدفع
-            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
-            window.location.href = "#pricing";
-        });
         // Payment
         // --- Wire the PayPal per-plan buttons to the real payment links ---
         document.querySelectorAll('#paypalLinkRow .amount-chip').forEach(a => {
@@ -2201,7 +2175,7 @@
             const originalText = btn.textContent;
             btn.textContent = '...'; btn.disabled = true;
             try {
-                const res = await fetch(`${API_BASE_URL} /enterprise/paypal / claim`, {
+                const res = await fetch(`${API_BASE_URL}/enterprise/paypal/claim`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, email, plan: selectedPaypalPlan, paypal_reference })
@@ -2231,130 +2205,6 @@
 
         // Init
         setLanguage('ar');
-        // -----------------------------------------------------
-        // 1. تنبيه زر Google
-        // -----------------------------------------------------
-        document.addEventListener('DOMContentLoaded', function () {
-            const googleBtns = document.querySelectorAll('.btn-google, [data-i18n="auth.google"]');
-            googleBtns.forEach(btn => {
-                btn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (typeof showToast === 'function') {
-                        showToast('خدمة المتابعة عبر Google سوف تتوفر قريباً!');
-                    }
-                });
-            });
-
-            // -----------------------------------------------------
-            // 2. فحص حالة الجلسة عند فتح الصفحة
-            // -----------------------------------------------------
-            function checkSavedSession() {
-                const savedEmail = localStorage.getItem('userEmail');
-                const savedKey = localStorage.getItem('userApiKey');
-
-                if (savedEmail && savedKey) {
-                    showLoggedInCard(savedEmail, savedKey);
-                }
-            }
-
-            // -----------------------------------------------------
-            // 3. عرض كارت الحساب الحقيقي مع مفتاح API
-            // -----------------------------------------------------
-            function showLoggedInCard(email, apiKey) {
-                const authCard = document.querySelector('.auth-card') || document.getElementById('auth');
-                const navLoginBtn = document.querySelector('a[href="#auth"]');
-
-                if (navLoginBtn) navLoginBtn.innerText = 'حسابي 👤';
-
-                const authTabs = document.querySelector('.auth-tabs');
-                const forms = document.querySelectorAll('form:not(#paypalclaimForm), .auth-form');
-                if (authTabs) authTabs.style.display = 'none';
-                forms.forEach(f => f.style.display = 'none');
-
-                let userCard = document.getElementById('userProfileCard');
-                if (!userCard && authCard) {
-                    userCard = document.createElement('div');
-                    userCard.id = 'userProfileCard';
-                    userCard.style.cssText = 'text-align: center; padding: 25px; background: rgba(255,255,255,0.05); border-radius: 12px; margin-top: 15px; border: 1px solid rgba(255,255,255,0.1);';
-                    userCard.innerHTML = `
-                    < div style = "font-size: 45px; margin-bottom: 10px;" >👤</div >
-                        <h3 style="margin-bottom: 8px;">مرحباً بك في حسابك</h3>
-                        <p style="opacity: 0.85; dir: ltr; font-weight: bold; margin-bottom: 15px;">${email}</p>
-                        
-                        <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin: 15px 0; border: 1px dashed rgba(255,255,255,0.2);">
-                            <span style="font-size: 0.85em; opacity: 0.8; display: block; margin-bottom: 5px;">مفتاح الـ API الخاص بك:</span>
-                            <code style="color: #4caf50; font-family: monospace; font-size: 1.1em; word-break: break-all;">${apiKey}</code>
-                        </div>
-
-                        <p style="color: #4CAF50; font-size: 0.9em;">✅ الحساب نشط ومعتمد</p>
-                        <button id="logoutBtn" class="btn btn-ghost" style="margin-top: 20px; color: #ff4d4d; border-color: #ff4d4d; width: 100%;">تسجيل الخروج</button>
-                `;
-                    authCard.appendChild(userCard);
-
-                    document.getElementById('logoutBtn').addEventListener('click', function () {
-                        localStorage.removeItem('userEmail');
-                        localStorage.removeItem('userApiKey');
-                        location.reload();
-                    });
-                }
-            }
-
-            // -----------------------------------------------------
-            // 4. ربط نموذج الدخول بالسيرفر الحقيقي (Railway)
-            // -----------------------------------------------------
-            const authForms = document.querySelectorAll('form:not(#paypalclaimForm)');
-            authForms.forEach(form => {
-                form.addEventListener('submit', async function (e) {
-                    e.preventDefault();
-
-                    const emailInput = form.querySelector('input[type="email"]');
-                    const emailVal = emailInput ? emailInput.value.trim() : '';
-
-                    if (!emailVal) {
-                        if (typeof showToast === 'function') showToast('يرجى إدخال البريد الإلكتروني');
-                        return;
-                    }
-
-                    const submitBtn = form.querySelector('button[type="submit"]');
-                    const originalBtnText = submitBtn ? submitBtn.textContent : '';
-                    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'جاري التحقق...'; }
-
-                    try {
-                        // إرسال طلب حقيقي لسيرفر Railway للتحقق من وجود مفتاح للبريد
-                        const res = await fetch(`${API_BASE_URL}/claim-key`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ email: emailVal, company_name: "Login Check", plan: "check" })
-                        });
-
-                        const data = await res.json();
-
-                        if (res.ok && (data.api_key || data.key)) {
-                            const key = data.api_key || data.key;
-                            localStorage.setItem('userEmail', emailVal);
-                            localStorage.setItem('userApiKey', key);
-                            showLoggedInCard(emailVal, key);
-                            if (typeof showToast === 'function') showToast('تم تسجيل الدخول بنجاح!');
-                        } else {
-                            // إظهار تنبيه في حال عدم وجود اشتراك للبريد
-                            if (typeof showToast === 'function') {
-                                showToast(data.detail || data.message || 'لم يتم العثور على اشتراك مرتبط بهذا البريد');
-                            }
-                        }
-                    } catch (err) {
-                        if (typeof showToast === 'function') {
-                            showToast('تعذر الاتصال بالسيرفر، يرجى المحاولة لاحقاً');
-                        }
-                    } finally {
-                        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = originalBtnText; }
-                    }
-                });
-            });
-
-            checkSavedSession();
-        });
-
     </script>
 
 </body>
