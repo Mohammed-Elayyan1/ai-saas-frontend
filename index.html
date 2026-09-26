@@ -1970,15 +1970,26 @@
       </div>`).join('');
 
             // Pricing
-            document.getElementById('pricingGrid').innerHTML = dict.pricing.plans.map(p => `
+            document.getElementById('pricingGrid').innerHTML = dict.pricing.plans.map((p, i) => {
+                const paypalUrls = [
+                    PAYPAL_LINKS.basic,      // الباقة الأساسية ($29)
+                    PAYPAL_LINKS.pro,        // الباقة الاحترافية ($79)
+                    PAYPAL_LINKS.enterprise  // باقة المؤسسات ($199)
+                ];
+                const paypalUrl = paypalUrls[i] || PAYPAL_LINKS.basic;
+
+                return `
       <div class="price-card ${p.badge ? 'featured' : ''}">
         ${p.badge ? `<span class="plan-badge">${p.badge}</span>` : ''}
         <div class="plan-name">${p.name}</div>
         <div class="plan-desc">${p.desc}</div>
         <div class="plan-price"><span class="amount" data-monthly="${p.m}" data-yearly="${p.y}">$${p.m}</span><span class="period">${dict.pricing.perMonth}</span></div>
         <ul class="plan-list">${p.feats.map(f => `<li><span class="check">✔</span> ${f}</li>`).join('')}</ul>
-        <a href="#auth" class="btn ${p.btnClass} btn-block">${p.cta}</a>
-      </div>`).join('');
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="${paypalUrl}" target="_blank" onclick="window.open('${paypalUrl}', '_blank'); return false;" class="btn ${p.btnClass}" style="border-radius: 50px !important; padding: 12px 32px; display: inline-block; text-decoration: none; width: auto !important;">${p.cta}</a>
+        </div>
+      </div>`;
+            }).join('');
 
             // Trust
             document.getElementById('trustGrid').innerHTML = dict.trust.items.map(t => `
