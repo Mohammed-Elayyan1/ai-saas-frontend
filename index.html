@@ -2253,38 +2253,33 @@
             } finally {
                 btn.textContent = originalText; btn.disabled = false;
             }
-            // === حماية زر استلام المفتاح بشكل آمن ومحمي من الأخطاء ===
-            (function () {
-                document.addEventListener('click', function (e) {
-                    try {
-                        // التحقق هل النقر تم على زر داخل نموذج paypalclaimForm
-                        const submitBtn = e.target.closest('#paypalclaimForm button, #paypalclaimForm input[type="submit"]');
-                        if (submitBtn) {
-                            const form = document.getElementById('paypalclaimForm');
-                            if (form) {
-                                // البحث عن حقل رقم المعاملة
-                                const textInputs = form.querySelectorAll('input[type="text"]');
-                                let txValue = '';
+            // === حماية نموذج طلب المفتاح والتأكد من رقم المعاملة ===
+            document.addEventListener('click', function (e) {
+                try {
+                    const submitBtn = e.target.closest('#paypalclaimForm button, #paypalclaimForm input[type="submit"]');
+                    if (submitBtn) {
+                        const form = document.getElementById('paypalclaimForm');
+                        if (form) {
+                            const textInputs = form.querySelectorAll('input[type="text"]');
+                            let txValue = '';
 
-                                textInputs.forEach(input => {
-                                    if (input.id !== 'ppName') {
-                                        txValue = input.value.trim();
-                                    }
-                                });
-
-                                // إذا ترك المستخدم حقل رقم المعاملة فارغاً
-                                if (!txValue) {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    alert('⚠️ عذراً، لا يمكن منح المفتاح! يجب إتمام الدفع وإدخال رقم المعاملة (Transaction ID) في الحقل أولاً.');
+                            textInputs.forEach(input => {
+                                if (input.id !== 'ppName') {
+                                    txValue = input.value.trim();
                                 }
+                            });
+
+                            if (!txValue) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                alert('⚠️ عذراً، لا يمكن منح المفتاح! يجب إتمام الدفع وإدخال رقم المعاملة (Transaction ID) في الحقل أولاً.');
                             }
                         }
-                    } catch (err) {
-                        console.error("Auth check error:", err);
                     }
-                }, true);
-            })();
+                } catch (err) {
+                    console.error("Validation error:", err);
+                }
+            }, true);
             // Init
             setLanguage('ar');
     </script>
