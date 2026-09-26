@@ -1728,7 +1728,7 @@
                 brand: "منصّة",
                 nav: { features: "المميزات", how: "كيف تعمل", pricing: "الأسعار", faq: "الأسئلة الشائعة", login: "تسجيل الدخول", cta: "ابدأ رحلتك الآن", logout: "تسجيل الخروج" },
                 hero: {
-                    eyebrow: "نسخة تجريبية مجانية لمدة 14 يومًا",
+                    eyebrow: "نسخة تجريبية مجانية لمدة 7 يومًا",
                     title: 'ذكاء اصطناعي خاص بشركتك<br><span class="grad">يجيب، يحلّل، ويعمل نيابة عنك</span>',
                     sub: "ارفع بيانات شركتك، واحصل على مساعد ذكاء اصطناعي يجاوب عملاءك وفريقك على مدار الساعة، مبني على واجهة API آمنة وسريعة التكامل.",
                     ctaPrimary: "جرّب المنصّة الآن", ctaSecondary: "شاهد كيف تعمل",
@@ -2263,7 +2263,7 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === نظام التجربة المجانية وتوليد مفتاح API تلقائياً للمستخدم ===
+        // === نظام التجربة المجانية وإخفاء أزرار التسجيل والتجربة بعد الدخول ===
         (function () {
             const TRIAL_DAYS = 7; // مدة التجربة المجانية
 
@@ -2288,14 +2288,14 @@
                     remainingDays = Math.max(0, TRIAL_DAYS - diffDays);
                 }
 
-                // توليد مفتاح API فريد للمستخدم عند تسجيل الدخول إذا لم يكن موجوداً
+                // توليد مفتاح API فريد للمستخدم
                 let userApiKey = localStorage.getItem('user_api_key');
                 if (!userApiKey && isLoggedIn) {
                     userApiKey = 'ai_saas_' + Math.random().toString(36).substring(2, 10) + '_' + Math.random().toString(36).substring(2, 10);
                     localStorage.setItem('user_api_key', userApiKey);
                 }
 
-                // 1. تحديث النصوص في الموقع
+                // 1. تحديث النصوص العامة في الموقع
                 document.querySelectorAll('p, span, h2, h3, div').forEach(el => {
                     if (el.textContent.includes('14 يوماً مجانًا') || el.textContent.includes('يومًا مجانًا')) {
                         el.innerHTML = el.innerHTML.replace(/14\s*يوماً\s*مجانًا|14\s*يومًا\s*مجانًا/g, `${TRIAL_DAYS} أيام مجانًا`);
@@ -2316,7 +2316,23 @@
                     }
                 });
 
-                // 3. إدارة الحاويات ونماذج تسجيل الدخول ومنع التكرار
+                // 3. إخفاء أزرار "إنشاء حساب" و "ابدأ تجربتك المجانية" و "ابداً رحلتك الآن" بالكامل عند تسجيل الدخول
+                document.querySelectorAll('a, button, .btn, div, span').forEach(el => {
+                    const txt = el.textContent.trim();
+                    if (isLoggedIn) {
+                        if (txt.includes('إنشاء حساب') || txt.includes('ابدأ تجربتك المجانية') || txt.includes('ابداً تجربتك المجانية') || txt.includes('ابدأ رحلتك الآن') || txt.includes('ابداً رحلتك الآن')) {
+                            if (!el.closest('.user-profile-box')) {
+                                el.style.setProperty('display', 'none', 'important');
+                            }
+                        }
+                    } else {
+                        if (txt.includes('إنشاء حساب') || txt.includes('ابدأ تجربتك المجانية') || txt.includes('ابداً تجربتك المجانية') || txt.includes('ابدأ رحلتك الآن') || txt.includes('ابداً رحلتك الآن')) {
+                            el.style.display = '';
+                        }
+                    }
+                });
+
+                // 4. إدارة الحاويات ونماذج تسجيل الدخول ومنع التكرار
                 const authForms = document.querySelectorAll('form, .auth-modal, .login-container');
 
                 authForms.forEach(form => {
@@ -2410,7 +2426,7 @@
 
             setInterval(updateUIState, 300);
 
-            // 4. تفعيل زر تسجيل الخروج
+            // 5. تفعيل زر تسجيل الخروج
             document.addEventListener('click', function (e) {
                 if (e.target && e.target.classList.contains('globalLogoutBtn')) {
                     e.preventDefault();
@@ -2424,13 +2440,12 @@
                 }
             });
 
-            // 5. معالجة إرسال النموذج وحفظ الحساب
+            // 6. معالجة إرسال النموذج وحفظ الحساب
             window.addEventListener('submit', function (e) {
                 const form = e.target;
                 if (form.id === 'paypalClaimForm') return;
 
                 const emailInput = form.querySelector('input[type="email"]');
-                const passInput = form.querySelector('input[type="password"]');
                 const companyInput = form.querySelector('input[placeholder*="الشركة"], input[name*="company"]');
 
                 if (emailInput) {
