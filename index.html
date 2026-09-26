@@ -2263,7 +2263,7 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === الحل النهائي والنظيف 100% لإدارة واجهة تسجيل الدخول والملف الشخصي ===
+        // === الحل الهندسي النظيف: إخفاء حقول الدخول فقط وإظهار الملف الشخصي ===
         (function () {
             function updateUIState() {
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
@@ -2284,40 +2284,43 @@
                     }
                 });
 
-                // 2. إدارة حاويات المصادقة داخل المربع الأزرق وإخفاء الأزرار القديمة تماماً
-                const authBoxes = document.querySelectorAll('form, .auth-modal, .login-container, div');
+                // 2. استهداف نموذج تسجيل الدخول أو أزرار المصادقة فقط بدقة
+                const loginForms = document.querySelectorAll('form, .auth-modal, .login-container');
 
-                authBoxes.forEach(box => {
-                    const hasAuthElements = box.innerHTML.includes('إنشاء حساب') || box.innerHTML.includes('البريد الإلكتروني') || box.querySelector('input');
+                loginForms.forEach(form => {
+                    // نتحقق أن هذا هو نموذج تسجيل الدخول أو إنشاء الحساب
+                    const isAuthForm = form.innerHTML.includes('البريد الإلكتروني') || form.innerHTML.includes('كلمة المرور') || form.innerHTML.includes('إنشاء حساب');
 
-                    if (hasAuthElements && box.id !== 'paypalClaimForm' && !box.closest('header')) {
-                        let profileBox = box.querySelector('.user-profile-box');
+                    if (isAuthForm && form.id !== 'paypalClaimForm') {
+                        let profileBox = form.querySelector('.user-profile-box');
+                        // العناصر الداخلية للنموذج (حقول، أزرار، ترويسات الدخول)
+                        const formInputsAndButtons = form.querySelectorAll('input, button[type="submit"], .auth-actions, label, .social-login, a[href*="forgot"], h2, h3, p');
 
                         if (isLoggedIn) {
-                            // إخفاء كل العناصر القديمة (أزرار، حقول، نص إنشاء حساب) داخل المربع
-                            Array.from(box.children).forEach(child => {
-                                if (!child.classList.contains('user-profile-box')) {
-                                    child.style.setProperty('display', 'none', 'important');
+                            // إخفاء حقول وأزرار الدخول فقط، دون المساس بباقي عناصر الصفحة
+                            formInputsAndButtons.forEach(el => {
+                                if (!el.closest('.user-profile-box')) {
+                                    el.style.display = 'none';
                                 }
                             });
 
-                            // إنشاء أو إظهار بطاقة الملف الشخصي وحدها
+                            // إظهار بطاقة الملف الشخصي داخل الفورم
                             if (!profileBox) {
                                 profileBox = document.createElement('div');
                                 profileBox.className = 'user-profile-box';
-                                profileBox.style.cssText = 'text-align: center; padding: 40px 20px; color: #fff; width: 100%; display: block !important;';
+                                profileBox.style.cssText = 'text-align: center; padding: 30px 20px; color: #fff; width: 100%; display: block;';
                                 profileBox.innerHTML = `
-                            <div style="font-size: 60px; margin-bottom: 15px;">👤</div>
-                            <h3 style="margin: 0 0 8px 0; font-size: 24px; color: #fff;">أهلاً بك مجدداً</h3>
-                            ${companyName ? `<p style="color: #fff; font-size: 16px; margin-bottom: 5px; font-weight: bold;">🏢 ${companyName}</p>` : ''}
-                            <p style="color: #4da6ff; font-size: 15px; margin-bottom: 30px; direction: ltr;">${userEmail}</p>
-                            <button type="button" id="absoluteLogoutBtn" style="background: #e74c3c; color: white; border: none; padding: 14px 30px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; transition: 0.3s; box-shadow: 0 4px 12px rgba(231,76,60,0.4);">تسجيل الخروج</button>
+                            <div style="font-size: 55px; margin-bottom: 12px;">👤</div>
+                            <h3 style="margin: 0 0 5px 0; font-size: 22px; color: #fff;">أهلاً بك مجدداً</h3>
+                            ${companyName ? `<p style="color: #fff; font-size: 15px; margin-bottom: 5px; font-weight: bold;">🏢 ${companyName}</p>` : ''}
+                            <p style="color: #4da6ff; font-size: 14px; margin-bottom: 25px; direction: ltr;">${userEmail}</p>
+                            <button type="button" id="safeLogoutBtn" style="background: #e74c3c; color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; transition: 0.3s; box-shadow: 0 4px 12px rgba(231,76,60,0.4);">تسجيل الخروج</button>
                         `;
-                                box.appendChild(profileBox);
+                                form.appendChild(profileBox);
 
                                 // برمجة زر تسجيل الخروج الفوري
                                 setTimeout(() => {
-                                    const logoutBtn = document.getElementById('absoluteLogoutBtn');
+                                    const logoutBtn = document.getElementById('safeLogoutBtn');
                                     if (logoutBtn) {
                                         logoutBtn.onclick = function (e) {
                                             e.preventDefault();
@@ -2336,11 +2339,9 @@
                             if (profileBox) {
                                 profileBox.style.display = 'none';
                             }
-                            // إعادة إظهار محتويات النموذج الأصلية عند تسجيل الخروج
-                            Array.from(box.children).forEach(child => {
-                                if (!child.classList.contains('user-profile-box')) {
-                                    child.style.display = '';
-                                }
+                            // إرجاع إظهار الحقول عند تسجيل الخروج
+                            formInputsAndButtons.forEach(el => {
+                                el.style.display = '';
                             });
                         }
                     }
