@@ -2263,7 +2263,7 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === الحل النهائي والشامل لإخفاء كافة أزرار ونصوص المصادقة عند تسجيل الدخول ===
+        // === الحل النهائي والجذري لمنع التكرار وتفعيل زر الخروج بشكل قاطع ===
         (function () {
             function updateUIState() {
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
@@ -2284,27 +2284,35 @@
                     }
                 });
 
-                // 2. إدارة المربع الأزرق وحاويات المصادقة بدقة فائقة
+                // 2. إدارة الحاويات ومنع التكرار نهائياً
                 const containers = document.querySelectorAll('form, .auth-modal, .login-container, div');
 
                 containers.forEach(container => {
                     const hasAuthElements = container.innerHTML.includes('البريد الإلكتروني') || container.innerHTML.includes('كلمة المرور') || container.innerHTML.includes('إنشاء حساب') || container.innerHTML.includes('ليس لديك حساب');
 
                     if (hasAuthElements && container.id !== 'paypalClaimForm' && !container.closest('header')) {
-                        let profileBox = container.querySelector('.user-profile-box');
 
-                        // استهداف كافة العناصر داخل الحاوية (أزرار، حقول، نصوص، روابط مثل إنشاء حساب وليس لديك حساب)
-                        const allChildElements = container.querySelectorAll('input, button, a, label, span, p, h2, h3, .auth-actions, .social-login');
+                        // تنظيف أي بطاقات مكررة قديمة داخل هذا العنصر فوراً
+                        const existingBoxes = container.querySelectorAll('.user-profile-box');
+                        if (existingBoxes.length > 0) {
+                            // الاحتفاظ بواحدة فقط وحذف الباقي إن وجد
+                            for (let i = 1; i < existingBoxes.length; i++) {
+                                existingBoxes[i].remove();
+                            }
+                        }
+
+                        let profileBox = container.querySelector('.user-profile-box');
+                        const allChildElements = container.querySelectorAll('input, button:not(.globalLogoutBtn), a, label, span, p, h2, h3, .auth-actions, .social-login');
 
                         if (isLoggedIn) {
-                            // إخفاء كافة عناصر الدخول والتسجيل والنصوص القديمة تماماً
+                            // إخفاء حقول الدخول والنصوص القديمة
                             allChildElements.forEach(el => {
                                 if (!el.closest('.user-profile-box')) {
                                     el.style.setProperty('display', 'none', 'important');
                                 }
                             });
 
-                            // إظهار بطاقة الترحيب المنظمة وحدها داخل المربع الأزرق
+                            // إنشاؤها مرة واحدة فقط إذا لم تكن موجودة
                             if (!profileBox) {
                                 profileBox = document.createElement('div');
                                 profileBox.className = 'user-profile-box';
@@ -2314,32 +2322,16 @@
                             <h3 style="margin: 0 0 8px 0; font-size: 24px; color: #fff;">أهلاً بك مجدداً</h3>
                             ${companyName ? `<p style="color: #fff; font-size: 16px; margin-bottom: 5px; font-weight: bold;">🏢 ${companyName}</p>` : ''}
                             <p style="color: #4da6ff; font-size: 15px; margin-bottom: 30px; direction: ltr;">${userEmail}</p>
-                            <button type="button" id="finalLogoutBtn" style="background: #e74c3c; color: white; border: none; padding: 14px 30px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; transition: 0.3s; box-shadow: 0 4px 12px rgba(231,76,60,0.4);">تسجيل الخروج</button>
+                            <button type="button" class="globalLogoutBtn" style="background: #e74c3c; color: white; border: none; padding: 14px 30px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; transition: 0.3s; box-shadow: 0 4px 12px rgba(231,76,60,0.4);">تسجيل الخروج</button>
                         `;
                                 container.appendChild(profileBox);
-
-                                // برمجة زر تسجيل الخروج ليعمل فوراً ويحدث الصفحة
-                                setTimeout(() => {
-                                    const logoutBtn = document.getElementById('finalLogoutBtn');
-                                    if (logoutBtn) {
-                                        logoutBtn.onclick = function (e) {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            localStorage.removeItem('is_logged_in');
-                                            localStorage.removeItem('user_email');
-                                            localStorage.removeItem('company_name');
-                                            window.location.reload();
-                                        };
-                                    }
-                                }, 50);
                             } else {
                                 profileBox.style.display = 'block';
                             }
                         } else {
                             if (profileBox) {
-                                profileBox.style.display = 'none';
+                                profileBox.remove(); // إزالة البطاقة عند تسجيل الخروج
                             }
-                            // إعادة إظهار الحقول والنصوص عند تسجيل الخروج
                             allChildElements.forEach(el => {
                                 if (!el.closest('.user-profile-box')) {
                                     el.style.display = '';
@@ -2350,9 +2342,21 @@
                 });
             }
 
-            setInterval(updateUIState, 200);
+            setInterval(updateUIState, 300);
 
-            // 3. معالجة إرسال النموذج وحفظ الحساب والدخول
+            // 3. تفعيل زر تسجيل الخروج بنظام Event Delegation ليعمل 100%
+            document.addEventListener('click', function (e) {
+                if (e.target && e.target.classList.contains('globalLogoutBtn')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    localStorage.removeItem('is_logged_in');
+                    localStorage.removeItem('user_email');
+                    localStorage.removeItem('company_name');
+                    window.location.reload();
+                }
+            });
+
+            // 4. معالجة إرسال النموذج وحفظ الحساب والدخول
             window.addEventListener('submit', function (e) {
                 const form = e.target;
                 if (form.id === 'paypalClaimForm') return;
