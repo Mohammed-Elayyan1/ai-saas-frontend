@@ -2263,14 +2263,39 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === الحل الهندسي الدقيق: استهداف حاوية تسجيل الدخول فقط ومنع أي تكرار ===
+        // === نظام إدارة التجربة المجانية وتسجيل الدخول الموحد ===
         (function () {
+            const TRIAL_DAYS = 7; // تحديد مدة التجربة المجانية (يمكنك تعديلها إلى 14 متى شئت)
+
             function updateUIState() {
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
                 const userEmail = localStorage.getItem('user_email') || 'حسابي';
                 const companyName = localStorage.getItem('company_name') || '';
 
-                // 1. تحديث القائمة العلوية
+                // إدارة وتحديث أيام التجربة المجانية
+                let trialStart = localStorage.getItem('trial_start_date');
+                if (!trialStart && isLoggedIn) {
+                    trialStart = new Date().toISOString();
+                    localStorage.setItem('trial_start_date', trialStart);
+                }
+
+                let remainingDays = TRIAL_DAYS;
+                if (trialStart) {
+                    const startDate = new Date(trialStart);
+                    const now = new Date();
+                    const diffTime = now - startDate;
+                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                    remainingDays = Math.max(0, TRIAL_DAYS - diffDays);
+                }
+
+                // 1. تحديث النصوص في الموقع (مثل تبديل 14 يوماً إلى المدة المحددة وتحديث العداد)
+                document.querySelectorAll('p, span, h2, h3, div').forEach(el => {
+                    if (el.textContent.includes('14 يوماً مجانًا') || el.textContent.includes('يومًا مجانًا')) {
+                        el.innerHTML = el.innerHTML.replace(/14\s*يوماً\s*مجانًا|14\s*يومًا\s*مجانًا/g, `${TRIAL_DAYS} أيام مجانًا`);
+                    }
+                });
+
+                // 2. تحديث القائمة العلوية
                 document.querySelectorAll('a, button, span').forEach(el => {
                     const text = el.textContent.trim();
                     if (text === 'تسجيل الدخول' || text === 'تسجيل دخول') {
@@ -2284,24 +2309,23 @@
                     }
                 });
 
-                // 2. استهداف نماذج وحاويات تسجيل الدخول الحقيقية فقط (تجنب الـ div العشوائية)
+                // 3. إدارة الحاويات ونماذج تسجيل الدخول ومنع التكرار نهائياً
                 const authForms = document.querySelectorAll('form, .auth-modal, .login-container');
 
                 authForms.forEach(form => {
                     const emailInput = form.querySelector('input[type="email"]');
 
                     if (emailInput && form.id !== 'paypalClaimForm') {
-                        // تحديد الحاوية الرئيسية للنموذج
                         const targetBox = form.closest('.auth-modal, .login-container') || form;
                         let profileBox = targetBox.querySelector('.user-profile-box');
 
                         if (isLoggedIn) {
-                            // إزالة أي بطاقات مكررة قديمة بالكامل
+                            // إزالة أي بطاقات مكررة
                             document.querySelectorAll('.user-profile-box').forEach(box => {
                                 if (box !== profileBox) box.remove();
                             });
 
-                            // إخفاء كافة عناصر الفورم القديمة وأزرار التسجيل داخل الصندوق
+                            // إخفاء عناصر النموذج القديمة
                             Array.from(targetBox.children).forEach(child => {
                                 if (!child.classList.contains('user-profile-box')) {
                                     child.style.setProperty('display', 'none', 'important');
@@ -2311,7 +2335,7 @@
                                 form.style.setProperty('display', 'none', 'important');
                             }
 
-                            // إنشاؤها مرة واحدة فقط داخل الصندوق الصحيح
+                            // إنشاء بطاقة الملف الشخصي ومعلومات التجربة المجانية مرة واحدة فقط
                             if (!profileBox) {
                                 profileBox = document.createElement('div');
                                 profileBox.className = 'user-profile-box';
@@ -2320,7 +2344,10 @@
                             <div style="font-size: 60px; margin-bottom: 15px;">👤</div>
                             <h3 style="margin: 0 0 8px 0; font-size: 24px; color: #fff;">أهلاً بك مجدداً</h3>
                             ${companyName ? `<p style="color: #fff; font-size: 16px; margin-bottom: 5px; font-weight: bold;">🏢 ${companyName}</p>` : ''}
-                            <p style="color: #4da6ff; font-size: 15px; margin-bottom: 30px; direction: ltr;">${userEmail}</p>
+                            <p style="color: #4da6ff; font-size: 15px; margin-bottom: 15px; direction: ltr;">${userEmail}</p>
+                            <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; color: #f1c40f;">
+                                ⏳ التجربة المجانية نشطة: متبقي <b>${remainingDays}</b> أيام من أصل ${TRIAL_DAYS} أيام.
+                            </div>
                             <button type="button" class="globalLogoutBtn" style="background: #e74c3c; color: white; border: none; padding: 14px 30px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; transition: 0.3s; box-shadow: 0 4px 12px rgba(231,76,60,0.4);">تسجيل الخروج</button>
                         `;
                                 targetBox.appendChild(profileBox);
@@ -2331,7 +2358,6 @@
                             if (profileBox) {
                                 profileBox.remove();
                             }
-                            // إعادة إظهار عناصر النموذج عند تسجيل الخروج
                             Array.from(targetBox.children).forEach(child => {
                                 if (!child.classList.contains('user-profile-box')) {
                                     child.style.display = '';
@@ -2347,7 +2373,7 @@
 
             setInterval(updateUIState, 300);
 
-            // 3. تفعيل زر تسجيل الخروج الفوري
+            // 4. تفعيل زر تسجيل الخروج الفوري
             document.addEventListener('click', function (e) {
                 if (e.target && e.target.classList.contains('globalLogoutBtn')) {
                     e.preventDefault();
@@ -2355,11 +2381,12 @@
                     localStorage.removeItem('is_logged_in');
                     localStorage.removeItem('user_email');
                     localStorage.removeItem('company_name');
+                    localStorage.removeItem('trial_start_date');
                     window.location.reload();
                 }
             });
 
-            // 4. معالجة إرسال نموذج تسجيل الدخول
+            // 5. معالجة إرسال نموذج تسجيل الدخول أو بدء التجربة
             window.addEventListener('submit', function (e) {
                 const form = e.target;
                 if (form.id === 'paypalClaimForm') return;
@@ -2368,21 +2395,24 @@
                 const passInput = form.querySelector('input[type="password"]');
                 const companyInput = form.querySelector('input[placeholder*="الشركة"], input[name*="company"]');
 
-                if (emailInput && passInput) {
+                if (emailInput) {
                     e.preventDefault();
                     const email = emailInput.value.trim();
-                    const pass = passInput.value.trim();
+                    const pass = passInput ? passInput.value.trim() : '123456'; // دعم النماذج السريعة بالبريد فقط
                     const company = companyInput ? companyInput.value.trim() : '';
 
-                    if (email && pass) {
+                    if (email) {
                         localStorage.setItem('is_logged_in', 'true');
                         localStorage.setItem('user_email', email);
+                        if (!localStorage.getItem('trial_start_date')) {
+                            localStorage.setItem('trial_start_date', new Date().toISOString());
+                        }
                         if (company) {
                             localStorage.setItem('company_name', company);
                         }
                         updateUIState();
                     } else {
-                        alert('يرجى تعبئة البريد الإلكتروني وكلمة المرور.');
+                        alert('يرجى إدخال البريد الإلكتروني للمتابعة.');
                     }
                 }
             }, true);
