@@ -2263,7 +2263,7 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === النظام النهائي المحدث لدعم تسجيل الدخول، إنشاء الحساب، وتسجيل الخروج ===
+        // === التحديث النهائي لإخفاء تبويبات التسجيل وتفعيل التبديل وحل الخروج ===
         (function () {
             function updateUIState() {
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
@@ -2276,7 +2276,7 @@
                     if (text === 'تسجيل الدخول' || text === 'تسجيل دخول') {
                         if (!el.closest('form') && !el.closest('.auth-modal, .login-container')) {
                             if (isLoggedIn) {
-                                el.textContent = `👤 ${companyName ? companyName + ' (' + userEmail + ')' : userEmail}`;
+                                el.textContent = `👤 ${companyName ? companyName : userEmail}`;
                             } else {
                                 el.textContent = 'تسجيل الدخول';
                             }
@@ -2284,24 +2284,23 @@
                     }
                 });
 
-                // 2. إدارة حاويات تسجيل الدخول / إنشاء الحساب داخل المربع الأزرق
+                // 2. إدارة الحاويات والمربع الأزرق
                 const containers = document.querySelectorAll('form, .auth-modal, .login-container');
 
                 containers.forEach(container => {
                     if (container.id !== 'paypalClaimForm') {
-                        const isRegisterForm = container.innerHTML.includes('اسم الشركة') || container.querySelector('input[placeholder*="الشركة"], input[name*="company"]');
                         let profileBox = container.querySelector('.user-profile-box');
-                        const formElements = container.querySelectorAll('input, button[type="submit"], .auth-actions, label, .social-login, a, span, p');
+                        const formElements = container.querySelectorAll('input, button[type="submit"], .auth-actions, label, .social-login, a, span, p, div:not(.user-profile-box)');
 
                         if (isLoggedIn) {
-                            // إخفاء حقول الإدخال عند تسجيل الدخول
+                            // إخفاء كل عناصر الفورم والأزرار العلوية (مثل إنشاء حساب وتسجيل الدخول المتداخلة)
                             formElements.forEach(el => {
                                 if (!el.closest('.user-profile-box')) {
                                     el.style.display = 'none';
                                 }
                             });
 
-                            // إظهار بطاقة الملف الشخصي داخل نفس المربع الأزرق
+                            // إظهار بطاقة الملف الشخصي وحدها في المربع الأزرق
                             if (!profileBox) {
                                 profileBox = document.createElement('div');
                                 profileBox.className = 'user-profile-box';
@@ -2315,7 +2314,7 @@
                         `;
                                 container.appendChild(profileBox);
 
-                                // تفعيل زر تسجيل الخروج الحقيقي
+                                // تفعيل زر تسجيل الخروج
                                 setTimeout(() => {
                                     const logoutBtn = document.getElementById('globalLogoutBtn');
                                     if (logoutBtn) {
@@ -2328,7 +2327,7 @@
                                             window.location.reload();
                                         };
                                     }
-                                }, 100);
+                                }, 50);
                             } else {
                                 profileBox.style.display = 'block';
                             }
@@ -2344,16 +2343,38 @@
                 });
             }
 
-            setInterval(updateUIState, 250);
+            setInterval(updateUIState, 200);
 
-            // 3. التمييز بين نموذج تسجيل الدخول ونموذج إنشاء الحساب عند الإرسال
+            // 3. تفعيل الروابط مثل "ليس لديك حساب؟ أنشئ حساباً" لتكون تفاعلية
+            document.addEventListener('click', function (e) {
+                const target = e.target;
+                if (target.textContent.includes('أنشئ حساباً') || target.textContent.includes('ليس لديك حساب')) {
+                    e.preventDefault();
+                    const emailField = document.querySelector('input[type="email"]');
+                    if (emailField) {
+                        // محاكاة التبديل لوضع إنشاء الحساب (إضافة حقل اسم الشركة إن لم يكن موجوداً)
+                        let form = emailField.closest('form') || emailField.parentElement;
+                        if (form && !form.querySelector('input[placeholder*="الشركة"]')) {
+                            const companyInput = document.createElement('input');
+                            companyInput.type = 'text';
+                            companyInput.placeholder = 'اسم الشركة';
+                            companyInput.name = 'company_name';
+                            companyInput.style.cssText = 'width: 100%; padding: 12px; margin-bottom: 15px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff;';
+                            form.insertBefore(companyInput, emailField);
+                            alert('تم الانتقال إلى وضع إنشاء الحساب، يرجى إدخال اسم الشركة والبريد وكلمة المرور.');
+                        }
+                    }
+                }
+            });
+
+            // 4. معالجة الإرسال وحفظ بيانات المستخدم
             window.addEventListener('submit', function (e) {
                 const form = e.target;
                 if (form.id === 'paypalClaimForm') return;
 
                 const emailInput = form.querySelector('input[type="email"]');
                 const passInput = form.querySelector('input[type="password"]');
-                const companyInput = form.querySelector('input[placeholder*="الشركة"], input[name*="company"]');
+                const companyInput = form.querySelector('input[placeholder*="الشركة"], input[name*="company_name"]');
 
                 if (emailInput && passInput) {
                     e.preventDefault();
@@ -2366,13 +2387,10 @@
                         localStorage.setItem('user_email', email);
                         if (company) {
                             localStorage.setItem('company_name', company);
-                            alert(`تم إنشاء الحساب بنجاح للشركة: ${company}`);
-                        } else {
-                            alert(`تم تسجيل الدخول بنجاح: ${email}`);
                         }
                         updateUIState();
                     } else {
-                        alert('يرجى تعبئة الحقول المطلوبة بشكل صحيح.');
+                        alert('يرجى تعبئة الحقول المطلوبة.');
                     }
                 }
             }, true);
