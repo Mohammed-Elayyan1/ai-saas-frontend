@@ -2263,11 +2263,12 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === الحل الجذري والنهائي لتنظيم نموذج تسجيل الدخول وإخفاء الحقول عند الدخول ===
+        // === النظام النهائي المحدث لدعم تسجيل الدخول، إنشاء الحساب، وتسجيل الخروج ===
         (function () {
             function updateUIState() {
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
                 const userEmail = localStorage.getItem('user_email') || 'حسابي';
+                const companyName = localStorage.getItem('company_name') || '';
 
                 // 1. تحديث القائمة العلوية
                 document.querySelectorAll('a, button, span').forEach(el => {
@@ -2275,7 +2276,7 @@
                     if (text === 'تسجيل الدخول' || text === 'تسجيل دخول') {
                         if (!el.closest('form') && !el.closest('.auth-modal, .login-container')) {
                             if (isLoggedIn) {
-                                el.textContent = `👤 ${userEmail}`;
+                                el.textContent = `👤 ${companyName ? companyName + ' (' + userEmail + ')' : userEmail}`;
                             } else {
                                 el.textContent = 'تسجيل الدخول';
                             }
@@ -2283,90 +2284,95 @@
                     }
                 });
 
-                // 2. التحكم الكامل بنموذج تسجيل الدخول
-                const loginContainers = document.querySelectorAll('form, .auth-modal, .login-container, div');
+                // 2. إدارة حاويات تسجيل الدخول / إنشاء الحساب داخل المربع الأزرق
+                const containers = document.querySelectorAll('form, .auth-modal, .login-container');
 
-                loginContainers.forEach(container => {
-                    // نبحث عن الحاوية التي تحتوي على حقل البريد أو كلمة المرور
-                    const hasEmailInput = container.querySelector('input[type="email"]');
-                    const hasPassInput = container.querySelector('input[type="password"], input[placeholder*="مرور"]');
-
-                    if (hasEmailInput && hasPassInput && container.id !== 'paypalClaimForm') {
+                containers.forEach(container => {
+                    if (container.id !== 'paypalClaimForm') {
+                        const isRegisterForm = container.innerHTML.includes('اسم الشركة') || container.querySelector('input[placeholder*="الشركة"], input[name*="company"]');
                         let profileBox = container.querySelector('.user-profile-box');
-
-                        // تحديد العناصر الداخلية للنموذج (حقول، أزرار، نصوص) لإخفائها عند تسجيل الدخول
-                        const childrenToHide = container.querySelectorAll('input, button[type="submit"], .auth-actions, a, label, .social-login, span, div:not(.user-profile-box)');
+                        const formElements = container.querySelectorAll('input, button[type="submit"], .auth-actions, label, .social-login, a, span, p');
 
                         if (isLoggedIn) {
-                            // إخفاء كافة عناصر النموذج الأصلية تماماً
-                            childrenToHide.childElements?.forEach?.(el => { });
-                            Array.from(container.children).forEach(child => {
-                                if (!child.classList.contains('user-profile-box')) {
-                                    child.style.display = 'none';
+                            // إخفاء حقول الإدخال عند تسجيل الدخول
+                            formElements.forEach(el => {
+                                if (!el.closest('.user-profile-box')) {
+                                    el.style.display = 'none';
                                 }
                             });
 
-                            // إنشاء بطاقة الملف الشخصي إذا لم تكن موجودة
+                            // إظهار بطاقة الملف الشخصي داخل نفس المربع الأزرق
                             if (!profileBox) {
                                 profileBox = document.createElement('div');
                                 profileBox.className = 'user-profile-box';
-                                profileBox.style.cssText = 'text-align: center; padding: 30px; color: #fff; background: rgba(0,0,0,0.2); border-radius: 16px; width: 100%;';
+                                profileBox.style.cssText = 'text-align: center; padding: 40px 20px; color: #fff; width: 100%;';
                                 profileBox.innerHTML = `
-                            <div style="font-size: 50px; margin-bottom: 12px;">👤</div>
-                            <h3 style="margin: 0 0 5px 0; font-size: 20px; color: #fff;">أهلاً بك مجدداً</h3>
-                            <p style="color: #4da6ff; font-size: 15px; margin-bottom: 25px; direction: ltr; font-weight: bold;">${userEmail}</p>
-                            <button id="realLogoutBtn" style="background: #e74c3c; color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; transition: 0.3s;">تسجيل الخروج</button>
+                            <div style="font-size: 55px; margin-bottom: 15px;">👤</div>
+                            <h3 style="margin: 0 0 8px 0; font-size: 22px; color: #fff;">أهلاً بك مجدداً</h3>
+                            ${companyName ? `<p style="color: #fff; font-size: 16px; margin-bottom: 5px; font-weight: bold;">🏢 ${companyName}</p>` : ''}
+                            <p style="color: #4da6ff; font-size: 14px; margin-bottom: 30px; direction: ltr;">${userEmail}</p>
+                            <button type="button" id="globalLogoutBtn" style="background: #e74c3c; color: white; border: none; padding: 12px 30px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; transition: 0.3s; box-shadow: 0 4px 12px rgba(231,76,60,0.4);">تسجيل الخروج</button>
                         `;
                                 container.appendChild(profileBox);
 
-                                // برمجة زر تسجيل الخروج
+                                // تفعيل زر تسجيل الخروج الحقيقي
                                 setTimeout(() => {
-                                    const logoutBtn = document.getElementById('realLogoutBtn');
+                                    const logoutBtn = document.getElementById('globalLogoutBtn');
                                     if (logoutBtn) {
-                                        logoutBtn.addEventListener('click', function (ev) {
-                                            ev.preventDefault();
+                                        logoutBtn.onclick = function (e) {
+                                            e.preventDefault();
+                                            e.stopPropagation();
                                             localStorage.removeItem('is_logged_in');
                                             localStorage.removeItem('user_email');
+                                            localStorage.removeItem('company_name');
                                             window.location.reload();
-                                        });
+                                        };
                                     }
-                                }, 50);
+                                }, 100);
                             } else {
                                 profileBox.style.display = 'block';
                             }
                         } else {
-                            // إذا لم يكن مسجلاً، نخفي بطاقة الملف الشخصي ونظهر الحقول الأصلية
                             if (profileBox) {
                                 profileBox.style.display = 'none';
                             }
-                            Array.from(container.children).forEach(child => {
-                                child.style.display = '';
+                            formElements.forEach(el => {
+                                el.style.display = '';
                             });
                         }
                     }
                 });
             }
 
-            // تشغيل الفحص باستمرار
-            setInterval(updateUIState, 200);
+            setInterval(updateUIState, 250);
 
-            // 3. معالجة إرسال النموذج وحفظ الحساب
+            // 3. التمييز بين نموذج تسجيل الدخول ونموذج إنشاء الحساب عند الإرسال
             window.addEventListener('submit', function (e) {
                 const form = e.target;
-                const emailInput = form.querySelector('input[type="email"]');
-                const passInput = form.querySelector('input[type="password"], input[placeholder*="مرور"]');
+                if (form.id === 'paypalClaimForm') return;
 
-                if (emailInput && passInput && form.id !== 'paypalClaimForm') {
+                const emailInput = form.querySelector('input[type="email"]');
+                const passInput = form.querySelector('input[type="password"]');
+                const companyInput = form.querySelector('input[placeholder*="الشركة"], input[name*="company"]');
+
+                if (emailInput && passInput) {
                     e.preventDefault();
                     const email = emailInput.value.trim();
                     const pass = passInput.value.trim();
+                    const company = companyInput ? companyInput.value.trim() : '';
 
                     if (email && pass) {
                         localStorage.setItem('is_logged_in', 'true');
                         localStorage.setItem('user_email', email);
+                        if (company) {
+                            localStorage.setItem('company_name', company);
+                            alert(`تم إنشاء الحساب بنجاح للشركة: ${company}`);
+                        } else {
+                            alert(`تم تسجيل الدخول بنجاح: ${email}`);
+                        }
                         updateUIState();
                     } else {
-                        alert('يرجى إدخال البريد الإلكتروني وكلمة المرور.');
+                        alert('يرجى تعبئة الحقول المطلوبة بشكل صحيح.');
                     }
                 }
             }, true);
