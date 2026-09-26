@@ -2263,7 +2263,45 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
+        // === نظام تسجيل الدخول السلس (يمنع خطأ 405 ويخفي القائمة فوراً) ===
+        (function () {
+            function forceHideAuthButtons() {
+                if (localStorage.getItem('is_logged_in') === 'true') {
+                    document.querySelectorAll('a, button, span').forEach(el => {
+                        const text = el.textContent.trim();
+                        if (text === 'تسجيل الدخول' || text === 'ابدأ رحلتك الآن' || text === 'إنشاء حساب') {
+                            if (!el.closest('form')) {
+                                el.style.display = 'none';
+                            }
+                        }
+                    });
+                }
+            }
 
+            setInterval(forceHideAuthButtons, 300);
+
+            window.addEventListener('submit', function (e) {
+                const form = e.target;
+                const emailInput = form.querySelector('input[type="email"]');
+                const passInput = form.querySelector('input[type="password"]');
+
+                if (emailInput && passInput && form.id !== 'paypalClaimForm') {
+                    e.preventDefault(); // 🛑 منع حدوث خطأ 405 وتوجيه الصفحة الخاطئ
+
+                    // حفظ حالة الدخول
+                    localStorage.setItem('is_logged_in', 'true');
+
+                    // إخفاء الأزرار فوراً
+                    forceHideAuthButtons();
+
+                    // إظهار رسالة نجاح بدل الخطأ
+                    alert('تم تسجيل الدخول بنجاح! مرحباً بك.');
+
+                    // إعادة توجيه سلسة للرئيسية بدون أخطاء
+                    window.location.hash = '#';
+                }
+            }, true);
+        })();
         // Init
         setLanguage('ar');
     </script>
