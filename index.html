@@ -2263,7 +2263,7 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === نظام التجربة المجانية، حماية القائمة، وتوجيه أزرار الباقات لروابط PayPal ===
+        // === نظام التجربة المجانية، الـ PayPal، وتثبيت قسم تسجيل الدخول تحت البطاقات ===
         (function () {
             const TRIAL_DAYS = 7; // مدة التجربة المجانية
 
@@ -2279,7 +2279,7 @@
                 const userEmail = localStorage.getItem('user_email') || 'حسابي';
                 const companyName = localStorage.getItem('company_name') || '';
 
-                // إدارة أيام التجربة المجانية (لا تعود للبداية أبداً بل تتناقص بمرور الوقت)
+                // إدارة أيام التجربة المجانية (تناقص بمرور الوقت ولا تعود للبداية)
                 let trialStart = localStorage.getItem('trial_start_date');
                 if (!trialStart && isLoggedIn) {
                     trialStart = new Date().toISOString();
@@ -2327,104 +2327,90 @@
                     }
                 });
 
-                // 3. إدارة نماذج الدخول وبطاقة الملف الشخصي ومفتاح الـ API
-                const authForms = document.querySelectorAll('form, .auth-modal, .login-container');
+                // 3. إنشاء أو العثور على الحاوية الخاصة بتسجيل الدخول ووضعها تحت بطاقات المميزات مباشرة
+                let portalContainer = document.getElementById('custom-user-portal-container');
+                if (!portalContainer) {
+                    portalContainer = document.createElement('div');
+                    portalContainer.id = 'custom-user-portal-container';
+                    portalContainer.style.cssText = 'max-width: 600px; margin: 40px auto; padding: 25px; background: rgba(15, 23, 42, 0.9); border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; position: relative; z-index: 99;';
 
-                authForms.forEach(form => {
-                    const emailInput = form.querySelector('input[type="email"]');
-
-                    if (emailInput && form.id !== 'paypalClaimForm') {
-                        const targetBox = form.closest('.auth-modal, .login-container') || form;
-                        let profileBox = targetBox.querySelector('.user-profile-box');
-
-                        if (isLoggedIn) {
-                            document.querySelectorAll('.user-profile-box').forEach(box => {
-                                if (box !== profileBox) box.remove();
-                            });
-
-                            Array.from(targetBox.children).forEach(child => {
-                                if (!child.classList.contains('user-profile-box')) {
-                                    child.style.setProperty('display', 'none', 'important');
-                                }
-                            });
-                            if (form !== targetBox) {
-                                form.style.setProperty('display', 'none', 'important');
-                            }
-
-                            if (!profileBox) {
-                                profileBox = document.createElement('div');
-                                profileBox.className = 'user-profile-box';
-                                profileBox.style.cssText = 'text-align: center; padding: 30px 20px; color: #fff; width: 100%; display: block !important; position: relative; z-index: 99;';
-                                profileBox.innerHTML = `
-                            <div style="font-size: 50px; margin-bottom: 10px;">👤</div>
-                            <h3 style="margin: 0 0 5px 0; font-size: 22px; color: #fff;">أهلاً بك مجدداً</h3>
-                            ${companyName ? `<p style="color: #fff; font-size: 15px; margin-bottom: 3px; font-weight: bold;">🏢 ${companyName}</p>` : ''}
-                            <p style="color: #4da6ff; font-size: 14px; margin-bottom: 15px; direction: ltr;">${userEmail}</p>
-                            
-                            <!-- عداد الأيام المتبقية (يتناقص بمرور الوقت ولا يعود للبداية) -->
-                            <div style="background: rgba(241, 196, 15, 0.15); border: 1px solid rgba(241, 196, 15, 0.3); padding: 8px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; color: #f1c40f;">
-                                ⏳ التجربة المجانية نشطة: متبقي <b>${remainingDays}</b> أيام من أصل ${TRIAL_DAYS} أيام.
-                            </div>
-
-                            <!-- صندوق عرض مفتاح API مع زر النسخ -->
-                            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: right; border: 1px solid rgba(255,255,255,0.1);">
-                                <p style="color: #aaa; font-size: 12px; margin: 0 0 6px 0;">🔑 مفتاح الوصول (API Key):</p>
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <input type="text" readonly value="${userApiKey}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 6px 10px; border-radius: 6px; width: 100%; font-family: monospace; font-size: 11px; direction: ltr;" id="userApiKeyField">
-                                    <button type="button" id="copyApiKeyBtn" style="background: #3498db; color: white; border: none; padding: 7px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; white-space: nowrap; font-weight: bold;">نسخ</button>
-                                </div>
-                            </div>
-
-                            <button type="button" class="globalLogoutBtn" style="background: #e74c3c; color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; transition: 0.3s; box-shadow: 0 4px 12px rgba(231,76,60,0.4);">تسجيل الخروج</button>
-                        `;
-                                targetBox.appendChild(profileBox);
-
-                                setTimeout(() => {
-                                    const copyBtn = document.getElementById('copyApiKeyBtn');
-                                    if (copyBtn) {
-                                        copyBtn.onclick = function () {
-                                            const field = document.getElementById('userApiKeyField');
-                                            navigator.clipboard.writeText(field.value);
-                                            copyBtn.textContent = 'تم النسخ! ✓';
-                                            copyBtn.style.background = '#2ecc71';
-                                            setTimeout(() => {
-                                                copyBtn.textContent = 'نسخ';
-                                                copyBtn.style.background = '#3498db';
-                                            }, 2000);
-                                        };
-                                    }
-                                }, 50);
-
-                            } else {
-                                profileBox.style.display = 'block';
-                            }
-                        } else {
-                            if (profileBox) {
-                                profileBox.remove();
-                            }
-                            Array.from(targetBox.children).forEach(child => {
-                                if (!child.classList.contains('user-profile-box')) {
-                                    child.style.display = '';
-                                }
-                            });
-                            if (form !== targetBox) {
-                                form.style.display = '';
-                            }
+                    // البحث عن قسم البطاقات (Features Grid) لوضعه تحته تماماً
+                    let targetAnchor = null;
+                    document.querySelectorAll('div, section').forEach(el => {
+                        if (el.textContent.includes('فهم بيانات شركتك') && el.textContent.includes('مفتاح API خاص بك')) {
+                            targetAnchor = el;
                         }
+                    });
+
+                    if (targetAnchor && targetAnchor.parentNode) {
+                        targetAnchor.parentNode.insertBefore(portalContainer, targetAnchor.nextSibling);
+                    } else {
+                        document.body.appendChild(portalContainer);
                     }
-                });
+                }
+
+                // 4. عرض محتوى بطاقة الملف الشخصي (عند تسجيل الدخول) أو نموذج الدخول (عند الخروج)
+                if (isLoggedIn) {
+                    portalContainer.innerHTML = `
+                <div style="font-size: 50px; margin-bottom: 10px;">👤</div>
+                <h3 style="margin: 0 0 5px 0; font-size: 22px; color: #fff;">أهلاً بك مجدداً</h3>
+                ${companyName ? `<p style="color: #fff; font-size: 15px; margin-bottom: 3px; font-weight: bold;">🏢 ${companyName}</p>` : ''}
+                <p style="color: #4da6ff; font-size: 14px; margin-bottom: 15px; direction: ltr;">${userEmail}</p>
+                
+                <!-- عداد الأيام المتبقية -->
+                <div style="background: rgba(241, 196, 15, 0.15); border: 1px solid rgba(241, 196, 15, 0.3); padding: 8px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; color: #f1c40f;">
+                    ⏳ التجربة المجانية نشطة: متبقي <b>${remainingDays}</b> أيام من أصل ${TRIAL_DAYS} أيام.
+                </div>
+
+                <!-- صندوق عرض مفتاح API مع زر النسخ -->
+                <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: right; border: 1px solid rgba(255,255,255,0.1);">
+                    <p style="color: #aaa; font-size: 12px; margin: 0 0 6px 0;">🔑 مفتاح الوصول (API Key):</p>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <input type="text" readonly value="${userApiKey}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 6px 10px; border-radius: 6px; width: 100%; font-family: monospace; font-size: 11px; direction: ltr;" id="userApiKeyField">
+                        <button type="button" id="copyApiKeyBtn" style="background: #3498db; color: white; border: none; padding: 7px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; white-space: nowrap; font-weight: bold;">نسخ</button>
+                    </div>
+                </div>
+
+                <button type="button" class="globalLogoutBtn" style="background: #e74c3c; color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; transition: 0.3s; box-shadow: 0 4px 12px rgba(231,76,60,0.4);">تسجيل الخروج</button>
+            `;
+
+                    setTimeout(() => {
+                        const copyBtn = document.getElementById('copyApiKeyBtn');
+                        if (copyBtn) {
+                            copyBtn.onclick = function () {
+                                const field = document.getElementById('userApiKeyField');
+                                navigator.clipboard.writeText(field.value);
+                                copyBtn.textContent = 'تم النسخ! ✓';
+                                copyBtn.style.background = '#2ecc71';
+                                setTimeout(() => {
+                                    copyBtn.textContent = 'نسخ';
+                                    copyBtn.style.background = '#3498db';
+                                }, 2000);
+                            };
+                        }
+                    }, 50);
+
+                } else {
+                    portalContainer.innerHTML = `
+                <h3 style="color: #fff; margin-bottom: 15px; font-size: 20px;">تسجيل الدخول / بدء التجربة المجانية</h3>
+                <form id="customLoginForm" style="display: flex; flex-direction: column; gap: 12px;">
+                    <input type="email" placeholder="البريد الإلكتروني" required style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px;">
+                    <input type="text" placeholder="اسم الشركة (اختياري)" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px;">
+                    <button type="submit" style="background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer;">دخول / تفعيل التجربة</button>
+                </form>
+            `;
+                }
             }
 
             setInterval(updateUIState, 300);
 
-            // 4. توجيه أزرار الباقات لروابط الدفع في PayPal مباشرة عند الضغط عليها
+            // 5. توجيه أزرار الباقات لروابط الدفع في PayPal مباشرة عند الضغط عليها
             document.addEventListener('click', function (e) {
                 const target = e.target.closest('a, button');
                 if (!target) return;
 
                 const text = target.textContent.trim();
 
-                // التحقق من أزرار الباقات
                 const isStarterBtn = text.includes('الأساسية') || text.includes('Starter') || text.includes('29');
                 const isProBtn = text.includes('احترافية') || text.includes('Pro') || text.includes('79');
                 const isEnterpriseBtn = text.includes('Enterprise') || text.includes('الشركات') || text.includes('199') || text.includes('مبيعات') || text.includes('تواصل');
@@ -2444,7 +2430,7 @@
                 }
             }, true);
 
-            // 5. تفعيل زر تسجيل الخروج
+            // 6. تفعيل زر تسجيل الخروج
             document.addEventListener('click', function (e) {
                 if (e.target && e.target.classList.contains('globalLogoutBtn')) {
                     e.preventDefault();
@@ -2458,31 +2444,33 @@
                 }
             });
 
-            // 6. معالجة إرسال النموذج وحفظ الحساب
+            // 7. معالجة إرسال نموذج تسجيل الدخول تحت البطاقات
             window.addEventListener('submit', function (e) {
                 const form = e.target;
                 if (form.id === 'paypalClaimForm') return;
 
-                const emailInput = form.querySelector('input[type="email"]');
-                const companyInput = form.querySelector('input[placeholder*="الشركة"], input[name*="company"]');
-
-                if (emailInput) {
+                if (form.id === 'customLoginForm' || form.querySelector('input[type="email"]')) {
                     e.preventDefault();
-                    const email = emailInput.value.trim();
-                    const company = companyInput ? companyInput.value.trim() : '';
+                    const emailInput = form.querySelector('input[type="email"]');
+                    const companyInput = form.querySelector('input[placeholder*="الشركة"]');
 
-                    if (email) {
-                        localStorage.setItem('is_logged_in', 'true');
-                        localStorage.setItem('user_email', email);
-                        if (!localStorage.getItem('trial_start_date')) {
-                            localStorage.setItem('trial_start_date', new Date().toISOString());
+                    if (emailInput) {
+                        const email = emailInput.value.trim();
+                        const company = companyInput ? companyInput.value.trim() : '';
+
+                        if (email) {
+                            localStorage.setItem('is_logged_in', 'true');
+                            localStorage.setItem('user_email', email);
+                            if (!localStorage.getItem('trial_start_date')) {
+                                localStorage.setItem('trial_start_date', new Date().toISOString());
+                            }
+                            if (company) {
+                                localStorage.setItem('company_name', company);
+                            }
+                            updateUIState();
+                        } else {
+                            alert('يرجى إدخال البريد الإلكتروني للمتابعة.');
                         }
-                        if (company) {
-                            localStorage.setItem('company_name', company);
-                        }
-                        updateUIState();
-                    } else {
-                        alert('يرجى إدخال البريد الإلكتروني للمتابعة.');
                     }
                 }
             }, true);
