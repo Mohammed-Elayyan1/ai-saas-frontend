@@ -2263,7 +2263,7 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === الحل النهائي والجذري لإخفاء كافة محتويات نموذج الدخول عند تسجيل الدخول ===
+        // === الحل النهائي والنظيف 100% لإدارة واجهة تسجيل الدخول والملف الشخصي ===
         (function () {
             function updateUIState() {
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
@@ -2284,27 +2284,24 @@
                     }
                 });
 
-                // 2. إدارة المربع الأزرق الداخلي (حاوية المصادقة الأساسية)
-                // نبحث عن الحاوية التي تحمل الكلاسات أو الأيدي الخاصة بالنموذج
+                // 2. إدارة حاويات المصادقة داخل المربع الأزرق وإخفاء الأزرار القديمة تماماً
                 const authBoxes = document.querySelectorAll('form, .auth-modal, .login-container, div');
 
-                authBoxes.containerLoop:
-                for (let box of authBoxes) {
-                    // نتحقق أن المربع يحتوي على زر "إنشاء حساب" أو حقول إدخال تخص تسجيل الدخول
+                authBoxes.forEach(box => {
                     const hasAuthElements = box.innerHTML.includes('إنشاء حساب') || box.innerHTML.includes('البريد الإلكتروني') || box.querySelector('input');
 
                     if (hasAuthElements && box.id !== 'paypalClaimForm' && !box.closest('header')) {
                         let profileBox = box.querySelector('.user-profile-box');
 
                         if (isLoggedIn) {
-                            // إخفاء كل العناصر المباشرة داخل المربع عدا صندوق الملف الشخصي الخاص بنا
+                            // إخفاء كل العناصر القديمة (أزرار، حقول، نص إنشاء حساب) داخل المربع
                             Array.from(box.children).forEach(child => {
                                 if (!child.classList.contains('user-profile-box')) {
                                     child.style.setProperty('display', 'none', 'important');
                                 }
                             });
 
-                            // إنشاء بطاقة الملف الشخصي النظيفة داخل المربع إن لم تكن موجودة
+                            // إنشاء أو إظهار بطاقة الملف الشخصي وحدها
                             if (!profileBox) {
                                 profileBox = document.createElement('div');
                                 profileBox.className = 'user-profile-box';
@@ -2318,7 +2315,7 @@
                         `;
                                 box.appendChild(profileBox);
 
-                                // تفعيل زر تسجيل الخروج الفوري
+                                // برمجة زر تسجيل الخروج الفوري
                                 setTimeout(() => {
                                     const logoutBtn = document.getElementById('absoluteLogoutBtn');
                                     if (logoutBtn) {
@@ -2339,7 +2336,7 @@
                             if (profileBox) {
                                 profileBox.style.display = 'none';
                             }
-                            // إعادة إظهار عناصر النموذج الأصلية عند تسجيل الخروج
+                            // إعادة إظهار محتويات النموذج الأصلية عند تسجيل الخروج
                             Array.from(box.children).forEach(child => {
                                 if (!child.classList.contains('user-profile-box')) {
                                     child.style.display = '';
@@ -2347,13 +2344,12 @@
                             });
                         }
                     }
-                }
+                });
             }
 
-            // فحص مستمر لتحديث الحالة فوراً
             setInterval(updateUIState, 200);
 
-            // 3. معالجة إرسال نموذج تسجيل الدخول / إنشاء الحساب
+            // 3. معالجة الإرسال وحفظ بيانات المستخدم
             window.addEventListener('submit', function (e) {
                 const form = e.target;
                 if (form.id === 'paypalClaimForm') return;
