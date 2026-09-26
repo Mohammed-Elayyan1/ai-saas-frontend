@@ -2263,7 +2263,7 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === الحل الهندسي النظيف: إخفاء حقول الدخول فقط وإظهار الملف الشخصي ===
+        // === الحل النهائي: الحفاظ على شكل البطاقة داخل المربع الأزرق مع إخفاء زر إنشاء حساب عند الدخول ===
         (function () {
             function updateUIState() {
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
@@ -2284,43 +2284,43 @@
                     }
                 });
 
-                // 2. استهداف نموذج تسجيل الدخول أو أزرار المصادقة فقط بدقة
-                const loginForms = document.querySelectorAll('form, .auth-modal, .login-container');
+                // 2. إدارة الحاويات داخل المربع الأزرق
+                const containers = document.querySelectorAll('form, .auth-modal, .login-container');
 
-                loginForms.forEach(form => {
-                    // نتحقق أن هذا هو نموذج تسجيل الدخول أو إنشاء الحساب
-                    const isAuthForm = form.innerHTML.includes('البريد الإلكتروني') || form.innerHTML.includes('كلمة المرور') || form.innerHTML.includes('إنشاء حساب');
+                containers.forEach(container => {
+                    const isAuthContainer = container.innerHTML.includes('البريد الإلكتروني') || container.innerHTML.includes('كلمة المرور') || container.innerHTML.includes('إنشاء حساب');
 
-                    if (isAuthForm && form.id !== 'paypalClaimForm') {
-                        let profileBox = form.querySelector('.user-profile-box');
-                        // العناصر الداخلية للنموذج (حقول، أزرار، ترويسات الدخول)
-                        const formInputsAndButtons = form.querySelectorAll('input, button[type="submit"], .auth-actions, label, .social-login, a[href*="forgot"], h2, h3, p');
+                    if (isAuthContainer && container.id !== 'paypalClaimForm') {
+                        let profileBox = container.querySelector('.user-profile-box');
+
+                        // استهداف حقول الإدخال، الأزرار، وتبويب "إنشاء حساب" العلوي لإخفائها تماماً عند الدخول
+                        const elementsToHide = container.querySelectorAll('input, button[type="submit"], .auth-actions, label, .social-login, a, span, button:not(#cardLogoutBtn), div:not(.user-profile-box)');
 
                         if (isLoggedIn) {
-                            // إخفاء حقول وأزرار الدخول فقط، دون المساس بباقي عناصر الصفحة
-                            formInputsAndButtons.forEach(el => {
+                            // إخفاء كافة عناصر الفورم القديمة وزر إنشاء حساب المتداخل
+                            elementsToHide.forEach(el => {
                                 if (!el.closest('.user-profile-box')) {
-                                    el.style.display = 'none';
+                                    el.style.setProperty('display', 'none', 'important');
                                 }
                             });
 
-                            // إظهار بطاقة الملف الشخصي داخل الفورم
+                            // إظهار بطاقة الترحيب المنظمة داخل المربع الأزرق إن لم تكن موجودة
                             if (!profileBox) {
                                 profileBox = document.createElement('div');
                                 profileBox.className = 'user-profile-box';
-                                profileBox.style.cssText = 'text-align: center; padding: 30px 20px; color: #fff; width: 100%; display: block;';
+                                profileBox.style.cssText = 'text-align: center; padding: 40px 20px; color: #fff; width: 100%; display: block !important;';
                                 profileBox.innerHTML = `
-                            <div style="font-size: 55px; margin-bottom: 12px;">👤</div>
-                            <h3 style="margin: 0 0 5px 0; font-size: 22px; color: #fff;">أهلاً بك مجدداً</h3>
-                            ${companyName ? `<p style="color: #fff; font-size: 15px; margin-bottom: 5px; font-weight: bold;">🏢 ${companyName}</p>` : ''}
-                            <p style="color: #4da6ff; font-size: 14px; margin-bottom: 25px; direction: ltr;">${userEmail}</p>
-                            <button type="button" id="safeLogoutBtn" style="background: #e74c3c; color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; transition: 0.3s; box-shadow: 0 4px 12px rgba(231,76,60,0.4);">تسجيل الخروج</button>
+                            <div style="font-size: 60px; margin-bottom: 15px;">👤</div>
+                            <h3 style="margin: 0 0 8px 0; font-size: 24px; color: #fff;">أهلاً بك مجدداً</h3>
+                            ${companyName ? `<p style="color: #fff; font-size: 16px; margin-bottom: 5px; font-weight: bold;">🏢 ${companyName}</p>` : ''}
+                            <p style="color: #4da6ff; font-size: 15px; margin-bottom: 30px; direction: ltr;">${userEmail}</p>
+                            <button type="button" id="cardLogoutBtn" style="background: #e74c3c; color: white; border: none; padding: 14px 30px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; transition: 0.3s; box-shadow: 0 4px 12px rgba(231,76,60,0.4);">تسجيل الخروج</button>
                         `;
-                                form.appendChild(profileBox);
+                                container.appendChild(profileBox);
 
-                                // برمجة زر تسجيل الخروج الفوري
+                                // برمجة زر تسجيل الخروج ليعمل فوراً ويقوم بمسح الجلسة
                                 setTimeout(() => {
-                                    const logoutBtn = document.getElementById('safeLogoutBtn');
+                                    const logoutBtn = document.getElementById('cardLogoutBtn');
                                     if (logoutBtn) {
                                         logoutBtn.onclick = function (e) {
                                             e.preventDefault();
@@ -2339,8 +2339,8 @@
                             if (profileBox) {
                                 profileBox.style.display = 'none';
                             }
-                            // إرجاع إظهار الحقول عند تسجيل الخروج
-                            formInputsAndButtons.forEach(el => {
+                            // إعادة إظهار الحقول عند تسجيل الخروج
+                            elementsToHide.forEach(el => {
                                 el.style.display = '';
                             });
                         }
@@ -2350,7 +2350,7 @@
 
             setInterval(updateUIState, 200);
 
-            // 3. معالجة الإرسال وحفظ بيانات المستخدم
+            // 3. معالجة إرسال النموذج وحفظ الحساب
             window.addEventListener('submit', function (e) {
                 const form = e.target;
                 if (form.id === 'paypalClaimForm') return;
