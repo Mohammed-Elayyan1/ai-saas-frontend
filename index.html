@@ -2263,7 +2263,7 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === الحل النهائي: الحفاظ على شكل البطاقة داخل المربع الأزرق مع إخفاء زر إنشاء حساب عند الدخول ===
+        // === الحل النهائي والشامل لإخفاء كافة أزرار ونصوص المصادقة عند تسجيل الدخول ===
         (function () {
             function updateUIState() {
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
@@ -2284,27 +2284,27 @@
                     }
                 });
 
-                // 2. إدارة الحاويات داخل المربع الأزرق
-                const containers = document.querySelectorAll('form, .auth-modal, .login-container');
+                // 2. إدارة المربع الأزرق وحاويات المصادقة بدقة فائقة
+                const containers = document.querySelectorAll('form, .auth-modal, .login-container, div');
 
                 containers.forEach(container => {
-                    const isAuthContainer = container.innerHTML.includes('البريد الإلكتروني') || container.innerHTML.includes('كلمة المرور') || container.innerHTML.includes('إنشاء حساب');
+                    const hasAuthElements = container.innerHTML.includes('البريد الإلكتروني') || container.innerHTML.includes('كلمة المرور') || container.innerHTML.includes('إنشاء حساب') || container.innerHTML.includes('ليس لديك حساب');
 
-                    if (isAuthContainer && container.id !== 'paypalClaimForm') {
+                    if (hasAuthElements && container.id !== 'paypalClaimForm' && !container.closest('header')) {
                         let profileBox = container.querySelector('.user-profile-box');
 
-                        // استهداف حقول الإدخال، الأزرار، وتبويب "إنشاء حساب" العلوي لإخفائها تماماً عند الدخول
-                        const elementsToHide = container.querySelectorAll('input, button[type="submit"], .auth-actions, label, .social-login, a, span, button:not(#cardLogoutBtn), div:not(.user-profile-box)');
+                        // استهداف كافة العناصر داخل الحاوية (أزرار، حقول، نصوص، روابط مثل إنشاء حساب وليس لديك حساب)
+                        const allChildElements = container.querySelectorAll('input, button, a, label, span, p, h2, h3, .auth-actions, .social-login');
 
                         if (isLoggedIn) {
-                            // إخفاء كافة عناصر الفورم القديمة وزر إنشاء حساب المتداخل
-                            elementsToHide.forEach(el => {
+                            // إخفاء كافة عناصر الدخول والتسجيل والنصوص القديمة تماماً
+                            allChildElements.forEach(el => {
                                 if (!el.closest('.user-profile-box')) {
                                     el.style.setProperty('display', 'none', 'important');
                                 }
                             });
 
-                            // إظهار بطاقة الترحيب المنظمة داخل المربع الأزرق إن لم تكن موجودة
+                            // إظهار بطاقة الترحيب المنظمة وحدها داخل المربع الأزرق
                             if (!profileBox) {
                                 profileBox = document.createElement('div');
                                 profileBox.className = 'user-profile-box';
@@ -2314,13 +2314,13 @@
                             <h3 style="margin: 0 0 8px 0; font-size: 24px; color: #fff;">أهلاً بك مجدداً</h3>
                             ${companyName ? `<p style="color: #fff; font-size: 16px; margin-bottom: 5px; font-weight: bold;">🏢 ${companyName}</p>` : ''}
                             <p style="color: #4da6ff; font-size: 15px; margin-bottom: 30px; direction: ltr;">${userEmail}</p>
-                            <button type="button" id="cardLogoutBtn" style="background: #e74c3c; color: white; border: none; padding: 14px 30px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; transition: 0.3s; box-shadow: 0 4px 12px rgba(231,76,60,0.4);">تسجيل الخروج</button>
+                            <button type="button" id="finalLogoutBtn" style="background: #e74c3c; color: white; border: none; padding: 14px 30px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; transition: 0.3s; box-shadow: 0 4px 12px rgba(231,76,60,0.4);">تسجيل الخروج</button>
                         `;
                                 container.appendChild(profileBox);
 
-                                // برمجة زر تسجيل الخروج ليعمل فوراً ويقوم بمسح الجلسة
+                                // برمجة زر تسجيل الخروج ليعمل فوراً ويحدث الصفحة
                                 setTimeout(() => {
-                                    const logoutBtn = document.getElementById('cardLogoutBtn');
+                                    const logoutBtn = document.getElementById('finalLogoutBtn');
                                     if (logoutBtn) {
                                         logoutBtn.onclick = function (e) {
                                             e.preventDefault();
@@ -2339,9 +2339,11 @@
                             if (profileBox) {
                                 profileBox.style.display = 'none';
                             }
-                            // إعادة إظهار الحقول عند تسجيل الخروج
-                            elementsToHide.forEach(el => {
-                                el.style.display = '';
+                            // إعادة إظهار الحقول والنصوص عند تسجيل الخروج
+                            allChildElements.forEach(el => {
+                                if (!el.closest('.user-profile-box')) {
+                                    el.style.display = '';
+                                }
                             });
                         }
                     }
@@ -2350,7 +2352,7 @@
 
             setInterval(updateUIState, 200);
 
-            // 3. معالجة إرسال النموذج وحفظ الحساب
+            // 3. معالجة إرسال النموذج وحفظ الحساب والدخول
             window.addEventListener('submit', function (e) {
                 const form = e.target;
                 if (form.id === 'paypalClaimForm') return;
