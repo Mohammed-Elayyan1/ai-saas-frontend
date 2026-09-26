@@ -2263,7 +2263,7 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === نظام التجربة المجانية، الـ PayPal، وتثبيت قسم تسجيل الدخول تحت البطاقات ===
+        // === نظام التجربة المجانية، الـ PayPal، وتصحيح شكل صندوق تسجيل الدخول ليكون مربعاً أنيقاً ===
         (function () {
             const TRIAL_DAYS = 7; // مدة التجربة المجانية
 
@@ -2327,14 +2327,15 @@
                     }
                 });
 
-                // 3. إنشاء أو العثور على الحاوية الخاصة بتسجيل الدخول ووضعها تحت بطاقات المميزات مباشرة
+                // 3. إنشاء أو العثور على الحاوية الخاصة بتسجيل الدخول وجعلها بشكل "مربع / بطاقة" أنيقة ومقيدة العرض
                 let portalContainer = document.getElementById('custom-user-portal-container');
                 if (!portalContainer) {
                     portalContainer = document.createElement('div');
                     portalContainer.id = 'custom-user-portal-container';
-                    portalContainer.style.cssText = 'max-width: 600px; margin: 40px auto; padding: 25px; background: rgba(15, 23, 42, 0.9); border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; position: relative; z-index: 99;';
+                    // تعديل المقاسات لتصبح مربعة الشكل بمنتصف الصفحة وبدون تمدد عرضي مزعج
+                    portalContainer.style.cssText = 'width: 100%; max-width: 420px; margin: 40px auto; padding: 30px; background: rgba(15, 23, 42, 0.95); border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; position: relative; z-index: 99; box-sizing: border-box;';
 
-                    // البحث عن قسم البطاقات (Features Grid) لوضعه تحته تماماً
+                    // البحث عن قسم البطاقات لوضعه تحته تماماً
                     let targetAnchor = null;
                     document.querySelectorAll('div, section').forEach(el => {
                         if (el.textContent.includes('فهم بيانات شركتك') && el.textContent.includes('مفتاح API خاص بك')) {
@@ -2349,7 +2350,7 @@
                     }
                 }
 
-                // 4. عرض محتوى بطاقة الملف الشخصي (عند تسجيل الدخول) أو نموذج الدخول (عند الخروج)
+                // 4. عرض محتوى بطاقة الملف الشخصي أو نموذج تسجيل الدخول بشكله المربع والمرتب
                 if (isLoggedIn) {
                     portalContainer.innerHTML = `
                 <div style="font-size: 50px; margin-bottom: 10px;">👤</div>
@@ -2392,11 +2393,11 @@
 
                 } else {
                     portalContainer.innerHTML = `
-                <h3 style="color: #fff; margin-bottom: 15px; font-size: 20px;">تسجيل الدخول / بدء التجربة المجانية</h3>
+                <h3 style="color: #fff; margin-bottom: 15px; font-size: 20px;">تسجيل الدخول / بدء التجربة</h3>
                 <form id="customLoginForm" style="display: flex; flex-direction: column; gap: 12px;">
-                    <input type="email" placeholder="البريد الإلكتروني" required style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px;">
-                    <input type="text" placeholder="اسم الشركة (اختياري)" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px;">
-                    <button type="submit" style="background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer;">دخول / تفعيل التجربة</button>
+                    <input type="email" placeholder="البريد الإلكتروني" required style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box;">
+                    <input type="text" placeholder="اسم الشركة (اختياري)" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box;">
+                    <button type="submit" style="background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; width: 100%;">دخول / تفعيل التجربة</button>
                 </form>
             `;
                 }
@@ -2444,7 +2445,7 @@
                 }
             });
 
-            // 7. معالجة إرسال نموذج تسجيل الدخول تحت البطاقات
+            // 7. معالجة إرسال نموذج تسجيل الدخول
             window.addEventListener('submit', function (e) {
                 const form = e.target;
                 if (form.id === 'paypalClaimForm') return;
