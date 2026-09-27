@@ -2271,6 +2271,13 @@
                 enterprise: 'https://www.paypal.com/ncp/payment/CS59KMKAETBFC'
             };
 
+            // تحميل مكتبة EmailJS تلقائياً في الصفحة
+            if (!window.emailjs) {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
+                document.head.appendChild(script);
+            }
+
             function updateApp() {
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
                 const userEmail = localStorage.getItem('user_email') || 'hbhh@gmail.com';
@@ -2337,7 +2344,7 @@
 
                     let userApiKey = localStorage.getItem('user_api_key');
                     if (!userApiKey) {
-                        userApiKey = 'ai_saas_' + Math.random().toString(36).substring(2, 10) + '_' + Math.random().toString(36).substring(2, 10);
+                        userApiKey = 'nexus_' + Math.random().toString(36).substring(2, 10) + '_' + Math.random().toString(36).substring(2, 10);
                         localStorage.setItem('user_api_key', userApiKey);
                     }
 
@@ -2347,7 +2354,7 @@
                         loginBox.innerHTML = `
                     <div style="width: 100%; max-width: 400px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; text-align: center; box-sizing: border-box; padding: 20px;">
                         <div style="font-size: 38px; margin-bottom: 8px;">👤</div>
-                        <h3 style="margin: 0 0 6px 0; font-size: 18px; color: #fff; font-weight: bold;">أهلاً بك في فترتك التجريبية (7 أيام)</h3>
+                        <h3 style="margin: 0 0 6px 0; font-size: 18px; color: #fff; font-weight: bold;">أهلاً بك في فترتك التجريبية (NexusAI)</h3>
                         <p style="color: #60a5fa; font-size: 13px; margin-bottom: 16px; direction: ltr; font-weight: bold;">${userEmail}</p>
                         
                         <div style="background: rgba(241, 196, 15, 0.1); border: 1px solid rgba(241, 196, 15, 0.3); padding: 10px; border-radius: 8px; margin-bottom: 16px; font-size: 12px; color: #facc15; width: 100%; box-sizing: border-box;" id="nativeTimerDisplay">
@@ -2407,8 +2414,8 @@
             <div style="background: #1e293b; padding: 24px; border-radius: 12px; width: 100%; max-width: 400px; box-sizing: border-box; color: #fff; text-align: center; position: relative; box-shadow: 0 15px 35px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15);">
                 <button id="nativeCloseModal" style="position: absolute; top: 12px; left: 12px; background: transparent; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">✕</button>
                 
-                <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: bold; color: #fff;">استعادة كلمة المرور عبر البريد</h3>
-                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 20px;">أدخل بريدك الإلكتروني المسجل لإرسال رمز التحقق (OTP)</p>
+                <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: bold; color: #fff;">استعادة كلمة المرور - NexusAI</h3>
+                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 20px;">أدخل بريدك الإلكتروني لإرسال رمز التحقق الحقيقي (OTP)</p>
                 
                 <input type="email" placeholder="البريد الإلكتروني المسجل" id="modalVerifyEmail" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 6px; margin-bottom: 14px; box-sizing: border-box; font-size: 13px; text-align: right;">
                 
@@ -2439,7 +2446,6 @@
                     if (e.target === overlay) overlay.remove();
                 };
 
-                // إرسال الكود بشكل سري (لا يظهر على الشاشة، بل يطبع في الـ Console للاختبار أو يُفترض أنه أُرسل للإيميل)
                 document.getElementById('modalSendCodeBtn').onclick = function () {
                     const enteredEmail = document.getElementById('modalVerifyEmail').value.trim();
                     if (!enteredEmail) {
@@ -2450,16 +2456,39 @@
                     if (enteredEmail.toLowerCase() === savedEmail.toLowerCase()) {
                         generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-                        // طباعة الكود في الconsole فقط سرياً، وعدم عرضه في واجهة المستخدم أبداً
-                        console.log(`%c[رمز التحقق السري لـ ${savedEmail}]: ${generatedCode}`, 'color: #facc15; font-size: 14px; font-weight: bold;');
+                        const sendBtn = document.getElementById('modalSendCodeBtn');
+                        sendBtn.textContent = 'جارِ إرسال البريد...';
+                        sendBtn.disabled = true;
 
-                        document.getElementById('modalOtpNotice').innerHTML = `تم إرسال رمز التحقق بنجاح إلى بريدك الإلكتروني: <b>${savedEmail}</b>.<br><span style="color: #94a3b8; font-size: 11px;">(تحقق من صندوق الوارد لديك أو من وحدة التحكم Console للاختبار).</span>`;
+                        const SERVICE_ID = "service_jotpx98";
+                        const TEMPLATE_ID = "template_kitaaxu";
+                        const PUBLIC_KEY = "I66IR3zFFU2s0qTlS";
 
-                        document.getElementById('modalVerifyEmail').style.display = 'none';
-                        document.getElementById('modalSendCodeBtn').style.display = 'none';
-                        document.getElementById('modalOtpSection').style.display = 'block';
+                        const templateParams = {
+                            to_email: savedEmail,
+                            otp_code: generatedCode
+                        };
 
-                        alert('تم إرسال رمز التحقق إلى بريدك الإلكتروني بنجاح!');
+                        if (window.emailjs) {
+                            emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY)
+                                .then(function (response) {
+                                    document.getElementById('modalOtpNotice').innerHTML = `تم إرسال رمز التحقق بنجاح إلى بريدك الإلكتروني: <b>${savedEmail}</b>.<br><span style="color: #60a5fa;">(تحقق من صندوق الوارد أو الـ Spam في بريدك).</span>`;
+                                    document.getElementById('modalVerifyEmail').style.display = 'none';
+                                    sendBtn.style.display = 'none';
+                                    document.getElementById('modalOtpSection').style.display = 'block';
+                                    alert('تم إرسال رسالة التحقق إلى بريدك الإلكتروني بنجاح!');
+                                }, function (error) {
+                                    sendBtn.textContent = 'إرسال رسالة التحقق للإيميل';
+                                    sendBtn.disabled = false;
+                                    alert('حدث خطأ في إرسال الإيميل. تأكد من إعدادات Template ID و Public Key.');
+                                    console.error('EmailJS Error:', error);
+                                });
+                        } else {
+                            alert('مكتبة الإيميل لم تتحمل بعد، يرجى المحاولة بعد ثانية.');
+                            sendBtn.textContent = 'إرسال رسالة التحقق للإيميل';
+                            sendBtn.disabled = false;
+                        }
+
                     } else {
                         alert('عذراً، البريد الإلكتروني غير مسجل لدينا.');
                     }
@@ -2472,7 +2501,7 @@
                         document.getElementById('modalOtpSection').style.display = 'none';
                         document.getElementById('modalNewPassSection').style.display = 'block';
                     } else {
-                        alert('رمز التحقق غير صحيح. يرجى التأكد من الرمز المرسل وإعادة المحاولة.');
+                        alert('رمز التحقق غير صحيح. يرجى التأكد من الرمز المرسل لإيميلك وإعادة المحاولة.');
                     }
                 };
 
@@ -2509,7 +2538,6 @@
                 }
             }, true);
         })();
-
         // Init
         setLanguage('ar');
     </script>
