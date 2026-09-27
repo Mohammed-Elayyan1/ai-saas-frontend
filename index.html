@@ -2275,7 +2275,6 @@
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
                 const userEmail = localStorage.getItem('user_email') || 'hbhh@gmail.com';
 
-                // 1. تحديث النصوص واستبدال 14 بـ 7 في سياسة الاسترجاع والفترات وتحديث حالة تسجيل الدخول
                 document.querySelectorAll('a, button, span, p, div, li, td').forEach(el => {
                     if (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3) {
                         let text = el.textContent.trim();
@@ -2292,7 +2291,6 @@
                     }
                 });
 
-                // 2. البحث عن خانة كلمة المرور أو نموذج تسجيل الدخول لزرع رابط "نسيت كلمة المرور" تحته
                 const passInput = document.querySelector('input[type="password"]');
                 if (passInput) {
                     let parentContainer = passInput.closest('form') || passInput.parentElement;
@@ -2305,7 +2303,6 @@
                     }
                 }
 
-                // زر احتياطي عائم يظهر دائماً في أسفل الشاشة لضمان إمكانية الاستعادة في أي وقت
                 if (!document.getElementById('nativeFloatingForgotBtn')) {
                     const floatBtn = document.createElement('div');
                     floatBtn.id = 'nativeFloatingForgotBtn';
@@ -2319,7 +2316,6 @@
                     };
                 }
 
-                // ربط جميع روابط "نسيت كلمة المرور" الموجودة بالصفحة
                 document.querySelectorAll('.native-forgot-trigger, a, span').forEach(el => {
                     if (el.textContent.trim().includes('نسيت كلمة المرور') && !el.dataset.modalHooked) {
                         el.dataset.modalHooked = 'true';
@@ -2345,7 +2341,6 @@
                         localStorage.setItem('user_api_key', userApiKey);
                     }
 
-                    // إذا كان مسجل دخول، قم بتحديث واجهة تسجيل الدخول لعرض بيانات التجربة
                     const loginBox = document.querySelector('form') || passInput?.closest('div');
                     if (loginBox && loginBox.dataset.currentState !== 'logged_in') {
                         loginBox.dataset.currentState = 'logged_in';
@@ -2400,7 +2395,6 @@
                 }
             }
 
-            // نافذة منبثقة تفاعلية بالكامل لإرسال رمز تحقق وتحقيق الهوية
             function openForgotModal() {
                 const existing = document.getElementById('nativeModalOverlay');
                 if (existing) existing.remove();
@@ -2445,7 +2439,7 @@
                     if (e.target === overlay) overlay.remove();
                 };
 
-                // الخطوة 1: إرسال رمز التحقق وتوليده
+                // إرسال الكود بشكل سري (لا يظهر على الشاشة، بل يطبع في الـ Console للاختبار أو يُفترض أنه أُرسل للإيميل)
                 document.getElementById('modalSendCodeBtn').onclick = function () {
                     const enteredEmail = document.getElementById('modalVerifyEmail').value.trim();
                     if (!enteredEmail) {
@@ -2456,19 +2450,21 @@
                     if (enteredEmail.toLowerCase() === savedEmail.toLowerCase()) {
                         generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-                        document.getElementById('modalOtpNotice').innerHTML = `تم إرسال رسالة تحقق إلى بريدك الإلكتروني: <b>${savedEmail}</b>.<br><span style="color: #facc15;">[رمز التحقق للتجربة: ${generatedCode}]</span>`;
+                        // طباعة الكود في الconsole فقط سرياً، وعدم عرضه في واجهة المستخدم أبداً
+                        console.log(`%c[رمز التحقق السري لـ ${savedEmail}]: ${generatedCode}`, 'color: #facc15; font-size: 14px; font-weight: bold;');
+
+                        document.getElementById('modalOtpNotice').innerHTML = `تم إرسال رمز التحقق بنجاح إلى بريدك الإلكتروني: <b>${savedEmail}</b>.<br><span style="color: #94a3b8; font-size: 11px;">(تحقق من صندوق الوارد لديك أو من وحدة التحكم Console للاختبار).</span>`;
 
                         document.getElementById('modalVerifyEmail').style.display = 'none';
                         document.getElementById('modalSendCodeBtn').style.display = 'none';
                         document.getElementById('modalOtpSection').style.display = 'block';
 
-                        alert(`تم إرسال رسالة التحقق إلى بريدك الإلكتروني بنجاح! رمز التحقق هو: ${generatedCode}`);
+                        alert('تم إرسال رمز التحقق إلى بريدك الإلكتروني بنجاح!');
                     } else {
                         alert('عذراً، البريد الإلكتروني غير مسجل لدينا.');
                     }
                 };
 
-                // الخطوة 2: التحقق من صحة الرمز المدخل
                 document.getElementById('modalConfirmOtpBtn').onclick = function () {
                     const enteredOtp = document.getElementById('modalOtpInput').value.trim();
                     if (enteredOtp === generatedCode) {
@@ -2480,7 +2476,6 @@
                     }
                 };
 
-                // الخطوة 3: حفظ كلمة المرور الجديدة
                 document.getElementById('modalSavePassBtn').onclick = function () {
                     const newPass = document.getElementById('modalNewPassInput').value;
                     if (!newPass || newPass.length < 6) {
@@ -2498,7 +2493,6 @@
             setInterval(updateApp, 500);
             window.addEventListener('DOMContentLoaded', updateApp);
 
-            // توجيه باقات الأسعار لروابط باي بال بأمان
             document.addEventListener('click', function (e) {
                 const target = e.target.closest('a, button');
                 if (!target) return;
@@ -2516,8 +2510,6 @@
             }, true);
         })();
 
-        // Init
-        setLanguage('ar');
         // Init
         setLanguage('ar');
     </script>
