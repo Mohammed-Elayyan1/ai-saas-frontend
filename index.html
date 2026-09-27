@@ -2288,26 +2288,17 @@
                     }
                 });
 
-                // 2. البحث عن صندوق تسجيل الدخول وتثبيته بعلامة دائمية لضمان عدم اختفائه بعد تسجيل الدخول
-                let loginBox = document.querySelector('[data-auth-box="true"]');
-                if (!loginBox) {
-                    const allDivs = document.querySelectorAll('div');
-                    for (let div of allDivs) {
-                        const txt = div.textContent || '';
-                        if (txt.includes('باقات تناسب') || txt.includes('الأسعار') || txt.includes('سنوي') || txt.includes('شهري')) {
-                            continue;
-                        }
-                        if (((txt.includes('البريد الإلكتروني') || txt.includes('كلمة المرور')) && txt.includes('تسجيل الدخول')) || div.dataset.authBox === 'true') {
-                            if (div.clientHeight > 100 && div.clientHeight < 700) {
-                                loginBox = div;
-                                loginBox.dataset.authBox = 'true';
-                                break;
-                            }
-                        }
+                // 2. البحث الذكي عن نموذج أو حاوية تسجيل الدخول بالاعتماد على حقل كلمة المرور أو البريد
+                let loginForm = document.querySelector('form') || document.querySelector('[data-auth-box="true"]');
+                if (!loginForm) {
+                    const passInput = document.querySelector('input[type="password"]');
+                    if (passInput) {
+                        loginForm = passInput.closest('div') || passInput.parentElement;
                     }
                 }
 
-                if (!loginBox) return;
+                if (!loginForm) return;
+                loginForm.dataset.authBox = 'true';
 
                 if (isLoggedIn) {
                     let trialStart = localStorage.getItem('trial_start_date');
@@ -2322,9 +2313,9 @@
                         localStorage.setItem('user_api_key', userApiKey);
                     }
 
-                    if (loginBox.dataset.currentState !== 'logged_in') {
-                        loginBox.dataset.currentState = 'logged_in';
-                        loginBox.innerHTML = `
+                    if (loginForm.dataset.currentState !== 'logged_in') {
+                        loginForm.dataset.currentState = 'logged_in';
+                        loginForm.innerHTML = `
                     <div style="width: 100%; max-width: 400px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; text-align: center; box-sizing: border-box; padding: 20px;">
                         <div style="font-size: 38px; margin-bottom: 8px;">👤</div>
                         <h3 style="margin: 0 0 6px 0; font-size: 18px; color: #fff; font-weight: bold;">أهلاً بك في فترتك التجريبية (7 أيام)</h3>
@@ -2368,10 +2359,8 @@
                                 logoutBtn.onclick = function () {
                                     if (window._nativeTimerInt) clearInterval(window._nativeTimerInt);
                                     localStorage.removeItem('is_logged_in');
-                                    if (loginBox) {
-                                        loginBox.removeAttribute('data-current-state');
-                                        loginBox.removeAttribute('data-auth-box');
-                                    }
+                                    loginForm.removeAttribute('data-current-state');
+                                    loginForm.removeAttribute('data-auth-box');
                                     location.reload();
                                 };
                             }
@@ -2404,24 +2393,29 @@
                     window._nativeTimerInt = setInterval(updateTimer, 1000);
 
                 } else {
-                    // ربط أزرار تسجيل الدخول والتحقق من صحة المدخلات وكلمة المرور
-                    const buttons = loginBox.querySelectorAll('button');
+                    // ربط أزرار النموذج والتحقق من صحة البريد وكلمة المرور
+                    const buttons = loginForm.querySelectorAll('button, input[type="submit"]');
                     buttons.forEach(btn => {
-                        if (!btn.dataset.hooked && (btn.textContent.includes('تسجيل الدخول') || btn.type === 'submit')) {
+                        if (!btn.dataset.hooked) {
                             btn.dataset.hooked = 'true';
                             btn.addEventListener('click', function (e) {
                                 e.preventDefault();
-                                const inputs = loginBox.querySelectorAll('input');
+                                e.stopPropagation();
+
+                                const inputs = loginForm.querySelectorAll('input');
                                 let emailVal = '';
                                 let passVal = '';
 
                                 inputs.forEach(inp => {
-                                    if (inp.type === 'email' || inp.name.includes('email') || inp.placeholder.includes('البريد')) {
+                                    if (inp.type === 'email' || inp.name.includes('email') || inp.placeholder?.includes('البريد')) {
                                         emailVal = inp.value.trim();
-                                    } else if (inp.type === 'password' || inp.name.includes('password') || inp.placeholder.includes('كلمة')) {
+                                    } else if (inp.type === 'password' || inp.name.includes('pass') || inp.placeholder?.includes('كلمة')) {
                                         passVal = inp.value;
                                     }
                                 });
+
+                                if (!emailVal && inputs.length > 0) emailVal = inputs[0].value.trim();
+                                if (!passVal && inputs.length > 1) passVal = inputs[1].value;
 
                                 if (!emailVal || !emailVal.includes('@')) {
                                     alert('الرجاء إدخال بريد إلكتروني صحيح.');
@@ -2475,8 +2469,6 @@
             }, true);
         })();
 
-        // Init
-        setLanguage('ar');
         // Init
         setLanguage('ar');
 
