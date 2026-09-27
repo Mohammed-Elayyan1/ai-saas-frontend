@@ -2437,7 +2437,7 @@
                 <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: bold; color: #fff;">استعادة كلمة المرور - NexusAI</h3>
                 <p style="color: #94a3b8; font-size: 12px; margin-bottom: 20px;">أدخل بريدك الإلكتروني لإرسال رمز التحقق الحقيقي (OTP)</p>
                 
-                <input type="email" placeholder="البريد الإلكتروني المسجل" id="modalVerifyEmail" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 6px; margin-bottom: 14px; box-sizing: border-box; font-size: 13px; text-align: right;">
+                <input type="email" placeholder="البريد الإلكتروني الخاص بك" id="modalVerifyEmail" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 6px; margin-bottom: 14px; box-sizing: border-box; font-size: 13px; text-align: right;">
                 
                 <div id="modalOtpSection" style="display: none; width: 100%;">
                     <div id="modalOtpNotice" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); padding: 10px; border-radius: 6px; margin-bottom: 12px; font-size: 12px; color: #60a5fa; line-height: 1.5;"></div>
@@ -2457,7 +2457,6 @@
                 document.body.appendChild(overlay);
 
                 let generatedCode = '';
-                const savedEmail = localStorage.getItem('user_email') || 'hbhh@gmail.com';
 
                 document.getElementById('nativeCloseModal').onclick = function () {
                     overlay.remove();
@@ -2468,49 +2467,44 @@
 
                 document.getElementById('modalSendCodeBtn').onclick = function () {
                     const enteredEmail = document.getElementById('modalVerifyEmail').value.trim();
-                    if (!enteredEmail) {
-                        alert('الرجاء إدخال البريد الإلكتروني.');
+                    if (!enteredEmail || !enteredEmail.includes('@')) {
+                        alert('الرجاء إدخال بريد إلكتروني صحيح.');
                         return;
                     }
 
-                    if (enteredEmail.toLowerCase() === savedEmail.toLowerCase()) {
-                        generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+                    generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-                        const sendBtn = document.getElementById('modalSendCodeBtn');
-                        sendBtn.textContent = 'جارِ إرسال البريد...';
-                        sendBtn.disabled = true;
+                    const sendBtn = document.getElementById('modalSendCodeBtn');
+                    sendBtn.textContent = 'جارِ إرسال البريد...';
+                    sendBtn.disabled = true;
 
-                        const SERVICE_ID = "service_jotpx98";
-                        const TEMPLATE_ID = "template_kitaaxu";
-                        const PUBLIC_KEY = "I66IR3zFFU2s0qTlS";
+                    const SERVICE_ID = "service_jotpx98";
+                    const TEMPLATE_ID = "template_kitaaxu";
+                    const PUBLIC_KEY = "I66IR3zFFU2s0qTlS";
 
-                        const templateParams = {
-                            to_email: savedEmail,
-                            otp_code: generatedCode
-                        };
+                    const templateParams = {
+                        to_email: enteredEmail,
+                        otp_code: generatedCode
+                    };
 
-                        if (window.emailjs) {
-                            emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY)
-                                .then(function (response) {
-                                    document.getElementById('modalOtpNotice').innerHTML = `تم إرسال رمز التحقق بنجاح إلى بريدك الإلكتروني: <b>${savedEmail}</b>.<br><span style="color: #60a5fa;">(تحقق من صندوق الوارد أو الـ Spam في بريدك).</span>`;
-                                    document.getElementById('modalVerifyEmail').style.display = 'none';
-                                    sendBtn.style.display = 'none';
-                                    document.getElementById('modalOtpSection').style.display = 'block';
-                                    alert('تم إرسال رسالة التحقق إلى بريدك الإلكتروني بنجاح!');
-                                }, function (error) {
-                                    sendBtn.textContent = 'إرسال رسالة التحقق للإيميل';
-                                    sendBtn.disabled = false;
-                                    alert('حدث خطأ في إرسال الإيميل. تأكد من إعدادات Template ID و Public Key.');
-                                    console.error('EmailJS Error:', error);
-                                });
-                        } else {
-                            alert('مكتبة الإيميل لم تتحمل بعد، يرجى المحاولة بعد ثانية.');
-                            sendBtn.textContent = 'إرسال رسالة التحقق للإيميل';
-                            sendBtn.disabled = false;
-                        }
-
+                    if (window.emailjs) {
+                        emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY)
+                            .then(function (response) {
+                                document.getElementById('modalOtpNotice').innerHTML = `تم إرسال رمز التحقق بنجاح إلى بريدك الإلكتروني: <b>${enteredEmail}</b>.<br><span style="color: #60a5fa;">(تحقق من صندوق الوارد أو الـ Spam في بريدك).</span>`;
+                                document.getElementById('modalVerifyEmail').style.display = 'none';
+                                sendBtn.style.display = 'none';
+                                document.getElementById('modalOtpSection').style.display = 'block';
+                                alert('تم إرسال رسالة التحقق إلى بريدك الإلكتروني بنجاح!');
+                            }, function (error) {
+                                sendBtn.textContent = 'إرسال رسالة التحقق للإيميل';
+                                sendBtn.disabled = false;
+                                alert('حدث خطأ في إرسال الإيميل. تأكد من إعدادات Template ID و Public Key.');
+                                console.error('EmailJS Error:', error);
+                            });
                     } else {
-                        alert('عذراً، البريد الإلكتروني غير مسجل لدينا.');
+                        alert('مكتبة الإيميل لم تتحمل بعد، يرجى المحاولة بعد ثانية.');
+                        sendBtn.textContent = 'إرسال رسالة التحقق للإيميل';
+                        sendBtn.disabled = false;
                     }
                 };
 
