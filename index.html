@@ -2399,7 +2399,7 @@
                     window._nativeTimerInt = setInterval(updateTimer, 1000);
 
                 } else if (isForgotState) {
-                    // واجهة استعادة كلمة المرور المباشرة داخل الصندوق
+                    // واجهة استعادة كلمة المرور المباشرة داخل الصندوق بدون أي انتقال لصفحة أخرى
                     if (loginForm.dataset.renderedForgot !== 'true') {
                         loginForm.dataset.renderedForgot = 'true';
                         loginForm.innerHTML = `
@@ -2413,7 +2413,7 @@
                         
                         <button type="button" id="nativeResetBtn" style="background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px; margin-bottom: 10px; box-sizing: border-box;">حفظ كلمة المرور الجديدة</button>
                         
-                        <button type="button" id="nativeBackLoginBtn" style="background: transparent; color: #60a5fa; border: none; cursor: pointer; font-size: 12px; text-decoration: underline;">العودة لتسجيل الدخول</button>
+                        <span id="nativeBackLoginBtn" style="color: #60a5fa; font-size: 12px; text-decoration: underline; cursor: pointer;">العودة لتسجيل الدخول</span>
                     </div>
                 `;
 
@@ -2448,15 +2448,16 @@
                         }, 50);
                     }
                 } else {
-                    // إضافة رابط "نسيت كلمة المرور؟" أسفل النموذج الأصلي إذا لم يكن موجوداً
+                    // إضافة زر "نسيت كلمة المرور؟" كعنصر Span آمن لا يصعد لأعلى الصفحة
                     if (!loginForm.querySelector('#nativeForgotLink')) {
                         const forgotDiv = document.createElement('div');
                         forgotDiv.style.cssText = 'text-align: center; margin-top: 12px; width: 100%;';
-                        forgotDiv.innerHTML = `<a href="#" id="nativeForgotLink" style="color: #60a5fa; font-size: 12px; text-decoration: underline;">نسيت كلمة المرور؟</a>`;
+                        forgotDiv.innerHTML = `<span id="nativeForgotLink" style="color: #60a5fa; font-size: 12px; text-decoration: underline; cursor: pointer;">نسيت كلمة المرور؟</span>`;
                         loginForm.appendChild(forgotDiv);
 
                         document.getElementById('nativeForgotLink').onclick = function (e) {
                             e.preventDefault();
+                            e.stopPropagation();
                             loginForm.dataset.currentState = 'forgot';
                             updateApp();
                         };
@@ -2465,7 +2466,7 @@
                     // ربط أزرار النموذج والتحقق من صحة البريد وكلمة المرور
                     const buttons = loginForm.querySelectorAll('button, input[type="submit"]');
                     buttons.forEach(btn => {
-                        if (!btn.dataset.hooked && btn.id !== 'nativeForgotLink') {
+                        if (!btn.dataset.hooked) {
                             btn.dataset.hooked = 'true';
                             btn.addEventListener('click', function (e) {
                                 e.preventDefault();
