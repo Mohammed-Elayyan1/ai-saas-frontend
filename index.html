@@ -2263,20 +2263,16 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === إصلاح شامل ونهائي لصندوق تسجيل الدخول والملف الشخصي ===
+        // === إصلاح نهائي: صندوق واحد فقط بدون أي ازدحام أو تكرار ===
         (function () {
             const TRIAL_DAYS = 7;
             const PAYPAL_LINKS = {
-                starter: 'https://www.paypal.com/ncp/payment/23V3WQK4NVTG4',     // Starter (29$)
-                pro: 'https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6',         // Pro (79$)
-                enterprise: 'https://www.paypal.com/ncp/payment/CS59KMKAETBFC'  // Enterprise (199$)
+                starter: 'https://www.paypal.com/ncp/payment/23V3WQK4NVTG4',
+                pro: 'https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6',
+                enterprise: 'https://www.paypal.com/ncp/payment/CS59KMKAETBFC'
             };
 
-            function initPortal() {
-                // إزالة أي حاوية قديمة لمنع التكرار والتداخل تماماً
-                const oldContainers = document.querySelectorAll('#custom-user-portal-container');
-                oldContainers.forEach(el => el.remove());
-
+            function updateSingleBox() {
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
                 const userEmail = localStorage.getItem('user_email') || 'حسابي';
                 const companyName = localStorage.getItem('company_name') || '';
@@ -2301,13 +2297,28 @@
                     localStorage.setItem('user_api_key', userApiKey);
                 }
 
-                // إنشاء حاوية مربعة وأنيقة جديدة
-                const portalContainer = document.createElement('div');
-                portalContainer.id = 'custom-user-portal-container';
-                portalContainer.style.cssText = `
+                // إخفاء أي نموذج أو صندوق قديم لتجنب التكرار
+                document.querySelectorAll('.custom-unified-auth-box').forEach(el => el.remove());
+
+                // محاولة إخفاء النماذج الأصلية الواسعة في القالب إن وجدت لتجنب تشتيت العرض
+                document.querySelectorAll('form').forEach(f => {
+                    if (!f.id.includes('customUnifiedForm')) {
+                        const parentCard = f.closest('div');
+                        if (parentCard && (parentCard.style.maxWidth || parentCard.classList.contains('auth-card') || parentCard.innerHTML.includes('كلمة المرور'))) {
+                            parentCard.style.display = 'none';
+                        }
+                    }
+                });
+
+                // البحث عن مكان مناسب لوضع الصندوق الوحيد (غالباً تحت العنوان الرئيسي أو قسم الـ Auth)
+                let targetSection = document.getElementById('auth') || document.querySelector('section') || document.body;
+
+                const box = document.createElement('div');
+                box.className = 'custom-unified-auth-box';
+                box.style.cssText = `
             width: 100%;
             max-width: 420px;
-            margin: 50px auto;
+            margin: 40px auto;
             padding: 30px;
             background: rgba(15, 23, 42, 0.98);
             border-radius: 16px;
@@ -2315,13 +2326,13 @@
             box-shadow: 0 15px 35px rgba(0,0,0,0.6);
             text-align: center;
             position: relative;
-            z-index: 9999;
+            z-index: 99999;
             box-sizing: border-box;
             font-family: inherit;
         `;
 
                 if (isLoggedIn) {
-                    portalContainer.innerHTML = `
+                    box.innerHTML = `
                 <div style="font-size: 45px; margin-bottom: 10px;">👤</div>
                 <h3 style="margin: 0 0 5px 0; font-size: 20px; color: #fff;">أهلاً بك مجدداً</h3>
                 ${companyName ? `<p style="color: #fff; font-size: 14px; margin-bottom: 3px; font-weight: bold;">🏢 ${companyName}</p>` : ''}
@@ -2334,45 +2345,38 @@
                 <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: right; border: 1px solid rgba(255,255,255,0.1);">
                     <p style="color: #94a3b8; font-size: 12px; margin: 0 0 6px 0;">🔑 مفتاح الوصول (API Key):</p>
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <input type="text" readonly value="${userApiKey}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 6px 10px; border-radius: 6px; width: 100%; font-family: monospace; font-size: 11px; direction: ltr;" id="userApiKeyField">
-                        <button type="button" id="copyApiKeyBtn" style="background: #3b82f6; color: white; border: none; padding: 7px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; white-space: nowrap; font-weight: bold;">نسخ</button>
+                        <input type="text" readonly value="${userApiKey}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 6px 10px; border-radius: 6px; width: 100%; font-family: monospace; font-size: 11px; direction: ltr;" id="singleApiKeyField">
+                        <button type="button" id="singleCopyBtn" style="background: #3b82f6; color: white; border: none; padding: 7px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; white-space: nowrap; font-weight: bold;">نسخ</button>
                     </div>
                 </div>
 
-                <button type="button" id="globalLogoutBtn" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 14px; transition: 0.3s;">تسجيل الخروج</button>
+                <button type="button" id="singleLogoutBtn" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 14px;">تسجيل الخروج</button>
             `;
                 } else {
-                    portalContainer.innerHTML = `
+                    box.innerHTML = `
                 <h3 style="color: #fff; margin-bottom: 15px; font-size: 18px;">تسجيل الدخول / بدء التجربة</h3>
-                <form id="customLoginForm" style="display: flex; flex-direction: column; gap: 12px;">
-                    <input type="email" id="loginEmailInput" placeholder="البريد الإلكتروني" required style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box;">
-                    <input type="text" id="loginCompanyInput" placeholder="اسم الشركة (اختياري)" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box;">
+                <form id="customUnifiedForm" style="display: flex; flex-direction: column; gap: 12px;">
+                    <input type="email" id="singleEmail" placeholder="البريد الإلكتروني" required style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box;">
+                    <input type="text" id="singleCompany" placeholder="اسم الشركة (اختياري)" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box;">
                     <button type="submit" style="background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; width: 100%;">دخول / تفعيل التجربة</button>
                 </form>
             `;
                 }
 
-                // إدراج الصندوق تحت قسم البطاقات أو في مكان بارز
-                let inserted = false;
-                const elements = document.querySelectorAll('div, section');
-                for (let el of elements) {
-                    if (el.textContent && el.textContent.includes('مفتاح API خاص بك') && !el.id) {
-                        el.parentNode.insertBefore(portalContainer, el.nextSibling);
-                        inserted = true;
-                        break;
-                    }
+                // إدراج الصندوق في أول قسم مناسب بمنتصف الصفحة
+                const referenceNode = document.querySelector('section') || document.body.firstChild;
+                if (referenceNode && referenceNode.parentNode) {
+                    referenceNode.parentNode.insertBefore(box, referenceNode);
+                } else {
+                    document.body.appendChild(box);
                 }
 
-                if (!inserted) {
-                    document.body.appendChild(portalContainer);
-                }
-
-                // تفعيل الأحداث والأزرار
+                // ربط الأحداث
                 setTimeout(() => {
-                    const copyBtn = document.getElementById('copyApiKeyBtn');
+                    const copyBtn = document.getElementById('singleCopyBtn');
                     if (copyBtn) {
                         copyBtn.onclick = function () {
-                            const field = document.getElementById('userApiKeyField');
+                            const field = document.getElementById('singleApiKeyField');
                             navigator.clipboard.writeText(field.value);
                             copyBtn.textContent = 'تم النسخ! ✓';
                             copyBtn.style.background = '#22c55e';
@@ -2383,7 +2387,7 @@
                         };
                     }
 
-                    const logoutBtn = document.getElementById('globalLogoutBtn');
+                    const logoutBtn = document.getElementById('singleLogoutBtn');
                     if (logoutBtn) {
                         logoutBtn.onclick = function () {
                             localStorage.removeItem('is_logged_in');
@@ -2391,35 +2395,35 @@
                             localStorage.removeItem('company_name');
                             localStorage.removeItem('trial_start_date');
                             localStorage.removeItem('user_api_key');
-                            initPortal();
+                            updateSingleBox();
                         };
                     }
 
-                    const loginForm = document.getElementById('customLoginForm');
-                    if (loginForm) {
-                        loginForm.onsubmit = function (e) {
+                    const form = document.getElementById('customUnifiedForm');
+                    if (form) {
+                        form.onsubmit = function (e) {
                             e.preventDefault();
-                            const email = document.getElementById('loginEmailInput').value.trim();
-                            const company = document.getElementById('loginCompanyInput').value.trim();
+                            const email = document.getElementById('singleEmail').value.trim();
+                            const company = document.getElementById('singleCompany').value.trim();
                             if (email) {
                                 localStorage.setItem('is_logged_in', 'true');
                                 localStorage.setItem('user_email', email);
                                 localStorage.setItem('trial_start_date', new Date().toISOString());
                                 if (company) localStorage.setItem('company_name', company);
-                                initPortal();
+                                updateSingleBox();
                             }
                         };
                     }
-                }, 100);
+                }, 50);
             }
 
             if (document.readyState === 'complete' || document.readyState === 'interactive') {
-                initPortal();
+                updateSingleBox();
             } else {
-                window.addEventListener('DOMContentLoaded', initPortal);
+                window.addEventListener('DOMContentLoaded', updateSingleBox);
             }
 
-            // توجيه أزرار الباقات لروابط PayPal المعتمدة
+            // توجيه أزرار الباقات لروابط PayPal
             document.addEventListener('click', function (e) {
                 const target = e.target.closest('a, button');
                 if (!target) return;
