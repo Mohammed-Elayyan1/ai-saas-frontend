@@ -2263,7 +2263,7 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === إصلاح نهائي: صندوق واحد فقط بدون أي ازدحام أو تكرار ===
+        // === الحل النهائي: وضع الصندوق داخل قسم "ابدأ رحلتك" وتحديث القائمة العلوية ===
         (function () {
             const TRIAL_DAYS = 7;
             const PAYPAL_LINKS = {
@@ -2272,11 +2272,28 @@
                 enterprise: 'https://www.paypal.com/ncp/payment/CS59KMKAETBFC'
             };
 
-            function updateSingleBox() {
+            function updatePortal() {
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
                 const userEmail = localStorage.getItem('user_email') || 'حسابي';
                 const companyName = localStorage.getItem('company_name') || '';
 
+                // 1. تحديث زر "تسجيل الدخول" في القائمة العلوية ليعرض البريد أو اسم الشركة عند تسجيل الدخول
+                document.querySelectorAll('a, button').forEach(el => {
+                    const text = el.textContent.trim();
+                    if (text === 'تسجيل الدخول' || text === 'تسجيل دخول' || text.includes('hbhh@gmail.com')) {
+                        if (!el.closest('.custom-unified-auth-box')) {
+                            if (isLoggedIn) {
+                                el.textContent = `👤 ${companyName ? companyName : userEmail}`;
+                                el.style.display = '';
+                            } else {
+                                el.textContent = 'تسجيل الدخول';
+                                el.style.display = '';
+                            }
+                        }
+                    }
+                });
+
+                // إدارة أيام التجربة والمفتاح
                 let trialStart = localStorage.getItem('trial_start_date');
                 if (!trialStart && isLoggedIn) {
                     trialStart = new Date().toISOString();
@@ -2297,81 +2314,78 @@
                     localStorage.setItem('user_api_key', userApiKey);
                 }
 
-                // إخفاء أي نموذج أو صندوق قديم لتجنب التكرار
+                // إزالة الحاويات القديمة لتجنب التكرار
                 document.querySelectorAll('.custom-unified-auth-box').forEach(el => el.remove());
 
-                // محاولة إخفاء النماذج الأصلية الواسعة في القالب إن وجدت لتجنب تشتيت العرض
-                document.querySelectorAll('form').forEach(f => {
-                    if (!f.id.includes('customUnifiedForm')) {
-                        const parentCard = f.closest('div');
-                        if (parentCard && (parentCard.style.maxWidth || parentCard.classList.contains('auth-card') || parentCard.innerHTML.includes('كلمة المرور'))) {
-                            parentCard.style.display = 'none';
-                        }
-                    }
-                });
-
-                // البحث عن مكان مناسب لوضع الصندوق الوحيد (غالباً تحت العنوان الرئيسي أو قسم الـ Auth)
-                let targetSection = document.getElementById('auth') || document.querySelector('section') || document.body;
-
+                // بناء محتوى الصندوق المربع الأنيق
                 const box = document.createElement('div');
                 box.className = 'custom-unified-auth-box';
                 box.style.cssText = `
             width: 100%;
-            max-width: 420px;
-            margin: 40px auto;
-            padding: 30px;
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 25px;
             background: rgba(15, 23, 42, 0.98);
             border-radius: 16px;
             border: 1px solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 15px 35px rgba(0,0,0,0.6);
             text-align: center;
             position: relative;
-            z-index: 99999;
+            z-index: 999;
             box-sizing: border-box;
             font-family: inherit;
         `;
 
                 if (isLoggedIn) {
                     box.innerHTML = `
-                <div style="font-size: 45px; margin-bottom: 10px;">👤</div>
-                <h3 style="margin: 0 0 5px 0; font-size: 20px; color: #fff;">أهلاً بك مجدداً</h3>
-                ${companyName ? `<p style="color: #fff; font-size: 14px; margin-bottom: 3px; font-weight: bold;">🏢 ${companyName}</p>` : ''}
-                <p style="color: #60a5fa; font-size: 13px; margin-bottom: 15px; direction: ltr;">${userEmail}</p>
+                <div style="font-size: 38px; margin-bottom: 8px;">👤</div>
+                <h3 style="margin: 0 0 5px 0; font-size: 18px; color: #fff;">أهلاً بك مجدداً</h3>
+                ${companyName ? `<p style="color: #fff; font-size: 13px; margin-bottom: 3px; font-weight: bold;">🏢 ${companyName}</p>` : ''}
+                <p style="color: #60a5fa; font-size: 12px; margin-bottom: 12px; direction: ltr;">${userEmail}</p>
                 
-                <div style="background: rgba(241, 196, 15, 0.1); border: 1px solid rgba(241, 196, 15, 0.3); padding: 8px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; color: #facc15;">
+                <div style="background: rgba(241, 196, 15, 0.1); border: 1px solid rgba(241, 196, 15, 0.3); padding: 6px; border-radius: 8px; margin-bottom: 12px; font-size: 12px; color: #facc15;">
                     ⏳ التجربة المجانية نشطة: متبقي <b>${remainingDays}</b> أيام من أصل ${TRIAL_DAYS} أيام.
                 </div>
 
-                <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: right; border: 1px solid rgba(255,255,255,0.1);">
-                    <p style="color: #94a3b8; font-size: 12px; margin: 0 0 6px 0;">🔑 مفتاح الوصول (API Key):</p>
+                <div style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: right; border: 1px solid rgba(255,255,255,0.1);">
+                    <p style="color: #94a3b8; font-size: 11px; margin: 0 0 4px 0;">🔑 مفتاح الوصول (API Key):</p>
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <input type="text" readonly value="${userApiKey}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 6px 10px; border-radius: 6px; width: 100%; font-family: monospace; font-size: 11px; direction: ltr;" id="singleApiKeyField">
-                        <button type="button" id="singleCopyBtn" style="background: #3b82f6; color: white; border: none; padding: 7px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; white-space: nowrap; font-weight: bold;">نسخ</button>
+                        <input type="text" readonly value="${userApiKey}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 6px; border-radius: 6px; width: 100%; font-family: monospace; font-size: 11px; direction: ltr;" id="singleApiKeyField">
+                        <button type="button" id="singleCopyBtn" style="background: #3b82f6; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: bold;">نسخ</button>
                     </div>
                 </div>
 
-                <button type="button" id="singleLogoutBtn" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 14px;">تسجيل الخروج</button>
+                <button type="button" id="singleLogoutBtn" style="background: #ef4444; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px;">تسجيل الخروج</button>
             `;
                 } else {
                     box.innerHTML = `
-                <h3 style="color: #fff; margin-bottom: 15px; font-size: 18px;">تسجيل الدخول / بدء التجربة</h3>
-                <form id="customUnifiedForm" style="display: flex; flex-direction: column; gap: 12px;">
-                    <input type="email" id="singleEmail" placeholder="البريد الإلكتروني" required style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box;">
-                    <input type="text" id="singleCompany" placeholder="اسم الشركة (اختياري)" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box;">
-                    <button type="submit" style="background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; width: 100%;">دخول / تفعيل التجربة</button>
+                <h3 style="color: #fff; margin-bottom: 12px; font-size: 16px;">تسجيل الدخول / بدء التجربة</h3>
+                <form id="customUnifiedForm" style="display: flex; flex-direction: column; gap: 10px;">
+                    <input type="email" id="singleEmail" placeholder="البريد الإلكتروني" required style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px; border-radius: 8px; font-size: 13px; width: 100%; box-sizing: border-box;">
+                    <input type="text" id="singleCompany" placeholder="اسم الشركة (اختياري)" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px; border-radius: 8px; font-size: 13px; width: 100%; box-sizing: border-box;">
+                    <button type="submit" style="background: #3b82f6; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; width: 100%;">دخول / تفعيل التجربة</button>
                 </form>
             `;
                 }
 
-                // إدراج الصندوق في أول قسم مناسب بمنتصف الصفحة
-                const referenceNode = document.querySelector('section') || document.body.firstChild;
-                if (referenceNode && referenceNode.parentNode) {
-                    referenceNode.parentNode.insertBefore(box, referenceNode);
-                } else {
-                    document.body.appendChild(box);
+                // 2. البحث عن القسم الذي يحتوي على "ابدأ رحلتك مع الذكاء الاصطناعي" ووضع الصندوق بداخله مباشرة
+                let targetContainer = null;
+                const allElements = document.querySelectorAll('div, section');
+                for (let el of allElements) {
+                    if (el.textContent && el.textContent.includes('ابدأ رحلتك مع الذكاء الاصطناعي') && el.children.length < 15) {
+                        targetContainer = el;
+                        break;
+                    }
                 }
 
-                // ربط الأحداث
+                if (targetContainer) {
+                    targetContainer.appendChild(box);
+                } else {
+                    const fallback = document.querySelector('section') || document.body;
+                    fallback.appendChild(box);
+                }
+
+                // ربط الأحداث والأزرار
                 setTimeout(() => {
                     const copyBtn = document.getElementById('singleCopyBtn');
                     if (copyBtn) {
@@ -2395,7 +2409,7 @@
                             localStorage.removeItem('company_name');
                             localStorage.removeItem('trial_start_date');
                             localStorage.removeItem('user_api_key');
-                            updateSingleBox();
+                            updatePortal();
                         };
                     }
 
@@ -2410,18 +2424,15 @@
                                 localStorage.setItem('user_email', email);
                                 localStorage.setItem('trial_start_date', new Date().toISOString());
                                 if (company) localStorage.setItem('company_name', company);
-                                updateSingleBox();
+                                updatePortal();
                             }
                         };
                     }
                 }, 50);
             }
 
-            if (document.readyState === 'complete' || document.readyState === 'interactive') {
-                updateSingleBox();
-            } else {
-                window.addEventListener('DOMContentLoaded', updateSingleBox);
-            }
+            // تحديث مستمر لتطبيق الحالة في القائمة والصندوق
+            setInterval(updatePortal, 300);
 
             // توجيه أزرار الباقات لروابط PayPal
             document.addEventListener('click', function (e) {
