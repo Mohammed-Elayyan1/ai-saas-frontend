@@ -2263,7 +2263,7 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === الحل النهائي والجذري: إخفاء أي صناديق مكررة وفرض صندوق واحد فقط ديناميكي بالكامل ===
+        // === الحل النهائي والجذري: منع أي تداخل وفرض صندوق واحد رئيسي داخل القسم الأزرق فقط ===
         (function () {
             const TRIAL_DAYS = 7;
             const PAYPAL_LINKS = {
@@ -2277,14 +2277,61 @@
                 e.preventDefault();
             }, true);
 
-            // حقن CSS لإخفاء أي عناصر تداخل قديمة من القالب الأصلي
-            const styleEl = document.createElement('style');
-            styleEl.innerHTML = `
-        .hidden-original-form { display: none !important; }
-        #single-unified-box {
+            function enforceSingleBox() {
+                const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
+                const userEmail = localStorage.getItem('user_email') || 'hbhh@gmail.com';
+
+                // 1. تحديث شريط التنقل العلوي
+                document.querySelectorAll('a, button').forEach(el => {
+                    const text = el.textContent.trim();
+                    if (text === 'تسجيل الدخول' || text === 'تسجيل دخول' || text.includes('hbhh@gmail.com') || text.includes('👤')) {
+                        if (!el.closest('#absolute-master-auth-box')) {
+                            el.textContent = isLoggedIn ? `👤 ${userEmail}` : 'تسجيل الدخول';
+                        }
+                    }
+                });
+
+                // 2. البحث عن القسم الأزرق الرئيسي (Hero Section) في القالب
+                let heroSection = null;
+                const allSections = document.querySelectorAll('div, section');
+                for (let s of allSections) {
+                    const txt = s.textContent || '';
+                    if (txt.includes('ابدأ رحلتك مع الذكاء الاصطناعي') && s.clientHeight > 150) {
+                        heroSection = s;
+                        break;
+                    }
+                }
+
+                if (!heroSection) {
+                    heroSection = document.querySelector('main') || document.body;
+                }
+
+                // 3. إنشاء أو جلب المربع الرئيسي الوحيد
+                let masterBox = document.getElementById('absolute-master-auth-box');
+
+                if (!heroSection.contains(masterBox)) {
+                    if (masterBox) masterBox.remove();
+                    masterBox = document.createElement('div');
+                    masterBox.id = 'absolute-master-auth-box';
+                    heroSection.appendChild(masterBox);
+                }
+
+                // إخفاء أي نماذج أو صناديق أخرى قديمة تنشئها مكتبة الصفحة (React) داخل القسم الأزرق
+                const siblingElements = heroSection.querySelectorAll('form, div');
+                siblingElements.forEach(el => {
+                    if (el !== masterBox && !masterBox.contains(el)) {
+                        const t = el.textContent || '';
+                        if ((t.includes('البريد الإلكتروني') || t.includes('كلمة المرور') || t.includes('إنشاء حساب')) && el.children.length < 15) {
+                            el.style.display = 'none';
+                        }
+                    }
+                });
+
+                // تنسيق المربع الواحد الثابت
+                masterBox.style.cssText = `
             width: 100% !important;
             max-width: 380px !important;
-            margin: 20px auto !important;
+            margin: 25px auto !important;
             padding: 24px !important;
             background: rgba(15, 23, 42, 0.98) !important;
             border-radius: 16px !important;
@@ -2294,68 +2341,11 @@
             box-sizing: border-box !important;
             font-family: inherit !important;
             position: relative !important;
-            z-index: 999 !important;
-        }
-    `;
-            document.head.appendChild(styleEl);
-
-            function renderUnifiedBox() {
-                const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
-                const userEmail = localStorage.getItem('user_email') || 'hbhh@gmail.com';
-
-                // 1. تحديث شريط التنقل العلوي وأزرار البدء
-                document.querySelectorAll('a, button').forEach(el => {
-                    const text = el.textContent.trim();
-                    if (text === 'تسجيل الدخول' || text === 'تسجيل دخول' || text.includes('hbhh@gmail.com') || text.includes('👤')) {
-                        if (!el.closest('#single-unified-box')) {
-                            el.textContent = isLoggedIn ? `👤 ${userEmail}` : 'تسجيل الدخول';
-                        }
-                    }
-                    if (text.includes('ابدأ رحلتك الآن') || text.includes('ابدأ تجربتك المجانية') || text.includes('ابدأ رحلتك') || text.includes('ابدأ الاستخدام')) {
-                        el.onclick = function (e) {
-                            e.preventDefault();
-                            const box = document.querySelector('#single-unified-box');
-                            if (box) box.scrollIntoView({ behavior: 'smooth' });
-                        };
-                    }
-                });
-
-                // 2. البحث عن الحاوية الرئيسية في الصفحة وإخفاء العناصر الأصلية المتداخلة
-                const allSections = document.querySelectorAll('div, section');
-                let parentContainer = null;
-
-                for (let el of allSections) {
-                    const txt = el.textContent || '';
-                    if ((txt.includes('إنشاء حساب') || txt.includes('البريد الإلكتروني') || txt.includes('المتابعة عبر Google')) && el.children.length < 25 && el.children.length > 0) {
-                        // إذا وجدنا نموذج القالب الأصلي، نخفيه ونستبدله بصندوقنا الموحد
-                        if (!el.id.includes('single-unified-box')) {
-                            el.classList.add('hidden-original-form');
-                        }
-                    }
-                }
-
-                // البحث عن أو إنشاء صندوقنا الموحد الفريد
-                let unifiedBox = document.querySelector('#single-unified-box');
-                if (!unifiedBox) {
-                    unifiedBox = document.createElement('div');
-                    unifiedBox.id = 'single-unified-box';
-
-                    // وضعه في مكان مناسب داخل القسم الأزرق
-                    for (let el of allSections) {
-                        if (el.textContent && el.textContent.includes('ابدأ رحلتك مع الذكاء الاصطناعي') && el.clientHeight > 150) {
-                            el.appendChild(unifiedBox);
-                            break;
-                        }
-                    }
-                    if (!unifiedBox.parentNode && document.body) {
-                        document.body.appendChild(unifiedBox);
-                    }
-                }
-
-                if (!unifiedBox) return;
+            z-index: 9999 !important;
+            display: block !important;
+        `;
 
                 if (isLoggedIn) {
-                    // إدارة تاريخ بدء التجربة وحساب الوقت الحقيقي
                     let trialStart = localStorage.getItem('trial_start_date');
                     if (!trialStart) {
                         trialStart = new Date().toISOString();
@@ -2368,35 +2358,35 @@
                         localStorage.setItem('user_api_key', userApiKey);
                     }
 
-                    // محتوى صندوق "أهلاً بك مجدداً" الموحد والوحيد
-                    unifiedBox.innerHTML = `
+                    // محتوى صندوق الترحيب والعداد ومفتاح الـ API داخل المربع الواحد
+                    masterBox.innerHTML = `
                 <div style="font-size: 38px; margin-bottom: 8px;">👤</div>
                 <h3 style="margin: 0 0 6px 0; font-size: 17px; color: #fff; font-weight: bold;">أهلاً بك مجدداً</h3>
                 <p style="color: #60a5fa; font-size: 12px; margin-bottom: 14px; direction: ltr; font-weight: bold;">${userEmail}</p>
                 
-                <div style="background: rgba(241, 196, 15, 0.1); border: 1px solid rgba(241, 196, 15, 0.3); padding: 8px; border-radius: 8px; margin-bottom: 14px; font-size: 11px; color: #facc15;" id="liveCountdownDisplay">
+                <div style="background: rgba(241, 196, 15, 0.1); border: 1px solid rgba(241, 196, 15, 0.3); padding: 8px; border-radius: 8px; margin-bottom: 14px; font-size: 11px; color: #facc15;" id="realCountdownEl">
                     ⏳ جارِ تحميل العداد...
                 </div>
 
                 <div style="background: rgba(0,0,0,0.45); padding: 10px; border-radius: 8px; margin-bottom: 16px; text-align: right; border: 1px solid rgba(255,255,255,0.1);">
                     <p style="color: #94a3b8; font-size: 10px; margin: 0 0 6px 0;">🔑 مفتاح الوصول (API Key):</p>
                     <div style="display: flex; align-items: center; gap: 6px;">
-                        <input type="text" readonly value="${userApiKey}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 6px; border-radius: 4px; width: 100%; font-family: monospace; font-size: 10px; direction: ltr;" id="apiKeyFieldFinal">
-                        <button type="button" id="copyBtnFinal" style="background: #3b82f6; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold;">نسخ</button>
+                        <input type="text" readonly value="${userApiKey}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 6px; border-radius: 4px; width: 100%; font-family: monospace; font-size: 10px; direction: ltr;" id="apiKeyFieldBox">
+                        <button type="button" id="copyBtnBox" style="background: #3b82f6; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold;">نسخ</button>
                     </div>
                 </div>
 
-                <button type="button" id="logoutBtnFinal" style="background: #ef4444; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 12px;">تسجيل الخروج</button>
+                <button type="button" id="logoutBtnBox" style="background: #ef4444; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 12px;">تسجيل الخروج</button>
             `;
 
-                    // العداد الحقيقي الذي يتحدث كل ثانية
+                    // العداد التنازلي الحقيقي
                     function updateTimer() {
                         const startDate = new Date(trialStart);
                         const expiryDate = new Date(startDate.getTime() + (TRIAL_DAYS * 24 * 60 * 60 * 1000));
                         const now = new Date();
                         const diffMs = expiryDate - now;
 
-                        const display = document.getElementById('liveCountdownDisplay');
+                        const display = document.getElementById('realCountdownEl');
                         if (!display) return;
 
                         if (diffMs <= 0) {
@@ -2413,14 +2403,14 @@
                     }
 
                     updateTimer();
-                    const timerInterval = setInterval(updateTimer, 1000);
+                    if (window._timerInstance) clearInterval(window._timerInstance);
+                    window._timerInstance = setInterval(updateTimer, 1000);
 
-                    // تفاعلات الأزرار
                     setTimeout(() => {
-                        const copyBtn = document.getElementById('copyBtnFinal');
+                        const copyBtn = document.getElementById('copyBtnBox');
                         if (copyBtn) {
                             copyBtn.onclick = function () {
-                                const field = document.getElementById('apiKeyFieldFinal');
+                                const field = document.getElementById('apiKeyFieldBox');
                                 if (field) {
                                     navigator.clipboard.writeText(field.value);
                                     copyBtn.textContent = 'تم النسخ! ✓';
@@ -2433,43 +2423,43 @@
                             };
                         }
 
-                        const logoutBtn = document.getElementById('logoutBtnFinal');
+                        const logoutBtn = document.getElementById('logoutBtnBox');
                         if (logoutBtn) {
                             logoutBtn.onclick = function () {
-                                clearInterval(timerInterval);
+                                if (window._timerInstance) clearInterval(window._timerInstance);
                                 localStorage.removeItem('is_logged_in');
                                 localStorage.removeItem('user_email');
                                 localStorage.removeItem('trial_start_date');
                                 localStorage.removeItem('user_api_key');
-                                renderUnifiedBox();
+                                enforceSingleBox();
                             };
                         }
                     }, 50);
 
                 } else {
-                    // محتوى صندوق تسجيل الدخول الموحد والوحيد
-                    unifiedBox.innerHTML = `
+                    // محتوى صندوق تسجيل الدخول في المربع الواحد
+                    masterBox.innerHTML = `
                 <h3 style="color: #fff; margin-bottom: 14px; font-size: 16px; font-weight: bold;">تسجيل الدخول</h3>
                 <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <input type="email" id="loginEmailFinal" placeholder="البريد الإلكتروني" value="hbhh@gmail.com" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px; border-radius: 8px; font-size: 12px; width: 100%; box-sizing: border-box; direction: ltr; text-align: right;">
-                    <input type="password" id="loginPassFinal" placeholder="كلمة المرور" value="********" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px; border-radius: 8px; font-size: 12px; width: 100%; box-sizing: border-box;">
-                    <button type="button" id="loginBtnFinal" style="background: #3b82f6; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%;">تسجيل الدخول</button>
+                    <input type="email" id="loginEmailBox" placeholder="البريد الإلكتروني" value="hbhh@gmail.com" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px; border-radius: 8px; font-size: 12px; width: 100%; box-sizing: border-box; direction: ltr; text-align: right;">
+                    <input type="password" id="loginPassBox" placeholder="كلمة المرور" value="********" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px; border-radius: 8px; font-size: 12px; width: 100%; box-sizing: border-box;">
+                    <button type="button" id="loginSubmitBtnBox" style="background: #3b82f6; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%;">تسجيل الدخول</button>
                     <div style="color: #94a3b8; font-size: 11px; margin: 4px 0;">أو</div>
-                    <button type="button" id="googleBtnFinal" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 9px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%;">المتابعة عبر Google</button>
+                    <button type="button" id="googleSubmitBtnBox" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 9px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%;">المتابعة عبر Google</button>
                 </div>
             `;
 
                     setTimeout(() => {
-                        const loginBtn = document.getElementById('loginBtnFinal');
-                        const googleBtn = document.getElementById('googleBtnFinal');
+                        const loginBtn = document.getElementById('loginSubmitBtnBox');
+                        const googleBtn = document.getElementById('googleSubmitBtnBox');
 
                         const performLogin = function () {
-                            const emailField = document.getElementById('loginEmailFinal');
+                            const emailField = document.getElementById('loginEmailBox');
                             const email = emailField ? emailField.value.trim() : 'hbhh@gmail.com';
                             localStorage.setItem('is_logged_in', 'true');
                             localStorage.setItem('user_email', email || 'hbhh@gmail.com');
                             localStorage.setItem('trial_start_date', new Date().toISOString());
-                            renderUnifiedBox();
+                            enforceSingleBox();
                         };
 
                         if (loginBtn) loginBtn.onclick = performLogin;
@@ -2478,16 +2468,19 @@
                 }
             }
 
-            window.addEventListener('DOMContentLoaded', renderUnifiedBox);
-            window.addEventListener('hashchange', renderUnifiedBox);
-            setTimeout(renderUnifiedBox, 200);
+            window.addEventListener('DOMContentLoaded', enforceSingleBox);
+            setTimeout(enforceSingleBox, 150);
 
-            // مراقبة التغييرات في الصفحة لمنع أي تداخل مستقبلي من تفاعلات React
+            // مراقب دائم يمنع أي محاولة من الصفحة لإعادة إنشاء صندوق ثاني مزدوج
+            let checkTimeout;
             const observer = new MutationObserver(() => {
-                const unified = document.querySelector('#single-unified-box');
-                if (!unified) {
-                    renderUnifiedBox();
-                }
+                clearTimeout(checkTimeout);
+                checkTimeout = setTimeout(() => {
+                    const box = document.getElementById('absolute-master-auth-box');
+                    if (!box || !document.body.contains(box)) {
+                        enforceSingleBox();
+                    }
+                }, 150);
             });
             observer.observe(document.body, { childList: true, subtree: true });
 
