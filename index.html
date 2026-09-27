@@ -2402,6 +2402,26 @@
                 }
             }
 
+            // اعتراض نموذج تسجيل الدخول ليعمل محلياً بدون أخطاء سيرفر
+            document.addEventListener('submit', function (e) {
+                const emailInput = e.target.querySelector('input[type="email"], input[type="text"]');
+                const passwordInput = e.target.querySelector('input[type="password"]');
+                if (emailInput && passwordInput) {
+                    e.preventDefault();
+                    const emailVal = emailInput.value.trim() || 'hbhh@gmail.com';
+                    const passVal = passwordInput.value.trim();
+                    if (passVal.length < 6) {
+                        alert('كلمة المرور يجب ألا تقل عن 6 أحرف.');
+                        return;
+                    }
+                    localStorage.setItem('is_logged_in', 'true');
+                    localStorage.setItem('user_email', emailVal);
+                    localStorage.setItem('user_password', passVal);
+                    alert('تم تسجيل الدخول بنجاح!');
+                    location.reload();
+                }
+            }, true);
+
             function openForgotModal() {
                 const existing = document.getElementById('nativeModalOverlay');
                 if (existing) existing.remove();
