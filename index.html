@@ -2272,66 +2272,50 @@
             };
 
             document.addEventListener('submit', function (e) {
-                if (e.target && e.target.id === 'customAuthForm') {
+                if (e.target && e.target.id === 'journeyAuthForm') {
                     e.preventDefault();
                 }
             }, true);
 
-            function updateApp() {
+            function updateJourneyWidget() {
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
                 const userEmail = localStorage.getItem('user_email') || 'hbhh@gmail.com';
 
-                // 1. تحديث زر تسجيل الدخول في القائمة العلوية بأمان تام ودون المساس بباقي الأزرار
+                // تحديث زر تسجيل الدخول في القائمة العلوية بأمان
                 document.querySelectorAll('a, button').forEach(el => {
                     const text = el.textContent.trim();
                     if (text === 'تسجيل الدخول' || text === 'تسجيل دخول') {
                         el.textContent = isLoggedIn ? `👤 ${userEmail.split('@')[0]}` : 'تسجيل الدخول';
-                        if (!el.dataset.authHooked) {
-                            el.dataset.authHooked = 'true';
-                            el.style.cursor = 'pointer';
-                            el.onclick = function (e) {
-                                if (!window.location.hash.includes('auth')) {
-                                    e.preventDefault();
-                                    window.location.hash = '#auth';
-                                }
-                            };
-                        }
                     }
                 });
 
-                // 2. التحقق مما إذا كنا في صفحة تسجيل الدخول (#auth) فقط
-                const isAuthPage = window.location.hash.includes('auth') || window.location.pathname.includes('auth');
+                // البحث حصرياً عن صندوق "ابدأ رحلتك الآن" مع حماية قسم الباقات تماماً
+                let targetBox = null;
+                const allElements = document.querySelectorAll('div, section, header');
 
-                if (!isAuthPage) {
-                    // إذا لم نكن في صفحة تسجيل الدخول، اترك الصفحة الرئيسية والباقات تظهر بشكل طبيعي تماماً
-                    return;
-                }
+                for (let el of allElements) {
+                    const txt = el.textContent || '';
+                    // استثناء قسم الباقات والأسعار كلياً لضمان عدم اختفائها
+                    if (txt.includes('باقات تناسب') || txt.includes('الأسعار') || txt.includes('سنوي') || txt.includes('شهري') || txt.includes('Starter') || txt.includes('Pro')) {
+                        continue;
+                    }
 
-                // 3. البحث عن صندوق تسجيل الدخول داخل صفحة الـ Auth فقط
-                let cardContainer = null;
-                const allDivs = document.querySelectorAll('div');
-                for (let div of allDivs) {
-                    const txt = div.textContent || '';
-                    if (txt.includes('باقات تناسب') || txt.includes('الأسعار')) continue;
-
-                    if ((txt.includes('تسجيل الدخول') || txt.includes('البريد الإلكتروني')) && div.children.length > 0 && div.children.length < 20) {
-                        if (div.clientHeight > 80 && div.clientHeight < 600) {
-                            cardContainer = div;
-                            break;
-                        }
+                    if (txt.includes('ابدأ رحلتك الآن') && el.children.length < 15 && el.clientHeight > 40 && el.clientHeight < 500) {
+                        targetBox = el;
+                        break;
                     }
                 }
 
-                if (!cardContainer) return;
+                if (!targetBox) return;
 
-                const stateKey = isLoggedIn ? 'dashboard_view_v7' : 'login_view_v7';
-                if (cardContainer.dataset.appState === stateKey) return;
-                cardContainer.dataset.appState = stateKey;
+                const stateFlag = isLoggedIn ? 'journey_logged_in_v8' : 'journey_logged_out_v8';
+                if (targetBox.dataset.widgetState === stateFlag) return;
+                targetBox.dataset.widgetState = stateFlag;
 
-                cardContainer.style.display = 'flex';
-                cardContainer.style.flexDirection = 'column';
-                cardContainer.style.alignItems = 'center';
-                cardContainer.style.justifyContent = 'center';
+                targetBox.style.display = 'flex';
+                targetBox.style.flexDirection = 'column';
+                targetBox.style.alignItems = 'center';
+                targetBox.style.justifyContent = 'center';
 
                 if (isLoggedIn) {
                     let trialStart = localStorage.getItem('trial_start_date');
@@ -2346,25 +2330,25 @@
                         localStorage.setItem('user_api_key', userApiKey);
                     }
 
-                    cardContainer.innerHTML = `
-                <div style="width: 100%; max-width: 380px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; text-align: center; box-sizing: border-box; padding: 20px;">
-                    <div style="font-size: 38px; margin-bottom: 8px;">👤</div>
-                    <h3 style="margin: 0 0 6px 0; font-size: 18px; color: #fff; font-weight: bold;">أهلاً بك في فترتك التجريبية</h3>
+                    targetBox.innerHTML = `
+                <div style="width: 100%; max-width: 400px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(59, 130, 246, 0.3); padding: 24px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; box-sizing: border-box; margin: 10px auto;">
+                    <div style="font-size: 36px; margin-bottom: 8px;">👤</div>
+                    <h3 style="margin: 0 0 6px 0; font-size: 18px; color: #fff; font-weight: bold;">أهلاً بك في رحلتك التجريبية</h3>
                     <p style="color: #60a5fa; font-size: 13px; margin-bottom: 16px; direction: ltr; font-weight: bold;">${userEmail}</p>
                     
-                    <div style="background: rgba(241, 196, 15, 0.1); border: 1px solid rgba(241, 196, 15, 0.3); padding: 10px; border-radius: 8px; margin-bottom: 16px; font-size: 12px; color: #facc15; width: 100%; box-sizing: border-box;" id="timerDisplayV7">
+                    <div style="background: rgba(241, 196, 15, 0.1); border: 1px solid rgba(241, 196, 15, 0.3); padding: 10px; border-radius: 8px; margin-bottom: 16px; font-size: 12px; color: #facc15; width: 100%; box-sizing: border-box;" id="journeyTimerDisplay">
                         ⏳ جارِ حساب الوقت المتبقي...
                     </div>
 
                     <div style="background: rgba(0,0,0,0.45); padding: 12px; border-radius: 8px; margin-bottom: 18px; text-align: right; border: 1px solid rgba(255,255,255,0.1); width: 100%; box-sizing: border-box;">
-                        <p style="color: #94a3b8; font-size: 11px; margin: 0 0 6px 0; text-align: right;">🔑 مفتاح التجربة المجانية (API Key):</p>
+                        <p style="color: #94a3b8; font-size: 11px; margin: 0 0 6px 0; text-align: right;">🔑 مفتاح التجربة (API Key):</p>
                         <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
-                            <input type="text" readonly value="${userApiKey}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px; border-radius: 4px; flex-grow: 1; font-family: monospace; font-size: 11px; direction: ltr; box-sizing: border-box;" id="apiKeyInputV7">
-                            <button type="button" id="copyBtnV7" style="background: #3b82f6; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; white-space: nowrap;">نسخ</button>
+                            <input type="text" readonly value="${userApiKey}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px; border-radius: 4px; flex-grow: 1; font-family: monospace; font-size: 11px; direction: ltr; box-sizing: border-box;" id="journeyApiKeyInput">
+                            <button type="button" id="journeyCopyBtn" style="background: #3b82f6; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; white-space: nowrap;">نسخ</button>
                         </div>
                     </div>
 
-                    <button type="button" id="logoutBtnV7" style="background: #ef4444; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px; box-sizing: border-box;">تسجيل الخروج</button>
+                    <button type="button" id="journeyLogoutBtn" style="background: #ef4444; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px; box-sizing: border-box;">تسجيل الخروج</button>
                 </div>
             `;
 
@@ -2374,30 +2358,30 @@
                         const now = new Date().getTime();
                         const diff = expiry - now;
 
-                        const el = document.getElementById('timerDisplayV7');
+                        const el = document.getElementById('journeyTimerDisplay');
                         if (!el) return;
 
                         if (diff <= 0) {
-                            el.innerHTML = `⚠️ انتهت فترتك التجريبية المجانية. يرجى الترقية لإحدى الباقات.`;
+                            el.innerHTML = `⚠️ انتهت فترتك التجريبية. يرجى الترقية لإحدى الباقات بالأسفل.`;
                             el.style.color = '#ef4444';
                         } else {
                             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
                             const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                             const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-                            el.innerHTML = `⏳ متبقي على نهاية التجربة المجانية: ${days} أيام، ${hours} س، ${minutes} د، ${seconds} ث`;
+                            el.innerHTML = `⏳ متبقي على نهاية التجربة: ${days} أيام، ${hours} س، ${minutes} د، ${seconds} ث`;
                         }
                     }
 
                     updateTimer();
-                    if (window._timerIntV7) clearInterval(window._timerIntV7);
-                    window._timerIntV7 = setInterval(updateTimer, 1000);
+                    if (window._journeyTimerInt) clearInterval(window._journeyTimerInt);
+                    window._journeyTimerInt = setInterval(updateTimer, 1000);
 
                     setTimeout(() => {
-                        const copyBtn = document.getElementById('copyBtnV7');
+                        const copyBtn = document.getElementById('journeyCopyBtn');
                         if (copyBtn) {
                             copyBtn.onclick = function () {
-                                const field = document.getElementById('apiKeyInputV7');
+                                const field = document.getElementById('journeyApiKeyInput');
                                 if (field) {
                                     navigator.clipboard.writeText(field.value);
                                     copyBtn.textContent = 'تم النسخ! ✓';
@@ -2410,45 +2394,45 @@
                             };
                         }
 
-                        const logoutBtn = document.getElementById('logoutBtnV7');
+                        const logoutBtn = document.getElementById('journeyLogoutBtn');
                         if (logoutBtn) {
                             logoutBtn.onclick = function () {
-                                if (window._timerIntV7) clearInterval(window._timerIntV7);
+                                if (window._journeyTimerInt) clearInterval(window._journeyTimerInt);
                                 localStorage.removeItem('is_logged_in');
-                                cardContainer.removeAttribute('data-app-state');
-                                updateApp();
+                                targetBox.removeAttribute('data-widget-state');
+                                updateJourneyWidget();
                             };
                         }
                     }, 50);
 
                 } else {
-                    cardContainer.innerHTML = `
-                <form id="customAuthForm" style="width: 100%; max-width: 380px; margin: 0 auto; display: flex; flex-direction: column; box-sizing: border-box; padding: 20px;">
-                    <div style="display: flex; justify-content: center; margin-bottom: 20px;">
-                        <span style="background: rgba(255,255,255,0.08); color: #fff; padding: 6px 20px; border-radius: 20px; font-size: 13px; font-weight: bold; border: 1px solid rgba(255,255,255,0.15);">تسجيل الدخول (ابدأ فترتك المجانية)</span>
+                    targetBox.innerHTML = `
+                <form id="journeyAuthForm" style="width: 100%; max-width: 400px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(59, 130, 246, 0.3); padding: 24px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; flex-direction: column; box-sizing: border-box; margin: 10px auto; text-align: right;">
+                    <div style="display: flex; justify-content: center; margin-bottom: 16px;">
+                        <span style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; padding: 6px 18px; border-radius: 20px; font-size: 13px; font-weight: bold; border: 1px solid rgba(59, 130, 246, 0.3);">ابدأ فترتك التجريبية الآن</span>
                     </div>
                     
                     <div style="display: flex; flex-direction: column; gap: 14px; width: 100%;">
                         <div style="display: flex; flex-direction: column; text-align: right;">
                             <label style="color: #94a3b8; font-size: 12px; margin-bottom: 6px;">البريد الإلكتروني</label>
-                            <input type="email" id="loginEmailInputV7" value="${userEmail}" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 12px; border-radius: 8px; font-size: 13px; width: 100%; box-sizing: border-box; direction: ltr; text-align: right;">
+                            <input type="email" id="journeyEmailInput" value="${userEmail}" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 12px; border-radius: 8px; font-size: 13px; width: 100%; box-sizing: border-box; direction: ltr; text-align: right;">
                         </div>
 
                         <div style="display: flex; flex-direction: column; text-align: right;">
                             <label style="color: #94a3b8; font-size: 12px; margin-bottom: 6px;">كلمة المرور</label>
-                            <input type="password" id="loginPassInputV7" value="********" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 12px; border-radius: 8px; font-size: 13px; width: 100%; box-sizing: border-box; direction: ltr; text-align: right;">
+                            <input type="password" id="journeyPassInput" value="********" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 12px; border-radius: 8px; font-size: 13px; width: 100%; box-sizing: border-box; direction: ltr; text-align: right;">
                         </div>
 
-                        <button type="button" id="loginSubmitBtnV7" style="background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; width: 100%; box-sizing: border-box; margin-top: 6px;">تسجيل الدخول وتفعيل التجربة</button>
+                        <button type="button" id="journeyLoginSubmit" style="background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; width: 100%; box-sizing: border-box; margin-top: 6px;">تسجيل الدخول وعرض المفتاح</button>
                     </div>
                 </form>
             `;
 
                     setTimeout(() => {
-                        const loginBtn = document.getElementById('loginSubmitBtnV7');
+                        const loginBtn = document.getElementById('journeyLoginSubmit');
                         if (loginBtn) {
                             loginBtn.onclick = function () {
-                                const emailField = document.getElementById('loginEmailInputV7');
+                                const emailField = document.getElementById('journeyEmailInput');
                                 const email = emailField ? emailField.value.trim() : 'hbhh@gmail.com';
 
                                 localStorage.setItem('is_logged_in', 'true');
@@ -2458,19 +2442,18 @@
                                     localStorage.setItem('trial_start_date', new Date().toISOString());
                                 }
 
-                                cardContainer.removeAttribute('data-app-state');
-                                updateApp();
+                                targetBox.removeAttribute('data-widget-state');
+                                updateJourneyWidget();
                             };
                         }
                     }, 50);
                 }
             }
 
-            setInterval(updateApp, 1000);
-            window.addEventListener('DOMContentLoaded', updateApp);
-            window.addEventListener('hashchange', updateApp);
+            setInterval(updateJourneyWidget, 1000);
+            window.addEventListener('DOMContentLoaded', updateJourneyWidget);
 
-            // توجيه باقات الأسعار لروابط باي بال بدقة
+            // توجيه باقات الأسعار لروابط باي بال بأمان تام
             document.addEventListener('click', function (e) {
                 const target = e.target.closest('a, button');
                 if (!target) return;
