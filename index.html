@@ -2399,7 +2399,7 @@
                     window._nativeTimerInt = setInterval(updateTimer, 1000);
 
                 } else if (isForgotState) {
-                    // واجهة أمان متقدمة: إدخال البريد -> إرسال رمز تحقق -> إدخال الرمز -> تغيير الباسورد
+                    // واجهة أمان متقدمة مع نظام التحقق برمز OTP
                     if (loginForm.dataset.renderedForgot !== 'true') {
                         loginForm.dataset.renderedForgot = 'true';
                         loginForm.innerHTML = `
@@ -2443,7 +2443,9 @@
 
                             let generatedCode = '';
 
-                            sendCodeBtn.onclick = function () {
+                            sendCodeBtn.onclick = function (e) {
+                                e.preventDefault();
+                                e.stopPropagation();
                                 const enteredEmail = verifyEmailInput.value.trim();
                                 const savedEmail = localStorage.getItem('user_email') || 'hbhh@gmail.com';
 
@@ -2453,10 +2455,7 @@
                                 }
 
                                 if (enteredEmail.toLowerCase() === savedEmail.toLowerCase()) {
-                                    // توليد رمز تحقق عشوائي من 6 أرقام
                                     generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-                                    // محاكاة إرسال الإيميل (لغرض التأكد والتسهيل أثناء التطوير، سيظهر الرمز في التنبيه وفي الصندوق)
                                     otpNotice.innerHTML = `تم إرسال الرمز إلى ${savedEmail}.<br><b>[رمز المحاكاة للتجربة: ${generatedCode}]</b>`;
 
                                     verifyEmailInput.style.display = 'none';
@@ -2469,7 +2468,9 @@
                                 }
                             };
 
-                            confirmOtpBtn.onclick = function () {
+                            confirmOtpBtn.onclick = function (e) {
+                                e.preventDefault();
+                                e.stopPropagation();
                                 const enteredOtp = otpInput.value.trim();
                                 if (enteredOtp === generatedCode) {
                                     alert('تم التحقق من الرمز بنجاح! يمكنك الآن تعيين كلمة مرور جديدة.');
@@ -2480,7 +2481,9 @@
                                 }
                             };
 
-                            resetBtn.onclick = function () {
+                            resetBtn.onclick = function (e) {
+                                e.preventDefault();
+                                e.stopPropagation();
                                 const passVal = forgotPassInput.value;
                                 if (!passVal || passVal.length < 6) {
                                     alert('كلمة المرور يجب ألا تقل عن 6 أحرف.');
@@ -2495,7 +2498,9 @@
                                 location.reload();
                             };
 
-                            document.getElementById('nativeBackLoginBtn').onclick = function () {
+                            document.getElementById('nativeBackLoginBtn').onclick = function (e) {
+                                e.preventDefault();
+                                e.stopPropagation();
                                 loginForm.removeAttribute('data-current-state');
                                 loginForm.removeAttribute('data-rendered-forgot');
                                 location.reload();
@@ -2503,18 +2508,23 @@
                         }, 50);
                     }
                 } else {
-                    // إضافة رابط "نسيت كلمة المرور؟" كعنصر Span آمن لا يصعد لأعلى الصفحة
+                    // إضافة رابط "نسيت كلمة المرور؟" كعنصر آمن يثبت الشاشة ويمنع الصعود تماماً
                     if (!loginForm.querySelector('#nativeForgotLink')) {
                         const forgotDiv = document.createElement('div');
                         forgotDiv.style.cssText = 'text-align: center; margin-top: 12px; width: 100%;';
-                        forgotDiv.innerHTML = `<span id="nativeForgotLink" style="color: #60a5fa; font-size: 12px; text-decoration: underline; cursor: pointer;">نسيت كلمة المرور؟</span>`;
+                        forgotDiv.innerHTML = `<span id="nativeForgotLink" style="color: #60a5fa; font-size: 12px; text-decoration: underline; cursor: pointer; display: inline-block;">نسيت كلمة المرور؟</span>`;
                         loginForm.appendChild(forgotDiv);
 
                         document.getElementById('nativeForgotLink').onclick = function (e) {
                             e.preventDefault();
                             e.stopPropagation();
+                            e.stopImmediatePropagation();
+
+                            // تثبيت موقع الشاشة لمنع أي صعود لأعلى الصفحة تماماً
+                            const currentY = window.scrollY;
                             loginForm.dataset.currentState = 'forgot';
                             updateApp();
+                            window.scrollTo({ top: currentY, behavior: 'instant' });
                         };
                     }
 
@@ -2593,6 +2603,9 @@
                 }
             }, true);
         })();
+
+        // Init
+        setLanguage('ar');
 
         // Init
         setLanguage('ar');
