@@ -2263,7 +2263,7 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === الحل النهائي: صندوق واحد فقط داخل المربع الكبير وإخفاء بقية النماذج ===
+        // === الحل النهائي: إدراج الصندوق (دخول / ملف شخصي وزر الخروج) حصرياً داخل المربع الكبير الأزرق ===
         (function () {
             const TRIAL_DAYS = 7;
             const PAYPAL_LINKS = {
@@ -2278,10 +2278,13 @@
             }, true);
 
             function initUnifiedAuth() {
-                // إخفاء وحذف أي نماذج أو صناديق قديمة تابعة للقالب الأصلي تمنع ظهور الصندوق الجديد منفصداً
+                // إخفاء نماذج القالب القديمة والمتداخلة لتصفية الشاشة
                 document.querySelectorAll('form, .auth-form, .login-container').forEach(el => {
-                    if (!el.classList.contains('custom-unified-auth-box')) {
-                        el.style.display = 'none';
+                    if (!el.classList.contains('custom-unified-auth-box') && !el.closest('.custom-unified-auth-box')) {
+                        // نخفي النماذج التي تحوي حقول كلمة المرور أو الدخول القديمة فقط
+                        if (el.innerHTML && (el.innerHTML.includes('كلمة المرور') || el.innerHTML.includes('البريد الإلكتروني'))) {
+                            el.style.display = 'none';
+                        }
                     }
                 });
 
@@ -2319,10 +2322,10 @@
                     localStorage.setItem('user_api_key', userApiKey);
                 }
 
-                // إزالة الصناديق القديمة الخاصة بنا لمنع التكرار
+                // إزالة صناديقنا القديمة لمنع التكرار
                 document.querySelectorAll('.custom-unified-auth-box').forEach(el => el.remove());
 
-                // بناء الصندوق الموحد المرتب
+                // بناء صندوق المحتوى الموحد (سواء لتسجيل الدخول أو للملف الشخصي وزر الخروج)
                 const box = document.createElement('div');
                 box.className = 'custom-unified-auth-box';
                 box.style.cssText = `
@@ -2330,13 +2333,13 @@
             max-width: 400px;
             margin: 20px auto;
             padding: 25px;
-            background: rgba(15, 23, 42, 0.98);
+            background: rgba(15, 23, 42, 0.95);
             border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
             text-align: center;
             position: relative;
-            z-index: 9999;
+            z-index: 999;
             box-sizing: border-box;
             font-family: inherit;
         `;
@@ -2372,24 +2375,24 @@
             `;
                 }
 
-                // البحث عن الحاوية أو المربع الكبير الذي يحتوي على نص "ابدأ رحلتك مع الذكاء الاصطناعي" ووضع الصندوق بداخله
-                let targetContainer = null;
-                const allElements = document.querySelectorAll('div, section');
-                for (let el of allElements) {
-                    if (el.textContent && el.textContent.includes('ابدأ رحلتك مع الذكاء الاصطناعي') && el.children.length < 20) {
-                        targetContainer = el;
-                        break;
+                // البحث الدقيق عن المربع الكبير الأزرق الذي يحتوي على "ابدأ رحلتك مع الذكاء الاصطناعي" ووضع الصندوق بداخل آخره
+                let targetBox = null;
+                const divs = document.querySelectorAll('div');
+                for (let div of divs) {
+                    if (div.textContent && div.textContent.includes('ابدأ رحلتك مع الذكاء الاصطناعي') && div.children.length < 25) {
+                        // نتحقق أنه العنصر الأبرز (المربع الكبير)
+                        targetBox = div;
                     }
                 }
 
-                if (targetContainer) {
-                    targetContainer.appendChild(box);
+                if (targetBox) {
+                    targetBox.appendChild(box);
                 } else {
                     const fallback = document.querySelector('section') || document.body;
                     fallback.appendChild(box);
                 }
 
-                // تفاعلات الأزرار
+                // ربط تفاعلات الأزرار
                 setTimeout(() => {
                     const copyBtn = document.getElementById('singleCopyBtn');
                     if (copyBtn) {
