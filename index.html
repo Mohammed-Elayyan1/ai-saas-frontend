@@ -2275,6 +2275,20 @@
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
                 const userEmail = localStorage.getItem('user_email') || 'hbhh@gmail.com';
 
+                // 1. تحديث كلمات "تسجيل الدخول" في أعلى وأسفل الموقع وجميع أنحائه، واستبدال 14 يوم بـ 7 أيام
+                document.querySelectorAll('a, button, span, p, div').forEach(el => {
+                    if (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3) {
+                        let text = el.textContent.trim();
+                        if (text === 'تسجيل الدخول' || text === 'تسجيل دخول') {
+                            el.textContent = isLoggedIn ? `👤 ${userEmail}` : 'تسجيل الدخول';
+                        }
+                        if (text.includes('14 يوم') || text.includes('١٤ يوم') || text.includes('14 يوماً') || text.includes('١٤ يوماً')) {
+                            el.textContent = text.replace(/14 يوم|١٤ يوم|14 يوماً|١٤ يوماً/g, '7 أيام');
+                        }
+                    }
+                });
+
+                // 2. البحث عن صندوق تسجيل الدخول الأصلي في الصفحة الرئيسية
                 let loginBox = null;
                 const allDivs = document.querySelectorAll('div');
                 for (let div of allDivs) {
@@ -2291,16 +2305,6 @@
                 }
 
                 if (!loginBox) return;
-
-                // استبدال أي نصوص تحتوي على 14 يوم لتصبح 7 أيام تلقائياً
-                document.querySelectorAll('*').forEach(el => {
-                    if (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3) {
-                        let t = el.textContent;
-                        if (t.includes('14 يوم') || t.includes('١٤ يوم')) {
-                            el.textContent = t.replace(/14 يوم|١٤ يوم/g, '7 أيام');
-                        }
-                    }
-                });
 
                 if (isLoggedIn) {
                     let trialStart = localStorage.getItem('trial_start_date');
@@ -2399,7 +2403,7 @@
                         loginBox.dataset.currentState = 'logged_out';
                     }
 
-                    // التحقق من صحة الحقول لمنع أي إدخال وهمي عشوائي
+                    // التحقق من صحة البريد وكلمة المرور بدقة ومنع الباسورد الوهمي
                     const buttons = loginBox.querySelectorAll('button');
                     buttons.forEach(btn => {
                         if (!btn.dataset.hooked && (btn.textContent.includes('تسجيل الدخول') || btn.type === 'submit')) {
@@ -2423,8 +2427,19 @@
                                     return;
                                 }
                                 if (!passVal || passVal.length < 6) {
-                                    alert('كلمة المرور قصيرة جداً (يجب ألا تقل عن 6 أحرف).');
+                                    alert('كلمة المرور يجب ألا تقل عن 6 أحرف.');
                                     return;
+                                }
+
+                                // التحقق من مطابقة كلمة المرور المحفوظة للمستخدم
+                                let savedPass = localStorage.getItem('user_password');
+                                if (!savedPass) {
+                                    localStorage.setItem('user_password', passVal);
+                                } else {
+                                    if (passVal !== savedPass) {
+                                        alert('كلمة المرور غير صحيحة. يرجى إدخال كلمة المرور الصحيحة.');
+                                        return;
+                                    }
                                 }
 
                                 localStorage.setItem('is_logged_in', 'true');
@@ -2434,13 +2449,14 @@
                                 }
                                 loginBox.removeAttribute('data-current-state');
                                 updateApp();
+                                location.reload();
                             }, true);
                         }
                     });
                 }
             }
 
-            setInterval(updateApp, 1000);
+            setInterval(updateApp, 500);
             window.addEventListener('DOMContentLoaded', updateApp);
 
             // توجيه باقات الأسعار لروابط باي بال بأمان
@@ -2460,8 +2476,10 @@
                 }
             }, true);
         })();
+
         // Init
         setLanguage('ar');
+
     </script>
 
 </body>
