@@ -2275,20 +2275,24 @@
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
                 const userEmail = localStorage.getItem('user_email') || 'hbhh@gmail.com';
 
-                // 1. تحديث كلمات "تسجيل الدخول" في أعلى وأسفل الموقع، واستبدال 14 يوم بـ 7 أيام
-                document.querySelectorAll('a, button, span, p, div').forEach(el => {
+                // 1. تحديث النصوص واستبدال 14 بـ 7 في سياسة الاسترجاع والفترات وتحديث حالة تسجيل الدخول
+                document.querySelectorAll('a, button, span, p, div, li, td').forEach(el => {
                     if (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3) {
                         let text = el.textContent.trim();
                         if (text === 'تسجيل الدخول' || text === 'تسجيل دخول') {
                             el.textContent = isLoggedIn ? `👤 ${userEmail}` : 'تسجيل الدخول';
                         }
-                        if (text.includes('14 يوم') || text.includes('١٤ يوم') || text.includes('14 يوماً') || text.includes('١٤ يوماً')) {
-                            el.textContent = text.replace(/14 يوم|١٤ يوم|14 يوماً|١٤ يوماً/g, '7 أيام');
+                        if (text.includes('14') || text.includes('١٤')) {
+                            el.textContent = text.replace(/14\s*يوم|١٤\s*يوم|14\s*يوماً|١٤\s*يوماً|14\s*يومًا|14/g, '7');
                         }
+                    }
+                    let fullText = el.textContent || '';
+                    if ((fullText.includes('استرجاع') || fullText.includes('الاسترجاع')) && (fullText.includes('14') || fullText.includes('١٤'))) {
+                        el.innerHTML = el.innerHTML.replace(/14/g, '7').replace(/١٤/g, '٧');
                     }
                 });
 
-                // 2. البحث الذكي عن نموذج أو حاوية تسجيل الدخول بالاعتماد على حقل كلمة المرور أو البريد
+                // 2. البحث الذكي عن نموذج أو حاوية تسجيل الدخول
                 let loginForm = document.querySelector('form') || document.querySelector('[data-auth-box="true"]');
                 if (!loginForm) {
                     const passInput = document.querySelector('input[type="password"]');
@@ -2393,6 +2397,29 @@
                     window._nativeTimerInt = setInterval(updateTimer, 1000);
 
                 } else {
+                    // إضافة رابط "نسيت كلمة المرور؟" إذا لم يكن موجوداً
+                    if (!loginForm.querySelector('#nativeForgotBtn')) {
+                        const forgotDiv = document.createElement('div');
+                        forgotDiv.style.cssText = 'text-align: center; margin-top: 12px; width: 100%;';
+                        forgotDiv.innerHTML = `<a href="#" id="nativeForgotBtn" style="color: #60a5fa; font-size: 12px; text-decoration: underline;">نسيت كلمة المرور؟</a>`;
+                        loginForm.appendChild(forgotDiv);
+
+                        document.getElementById('nativeForgotBtn').onclick = function (e) {
+                            e.preventDefault();
+                            const emailInput = prompt('أدخل بريدك الإلكتروني المسجل:');
+                            if (emailInput) {
+                                const newPass = prompt('أدخل كلمة المرور الجديدة (6 أحرف على الأقل):');
+                                if (newPass && newPass.length >= 6) {
+                                    localStorage.setItem('user_password', newPass);
+                                    localStorage.setItem('user_email', emailInput.trim());
+                                    alert('تم إعادة تعيين كلمة المرور بنجاح! يمكنك تسجيل الدخول الآن.');
+                                } else {
+                                    alert('كلمة المرور قصيرة جداً (يجب ألا تقل عن 6 أحرف).');
+                                }
+                            }
+                        };
+                    }
+
                     // ربط أزرار النموذج والتحقق من صحة البريد وكلمة المرور
                     const buttons = loginForm.querySelectorAll('button, input[type="submit"]');
                     buttons.forEach(btn => {
