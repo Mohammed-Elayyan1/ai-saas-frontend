@@ -2263,7 +2263,7 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === الحل النهائي والجذري: مربع واحد فقط يمنع أي تداخل ويحتوي على عداد حقيقي ومفتاح API ===
+        // === الحل النهائي والجذري: إخفاء أي صناديق مكررة وفرض صندوق واحد فقط ديناميكي بالكامل ===
         (function () {
             const TRIAL_DAYS = 7;
             const PAYPAL_LINKS = {
@@ -2272,66 +2272,16 @@
                 enterprise: 'https://www.paypal.com/ncp/payment/CS59KMKAETBFC'
             };
 
-            // منع إعادة تحميل الصفحة عند الضغط على أي نموذج
+            // منع إعادة تحميل الصفحة عند الإرسال
             document.addEventListener('submit', function (e) {
                 e.preventDefault();
             }, true);
 
-            function renderAuthBox() {
-                const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
-                const userEmail = localStorage.getItem('user_email') || 'hbhh@gmail.com';
-
-                // 1. تحديث شريط التنقل العلوي
-                document.querySelectorAll('a, button').forEach(el => {
-                    const text = el.textContent.trim();
-                    if (text === 'تسجيل الدخول' || text === 'تسجيل دخول' || text.includes('hbhh@gmail.com') || text.includes('👤')) {
-                        if (!el.closest('#absolute-single-auth-box')) {
-                            el.textContent = isLoggedIn ? `👤 ${userEmail}` : 'تسجيل الدخول';
-                        }
-                    }
-                    if (text.includes('ابدأ رحلتك الآن') || text.includes('ابدأ تجربتك المجانية') || text.includes('ابدأ رحلتك') || text.includes('ابدأ الاستخدام')) {
-                        el.onclick = function (e) {
-                            e.preventDefault();
-                            const targetBox = document.querySelector('#absolute-single-auth-box');
-                            if (targetBox) targetBox.scrollIntoView({ behavior: 'smooth' });
-                        };
-                    }
-                });
-
-                // 2. البحث عن الحاوية الأساسية داخل القسم الأزرق الكبير في القالب
-                let container = document.querySelector('#absolute-single-auth-box');
-
-                if (!container) {
-                    // البحث عن العنصر الذي يحوي نماذج الدخول الأصلية في القالب لتفريغه بالكامل
-                    const sections = document.querySelectorAll('div, section');
-                    for (let el of sections) {
-                        const txt = el.textContent || '';
-                        if ((txt.includes('إنشاء حساب') || txt.includes('البريد الإلكتروني') || txt.includes('كلمة المرور')) && el.children.length < 20 && el.children.length > 0) {
-                            container = el;
-                            break;
-                        }
-                    }
-                }
-
-                if (!container) {
-                    // كاحتياطي: وضعه داخل أول قسم أزرق رئيسي
-                    for (let el of document.querySelectorAll('div, section')) {
-                        if (el.textContent && el.textContent.includes('ابدأ رحلتك مع الذكاء الاصطناعي')) {
-                            container = document.createElement('div');
-                            el.appendChild(container);
-                            break;
-                        }
-                    }
-                }
-
-                if (!container) return;
-
-                // تعيين المعرف الموحد وتفريغ أي محتوى قديم تماماً لمنع التداخل
-                container.id = 'absolute-single-auth-box';
-                container.innerHTML = '';
-
-                // تنسيق المربع الواحد الثابت
-                container.style.cssText = `
+            // حقن CSS لإخفاء أي عناصر تداخل قديمة من القالب الأصلي
+            const styleEl = document.createElement('style');
+            styleEl.innerHTML = `
+        .hidden-original-form { display: none !important; }
+        #single-unified-box {
             width: 100% !important;
             max-width: 380px !important;
             margin: 20px auto !important;
@@ -2345,10 +2295,67 @@
             font-family: inherit !important;
             position: relative !important;
             z-index: 999 !important;
-        `;
+        }
+    `;
+            document.head.appendChild(styleEl);
+
+            function renderUnifiedBox() {
+                const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
+                const userEmail = localStorage.getItem('user_email') || 'hbhh@gmail.com';
+
+                // 1. تحديث شريط التنقل العلوي وأزرار البدء
+                document.querySelectorAll('a, button').forEach(el => {
+                    const text = el.textContent.trim();
+                    if (text === 'تسجيل الدخول' || text === 'تسجيل دخول' || text.includes('hbhh@gmail.com') || text.includes('👤')) {
+                        if (!el.closest('#single-unified-box')) {
+                            el.textContent = isLoggedIn ? `👤 ${userEmail}` : 'تسجيل الدخول';
+                        }
+                    }
+                    if (text.includes('ابدأ رحلتك الآن') || text.includes('ابدأ تجربتك المجانية') || text.includes('ابدأ رحلتك') || text.includes('ابدأ الاستخدام')) {
+                        el.onclick = function (e) {
+                            e.preventDefault();
+                            const box = document.querySelector('#single-unified-box');
+                            if (box) box.scrollIntoView({ behavior: 'smooth' });
+                        };
+                    }
+                });
+
+                // 2. البحث عن الحاوية الرئيسية في الصفحة وإخفاء العناصر الأصلية المتداخلة
+                const allSections = document.querySelectorAll('div, section');
+                let parentContainer = null;
+
+                for (let el of allSections) {
+                    const txt = el.textContent || '';
+                    if ((txt.includes('إنشاء حساب') || txt.includes('البريد الإلكتروني') || txt.includes('المتابعة عبر Google')) && el.children.length < 25 && el.children.length > 0) {
+                        // إذا وجدنا نموذج القالب الأصلي، نخفيه ونستبدله بصندوقنا الموحد
+                        if (!el.id.includes('single-unified-box')) {
+                            el.classList.add('hidden-original-form');
+                        }
+                    }
+                }
+
+                // البحث عن أو إنشاء صندوقنا الموحد الفريد
+                let unifiedBox = document.querySelector('#single-unified-box');
+                if (!unifiedBox) {
+                    unifiedBox = document.createElement('div');
+                    unifiedBox.id = 'single-unified-box';
+
+                    // وضعه في مكان مناسب داخل القسم الأزرق
+                    for (let el of allSections) {
+                        if (el.textContent && el.textContent.includes('ابدأ رحلتك مع الذكاء الاصطناعي') && el.clientHeight > 150) {
+                            el.appendChild(unifiedBox);
+                            break;
+                        }
+                    }
+                    if (!unifiedBox.parentNode && document.body) {
+                        document.body.appendChild(unifiedBox);
+                    }
+                }
+
+                if (!unifiedBox) return;
 
                 if (isLoggedIn) {
-                    // إدارة تاريخ بدء التجربة وحساب الوقت الحقيقي بدقة
+                    // إدارة تاريخ بدء التجربة وحساب الوقت الحقيقي
                     let trialStart = localStorage.getItem('trial_start_date');
                     if (!trialStart) {
                         trialStart = new Date().toISOString();
@@ -2361,60 +2368,59 @@
                         localStorage.setItem('user_api_key', userApiKey);
                     }
 
-                    // بناء واجهة "أهلاً بك مجدداً" مع مفتاح الـ API والعداد الحقيقي
-                    container.innerHTML = `
+                    // محتوى صندوق "أهلاً بك مجدداً" الموحد والوحيد
+                    unifiedBox.innerHTML = `
                 <div style="font-size: 38px; margin-bottom: 8px;">👤</div>
                 <h3 style="margin: 0 0 6px 0; font-size: 17px; color: #fff; font-weight: bold;">أهلاً بك مجدداً</h3>
                 <p style="color: #60a5fa; font-size: 12px; margin-bottom: 14px; direction: ltr; font-weight: bold;">${userEmail}</p>
                 
-                <div style="background: rgba(241, 196, 15, 0.1); border: 1px solid rgba(241, 196, 15, 0.3); padding: 8px; border-radius: 8px; margin-bottom: 14px; font-size: 11px; color: #facc15;" id="realTimeCountdownBox">
+                <div style="background: rgba(241, 196, 15, 0.1); border: 1px solid rgba(241, 196, 15, 0.3); padding: 8px; border-radius: 8px; margin-bottom: 14px; font-size: 11px; color: #facc15;" id="liveCountdownDisplay">
                     ⏳ جارِ تحميل العداد...
                 </div>
 
                 <div style="background: rgba(0,0,0,0.45); padding: 10px; border-radius: 8px; margin-bottom: 16px; text-align: right; border: 1px solid rgba(255,255,255,0.1);">
                     <p style="color: #94a3b8; font-size: 10px; margin: 0 0 6px 0;">🔑 مفتاح الوصول (API Key):</p>
                     <div style="display: flex; align-items: center; gap: 6px;">
-                        <input type="text" readonly value="${userApiKey}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 6px; border-radius: 4px; width: 100%; font-family: monospace; font-size: 10px; direction: ltr;" id="realApiKeyInput">
-                        <button type="button" id="realCopyBtn" style="background: #3b82f6; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold;">نسخ</button>
+                        <input type="text" readonly value="${userApiKey}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 6px; border-radius: 4px; width: 100%; font-family: monospace; font-size: 10px; direction: ltr;" id="apiKeyFieldFinal">
+                        <button type="button" id="copyBtnFinal" style="background: #3b82f6; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold;">نسخ</button>
                     </div>
                 </div>
 
-                <button type="button" id="realLogoutBtn" style="background: #ef4444; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 12px;">تسجيل الخروج</button>
+                <button type="button" id="logoutBtnFinal" style="background: #ef4444; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 12px;">تسجيل الخروج</button>
             `;
 
-                    // دالة تحديث العداد الحقيقي لحظياً كل ثانية
-                    function updateCountdown() {
+                    // العداد الحقيقي الذي يتحدث كل ثانية
+                    function updateTimer() {
                         const startDate = new Date(trialStart);
                         const expiryDate = new Date(startDate.getTime() + (TRIAL_DAYS * 24 * 60 * 60 * 1000));
                         const now = new Date();
                         const diffMs = expiryDate - now;
 
-                        const counterEl = document.getElementById('realTimeCountdownBox');
-                        if (!counterEl) return;
+                        const display = document.getElementById('liveCountdownDisplay');
+                        if (!display) return;
 
                         if (diffMs <= 0) {
-                            counterEl.innerHTML = `⚠️ انتهت فترة التجربة المجانية. يجدر بك ترقية الحساب.`;
-                            counterEl.style.color = '#ef4444';
-                            counterEl.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+                            display.innerHTML = `⚠️ انتهت التجربة المجانية. يرجى الترقية.`;
+                            display.style.color = '#ef4444';
                         } else {
                             const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
                             const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                            const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60 * 60 / 60) / 60); // دقائق
+                            const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
                             const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
 
-                            counterEl.innerHTML = `⏳ التجربة المجانية نشطة: متبقي <b>${days} أيام، ${hours} س، ${minutes} د، ${seconds} ث</b>`;
+                            display.innerHTML = `⏳ التجربة المجانية نشطة: متبقي ${days} أيام، ${hours} س، ${minutes} د، ${seconds} ث`;
                         }
                     }
 
-                    updateCountdown();
-                    const timerInterval = setInterval(updateCountdown, 1000);
+                    updateTimer();
+                    const timerInterval = setInterval(updateTimer, 1000);
 
-                    // تفاعلات أزرار النسخ وتسجيل الخروج
+                    // تفاعلات الأزرار
                     setTimeout(() => {
-                        const copyBtn = document.getElementById('realCopyBtn');
+                        const copyBtn = document.getElementById('copyBtnFinal');
                         if (copyBtn) {
                             copyBtn.onclick = function () {
-                                const field = document.getElementById('realApiKeyInput');
+                                const field = document.getElementById('apiKeyFieldFinal');
                                 if (field) {
                                     navigator.clipboard.writeText(field.value);
                                     copyBtn.textContent = 'تم النسخ! ✓';
@@ -2427,7 +2433,7 @@
                             };
                         }
 
-                        const logoutBtn = document.getElementById('realLogoutBtn');
+                        const logoutBtn = document.getElementById('logoutBtnFinal');
                         if (logoutBtn) {
                             logoutBtn.onclick = function () {
                                 clearInterval(timerInterval);
@@ -2435,46 +2441,55 @@
                                 localStorage.removeItem('user_email');
                                 localStorage.removeItem('trial_start_date');
                                 localStorage.removeItem('user_api_key');
-                                renderAuthBox();
+                                renderUnifiedBox();
                             };
                         }
                     }, 50);
 
                 } else {
-                    // محتوى المربع عندما يكون المستخدم غير مسجل دخول
-                    container.innerHTML = `
+                    // محتوى صندوق تسجيل الدخول الموحد والوحيد
+                    unifiedBox.innerHTML = `
                 <h3 style="color: #fff; margin-bottom: 14px; font-size: 16px; font-weight: bold;">تسجيل الدخول</h3>
                 <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <input type="email" id="realEmailInput" placeholder="البريد الإلكتروني" value="hbhh@gmail.com" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px; border-radius: 8px; font-size: 12px; width: 100%; box-sizing: border-box; direction: ltr; text-align: right;">
-                    <input type="password" id="realPassInput" placeholder="كلمة المرور" value="********" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px; border-radius: 8px; font-size: 12px; width: 100%; box-sizing: border-box;">
-                    <button type="button" id="realLoginBtn" style="background: #3b82f6; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%;">تسجيل الدخول</button>
+                    <input type="email" id="loginEmailFinal" placeholder="البريد الإلكتروني" value="hbhh@gmail.com" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px; border-radius: 8px; font-size: 12px; width: 100%; box-sizing: border-box; direction: ltr; text-align: right;">
+                    <input type="password" id="loginPassFinal" placeholder="كلمة المرور" value="********" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px; border-radius: 8px; font-size: 12px; width: 100%; box-sizing: border-box;">
+                    <button type="button" id="loginBtnFinal" style="background: #3b82f6; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%;">تسجيل الدخول</button>
                     <div style="color: #94a3b8; font-size: 11px; margin: 4px 0;">أو</div>
-                    <button type="button" id="realGoogleBtn" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 9px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%;">المتابعة عبر Google</button>
+                    <button type="button" id="googleBtnFinal" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 9px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%;">المتابعة عبر Google</button>
                 </div>
             `;
 
                     setTimeout(() => {
-                        const loginBtn = document.getElementById('realLoginBtn');
-                        const googleBtn = document.getElementById('realGoogleBtn');
+                        const loginBtn = document.getElementById('loginBtnFinal');
+                        const googleBtn = document.getElementById('googleBtnFinal');
 
-                        const handleLoginAction = function () {
-                            const emailField = document.getElementById('realEmailInput');
+                        const performLogin = function () {
+                            const emailField = document.getElementById('loginEmailFinal');
                             const email = emailField ? emailField.value.trim() : 'hbhh@gmail.com';
                             localStorage.setItem('is_logged_in', 'true');
                             localStorage.setItem('user_email', email || 'hbhh@gmail.com');
                             localStorage.setItem('trial_start_date', new Date().toISOString());
-                            renderAuthBox();
+                            renderUnifiedBox();
                         };
 
-                        if (loginBtn) loginBtn.onclick = handleLoginAction;
-                        if (googleBtn) googleBtn.onclick = handleLoginAction;
+                        if (loginBtn) loginBtn.onclick = performLogin;
+                        if (googleBtn) googleBtn.onclick = performLogin;
                     }, 50);
                 }
             }
 
-            window.addEventListener('DOMContentLoaded', renderAuthBox);
-            window.addEventListener('hashchange', renderAuthBox);
-            setTimeout(renderAuthBox, 200);
+            window.addEventListener('DOMContentLoaded', renderUnifiedBox);
+            window.addEventListener('hashchange', renderUnifiedBox);
+            setTimeout(renderUnifiedBox, 200);
+
+            // مراقبة التغييرات في الصفحة لمنع أي تداخل مستقبلي من تفاعلات React
+            const observer = new MutationObserver(() => {
+                const unified = document.querySelector('#single-unified-box');
+                if (!unified) {
+                    renderUnifiedBox();
+                }
+            });
+            observer.observe(document.body, { childList: true, subtree: true });
 
             // توجيه أزرار الباقات لروابط PayPal فقط
             document.addEventListener('click', function (e) {
