@@ -2275,7 +2275,6 @@
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
                 const userEmail = localStorage.getItem('user_email') || 'hbhh@gmail.com';
 
-                // البحث حصرياً عن مربع تسجيل الدخول الأصلي في الصفحة مع حماية قسم الباقات والأسعار تماماً
                 let loginBox = null;
                 const allDivs = document.querySelectorAll('div');
                 for (let div of allDivs) {
@@ -2292,6 +2291,16 @@
                 }
 
                 if (!loginBox) return;
+
+                // استبدال أي نصوص تحتوي على 14 يوم لتصبح 7 أيام تلقائياً
+                document.querySelectorAll('*').forEach(el => {
+                    if (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3) {
+                        let t = el.textContent;
+                        if (t.includes('14 يوم') || t.includes('١٤ يوم')) {
+                            el.textContent = t.replace(/14 يوم|١٤ يوم/g, '7 أيام');
+                        }
+                    }
+                });
 
                 if (isLoggedIn) {
                     let trialStart = localStorage.getItem('trial_start_date');
@@ -2311,7 +2320,7 @@
                         loginBox.innerHTML = `
                     <div style="width: 100%; max-width: 400px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; text-align: center; box-sizing: border-box; padding: 20px;">
                         <div style="font-size: 38px; margin-bottom: 8px;">👤</div>
-                        <h3 style="margin: 0 0 6px 0; font-size: 18px; color: #fff; font-weight: bold;">أهلاً بك في فترتك التجريبية</h3>
+                        <h3 style="margin: 0 0 6px 0; font-size: 18px; color: #fff; font-weight: bold;">أهلاً بك في فترتك التجريبية (7 أيام)</h3>
                         <p style="color: #60a5fa; font-size: 13px; margin-bottom: 16px; direction: ltr; font-weight: bold;">${userEmail}</p>
                         
                         <div style="background: rgba(241, 196, 15, 0.1); border: 1px solid rgba(241, 196, 15, 0.3); padding: 10px; border-radius: 8px; margin-bottom: 16px; font-size: 12px; color: #facc15; width: 100%; box-sizing: border-box;" id="nativeTimerDisplay">
@@ -2370,14 +2379,14 @@
                         if (!el) return;
 
                         if (diff <= 0) {
-                            el.innerHTML = `⚠️ انتهت فترتك التجريبية. يرجى الترقية لإحدى الباقات.`;
+                            el.innerHTML = `⚠️ انتهت فترتك التجريبية (7 أيام). يرجى الترقية لإحدى الباقات.`;
                             el.style.color = '#ef4444';
                         } else {
                             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
                             const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                             const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-                            el.innerHTML = `⏳ متبقي على نهاية التجربة: ${days} أيام، ${hours} س، ${minutes} د، ${seconds} ث`;
+                            el.innerHTML = `⏳ متبقي على نهاية التجربة (7 أيام): ${days} أيام، ${hours} س، ${minutes} د، ${seconds} ث`;
                         }
                     }
 
@@ -2390,18 +2399,36 @@
                         loginBox.dataset.currentState = 'logged_out';
                     }
 
-                    // التقاط تفاعل زر تسجيل الدخول داخل المربع الأصلي
+                    // التحقق من صحة الحقول لمنع أي إدخال وهمي عشوائي
                     const buttons = loginBox.querySelectorAll('button');
                     buttons.forEach(btn => {
                         if (!btn.dataset.hooked && (btn.textContent.includes('تسجيل الدخول') || btn.type === 'submit')) {
                             btn.dataset.hooked = 'true';
                             btn.addEventListener('click', function (e) {
                                 e.preventDefault();
-                                const emailInput = loginBox.querySelector('input[type="email"], input');
-                                const email = emailInput && emailInput.value ? emailInput.value.trim() : userEmail;
+                                const inputs = loginBox.querySelectorAll('input');
+                                let emailVal = '';
+                                let passVal = '';
+
+                                inputs.forEach(inp => {
+                                    if (inp.type === 'email' || inp.name.includes('email') || inp.placeholder.includes('البريد')) {
+                                        emailVal = inp.value.trim();
+                                    } else if (inp.type === 'password' || inp.name.includes('password') || inp.placeholder.includes('كلمة')) {
+                                        passVal = inp.value;
+                                    }
+                                });
+
+                                if (!emailVal || !emailVal.includes('@')) {
+                                    alert('الرجاء إدخال بريد إلكتروني صحيح.');
+                                    return;
+                                }
+                                if (!passVal || passVal.length < 6) {
+                                    alert('كلمة المرور قصيرة جداً (يجب ألا تقل عن 6 أحرف).');
+                                    return;
+                                }
 
                                 localStorage.setItem('is_logged_in', 'true');
-                                localStorage.setItem('user_email', email);
+                                localStorage.setItem('user_email', emailVal);
                                 if (!localStorage.getItem('trial_start_date')) {
                                     localStorage.setItem('trial_start_date', new Date().toISOString());
                                 }
@@ -2420,7 +2447,7 @@
             document.addEventListener('click', function (e) {
                 const target = e.target.closest('a, button');
                 if (!target) return;
-                const text = target.textContent.trim();
+                const text = target.textContent ? target.textContent.trim() : '';
                 if (text.includes('الأساسية') || text.includes('Starter') || text.includes('29')) {
                     e.preventDefault();
                     window.location.href = PAYPAL_LINKS.starter;
