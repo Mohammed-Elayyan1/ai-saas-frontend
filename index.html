@@ -2263,9 +2263,8 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === الحل النهائي: مربع واحد ديناميكي يتغير محتواه بين تسجيل الدخول والترحيب ===
+        // === الحل النهائي: مربع واحد ديناميكي بالكامل يتبدل محتواه من تسجيل الدخول إلى الترحيب ===
         (function () {
-            const TRIAL_DAYS = 7;
             const PAYPAL_LINKS = {
                 starter: 'https://www.paypal.com/ncp/payment/23V3WQK4NVTG4',
                 pro: 'https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6',
@@ -2276,71 +2275,62 @@
                 e.preventDefault();
             }, true);
 
-            function updateAuthCard() {
+            function renderSingleAuthBox() {
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
                 const userEmail = localStorage.getItem('user_email') || 'hbhh@gmail.com';
 
-                // 1. تحديث شريط التنقل العلوي وتوجيه أزرار البدء إلى صندوق تسجيل الدخول
+                // 1. تحديث شريط التنقل العلوي وتوجيه أزرار "ابدأ رحلتك" لتنقلك مباشرة إلى مكان المربع
                 document.querySelectorAll('a, button').forEach(el => {
                     const text = el.textContent.trim();
                     if (text === 'تسجيل الدخول' || text === 'تسجيل دخول' || text.includes('hbhh@gmail.com') || text.includes('👤')) {
-                        if (!el.closest('#unified-auth-box')) {
+                        if (!el.closest('#single-dynamic-auth-card')) {
                             el.textContent = isLoggedIn ? `👤 ${userEmail}` : 'تسجيل الدخول';
                         }
                     }
                     if (text.includes('ابدأ رحلتك الآن') || text.includes('ابدأ تجربتك المجانية') || text.includes('ابدأ رحلتك') || text.includes('ابدأ الاستخدام')) {
                         el.onclick = function (e) {
                             e.preventDefault();
-                            const box = document.querySelector('#unified-auth-box');
-                            if (box) box.scrollIntoView({ behavior: 'smooth' });
+                            const card = document.querySelector('#single-dynamic-auth-card');
+                            if (card) card.scrollIntoView({ behavior: 'smooth' });
                         };
                     }
                 });
 
-                // حساب أيام التجربة ومفتاح API
-                let trialStart = localStorage.getItem('trial_start_date');
-                if (!trialStart && isLoggedIn) {
-                    trialStart = new Date().toISOString();
-                    localStorage.setItem('trial_start_date', trialStart);
-                }
+                // 2. البحث عن المربع الأساسي في الصفحة أو إنشائه داخل القسم الأزرق
+                let authCard = document.querySelector('#single-dynamic-auth-card');
 
-                let remainingDays = TRIAL_DAYS;
-                if (trialStart) {
-                    const startDate = new Date(trialStart);
-                    const now = new Date();
-                    const diffDays = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
-                    remainingDays = Math.max(0, TRIAL_DAYS - diffDays);
-                }
-
-                let userApiKey = localStorage.getItem('user_api_key');
-                if (!userApiKey && isLoggedIn) {
-                    userApiKey = 'ai_saas_' + Math.random().toString(36).substring(2, 10) + '_' + Math.random().toString(36).substring(2, 10);
-                    localStorage.setItem('user_api_key', userApiKey);
-                }
-
-                // البحث عن الحاوية الأصلية أو تعيين معرف موحد لها لمنع التكرار
-                let targetCard = document.querySelector('#unified-auth-box');
-
-                if (!targetCard) {
-                    const allDivs = document.querySelectorAll('div, section');
-                    for (let el of allDivs) {
-                        const text = el.textContent || '';
-                        if ((text.includes('إنشاء حساب') || text.includes('البريد الإلكتروني') || text.includes('كلمة المرور') || text.includes('المتابعة عبر Google')) && el.children.length < 20 && el.children.length > 0) {
-                            targetCard = el;
-                            targetCard.id = 'unified-auth-box';
+                if (!authCard) {
+                    // البحث عن أي عنصر قديم يحتوي على نماذج الدخول في القالب الأصلي واستبداله
+                    const allElements = document.querySelectorAll('div, section');
+                    for (let el of allElements) {
+                        const txt = el.textContent || '';
+                        if ((txt.includes('البريد الإلكتروني') || txt.includes('كلمة المرور') || txt.includes('المتابعة عبر Google')) && el.children.length < 25 && el.children.length > 0) {
+                            authCard = el;
                             break;
                         }
                     }
                 }
 
-                if (!targetCard) return;
+                if (!authCard) {
+                    // إذا لم يتم العثور عليه، نضعه داخل القسم الأزرق الكبير
+                    for (let el of document.querySelectorAll('div, section')) {
+                        if (el.textContent && el.textContent.includes('ابدأ رحلتك مع الذكاء الاصطناعي')) {
+                            authCard = document.createElement('div');
+                            el.appendChild(authCard);
+                            break;
+                        }
+                    }
+                }
 
-                // تنسيق المربع الثابت ليكون مرتباً داخل القسم الأزرق
-                targetCard.style.cssText = `
+                if (!authCard) return;
+
+                // تثبيت الـ ID والشكل الموحد للمربع الوحيد
+                authCard.id = 'single-dynamic-auth-card';
+                authCard.style.cssText = `
             width: 100%;
-            max-width: 380px;
+            max-width: 370px;
             margin: 15px auto;
-            padding: 20px;
+            padding: 22px;
             background: rgba(15, 23, 42, 0.96);
             border-radius: 14px;
             border: 1px solid rgba(255, 255, 255, 0.15);
@@ -2352,92 +2342,109 @@
             z-index: 50;
         `;
 
-                // تغيير محتوى المربع كلياً بناءً على حالة تسجيل الدخول (مربع واحد فقط يتغير)
                 if (isLoggedIn) {
-                    targetCard.innerHTML = `
+                    // حساب أيام التجربة ومفتاح API
+                    let trialStart = localStorage.getItem('trial_start_date');
+                    if (!trialStart) {
+                        trialStart = new Date().toISOString();
+                        localStorage.setItem('trial_start_date', trialStart);
+                    }
+                    const diffDays = Math.floor((new Date() - new Date(trialStart)) / (1000 * 60 * 60 * 24));
+                    const remainingDays = Math.max(0, 7 - diffDays);
+
+                    let userApiKey = localStorage.getItem('user_api_key');
+                    if (!userApiKey) {
+                        userApiKey = 'ai_saas_' + Math.random().toString(36).substring(2, 10) + '_' + Math.random().toString(36).substring(2, 10);
+                        localStorage.setItem('user_api_key', userApiKey);
+                    }
+
+                    // محتوى المربع عند تسجيل الدخول (أهلاً بك مجدداً)
+                    authCard.innerHTML = `
                 <div style="font-size: 34px; margin-bottom: 6px;">👤</div>
                 <h3 style="margin: 0 0 4px 0; font-size: 16px; color: #fff;">أهلاً بك مجدداً</h3>
                 <p style="color: #60a5fa; font-size: 12px; margin-bottom: 10px; direction: ltr; font-weight: bold;">${userEmail}</p>
                 
                 <div style="background: rgba(241, 196, 15, 0.1); border: 1px solid rgba(241, 196, 15, 0.3); padding: 6px; border-radius: 6px; margin-bottom: 10px; font-size: 11px; color: #facc15;">
-                    ⏳ التجربة المجانية نشطة: متبقي <b>${remainingDays}</b> أيام من أصل ${TRIAL_DAYS} أيام.
+                    ⏳ التجربة المجانية نشطة: متبقي <b>${remainingDays}</b> أيام من أصل 7 أيام.
                 </div>
 
                 <div style="background: rgba(0,0,0,0.4); padding: 8px; border-radius: 6px; margin-bottom: 12px; text-align: right; border: 1px solid rgba(255,255,255,0.1);">
                     <p style="color: #94a3b8; font-size: 10px; margin: 0 0 4px 0;">🔑 مفتاح الوصول (API Key):</p>
                     <div style="display: flex; align-items: center; gap: 6px;">
-                        <input type="text" readonly value="${userApiKey}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 5px; border-radius: 4px; width: 100%; font-family: monospace; font-size: 10px; direction: ltr;" id="singleApiKeyField">
-                        <button type="button" id="singleCopyBtn" style="background: #3b82f6; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold;">نسخ</button>
+                        <input type="text" readonly value="${userApiKey}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 5px; border-radius: 4px; width: 100%; font-family: monospace; font-size: 10px; direction: ltr;" id="dynamicApiKeyField">
+                        <button type="button" id="dynamicCopyBtn" style="background: #3b82f6; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold;">نسخ</button>
                     </div>
                 </div>
 
-                <button type="button" id="singleLogoutBtn" style="background: #ef4444; color: white; border: none; padding: 9px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 12px;">تسجيل الخروج</button>
+                <button type="button" id="dynamicLogoutBtn" style="background: #ef4444; color: white; border: none; padding: 9px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 12px;">تسجيل الخروج</button>
             `;
+
+                    // تفاعلات أزرار الملف الشخصي
+                    setTimeout(() => {
+                        const copyBtn = document.getElementById('dynamicCopyBtn');
+                        if (copyBtn) {
+                            copyBtn.onclick = function () {
+                                const field = document.getElementById('dynamicApiKeyField');
+                                if (field) {
+                                    navigator.clipboard.writeText(field.value);
+                                    copyBtn.textContent = 'تم النسخ! ✓';
+                                    copyBtn.style.background = '#22c55e';
+                                    setTimeout(() => {
+                                        copyBtn.textContent = 'نسخ';
+                                        copyBtn.style.background = '#3b82f6';
+                                    }, 2000);
+                                }
+                            };
+                        }
+
+                        const logoutBtn = document.getElementById('dynamicLogoutBtn');
+                        if (logoutBtn) {
+                            logoutBtn.onclick = function () {
+                                localStorage.removeItem('is_logged_in');
+                                localStorage.removeItem('user_email');
+                                localStorage.removeItem('trial_start_date');
+                                localStorage.removeItem('user_api_key');
+                                renderSingleAuthBox();
+                            };
+                        }
+                    }, 50);
+
                 } else {
-                    targetCard.innerHTML = `
+                    // محتوى المربع عند عدم تسجيل الدخول (تسجيل الدخول + المتابعة عبر Google في نفس المربع)
+                    authCard.innerHTML = `
                 <h3 style="color: #fff; margin-bottom: 12px; font-size: 15px;">تسجيل الدخول</h3>
                 <div style="display: flex; flex-direction: column; gap: 8px;">
-                    <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" value="hbhh@gmail.com" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px; border-radius: 6px; font-size: 12px; width: 100%; box-sizing: border-box; direction: ltr; text-align: right;">
-                    <input type="password" id="loginPass" placeholder="كلمة المرور" value="********" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px; border-radius: 6px; font-size: 12px; width: 100%; box-sizing: border-box;">
-                    <button type="button" id="loginSubmitBtn" style="background: #3b82f6; color: white; border: none; padding: 9px; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%;">تسجيل الدخول</button>
+                    <input type="email" id="dynamicEmail" placeholder="البريد الإلكتروني" value="hbhh@gmail.com" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px; border-radius: 6px; font-size: 12px; width: 100%; box-sizing: border-box; direction: ltr; text-align: right;">
+                    <input type="password" id="dynamicPass" placeholder="كلمة المرور" value="********" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px; border-radius: 6px; font-size: 12px; width: 100%; box-sizing: border-box;">
+                    <button type="button" id="dynamicLoginBtn" style="background: #3b82f6; color: white; border: none; padding: 9px; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%;">تسجيل الدخول</button>
                     <div style="color: #94a3b8; font-size: 11px; margin: 3px 0;">أو</div>
-                    <button type="button" id="googleLoginBtn" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%;">المتابعة عبر Google</button>
+                    <button type="button" id="dynamicGoogleBtn" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%;">المتابعة عبر Google</button>
                 </div>
             `;
+
+                    // تفاعلات أزرار تسجيل الدخول
+                    setTimeout(() => {
+                        const loginBtn = document.getElementById('dynamicLoginBtn');
+                        const googleBtn = document.getElementById('dynamicGoogleBtn');
+
+                        const performLogin = function () {
+                            const emailField = document.getElementById('dynamicEmail');
+                            const email = emailField ? emailField.value.trim() : 'hbhh@gmail.com';
+                            localStorage.setItem('is_logged_in', 'true');
+                            localStorage.setItem('user_email', email || 'hbhh@gmail.com');
+                            localStorage.setItem('trial_start_date', new Date().toISOString());
+                            renderSingleAuthBox();
+                        };
+
+                        if (loginBtn) loginBtn.onclick = performLogin;
+                        if (googleBtn) googleBtn.onclick = performLogin;
+                    }, 50);
                 }
-
-                // تفاعلات الأزرار داخل المربع
-                setTimeout(() => {
-                    const copyBtn = document.getElementById('singleCopyBtn');
-                    if (copyBtn) {
-                        copyBtn.onclick = function (e) {
-                            e.preventDefault();
-                            const field = document.getElementById('singleApiKeyField');
-                            if (field) {
-                                navigator.clipboard.writeText(field.value);
-                                copyBtn.textContent = 'تم النسخ! ✓';
-                                copyBtn.style.background = '#22c55e';
-                                setTimeout(() => {
-                                    copyBtn.textContent = 'نسخ';
-                                    copyBtn.style.background = '#3b82f6';
-                                }, 2000);
-                            }
-                        };
-                    }
-
-                    const logoutBtn = document.getElementById('singleLogoutBtn');
-                    if (logoutBtn) {
-                        logoutBtn.onclick = function (e) {
-                            e.preventDefault();
-                            localStorage.removeItem('is_logged_in');
-                            localStorage.removeItem('user_email');
-                            localStorage.removeItem('trial_start_date');
-                            localStorage.removeItem('user_api_key');
-                            updateAuthCard();
-                        };
-                    }
-
-                    const loginBtn = document.getElementById('loginSubmitBtn');
-                    const googleBtn = document.getElementById('googleLoginBtn');
-
-                    const handleLogin = function (e) {
-                        if (e) e.preventDefault();
-                        const emailField = document.getElementById('loginEmail');
-                        const email = emailField ? emailField.value.trim() : 'hbhh@gmail.com';
-                        localStorage.setItem('is_logged_in', 'true');
-                        localStorage.setItem('user_email', email || 'hbhh@gmail.com');
-                        localStorage.setItem('trial_start_date', new Date().toISOString());
-                        updateAuthCard();
-                    };
-
-                    if (loginBtn) loginBtn.onclick = handleLogin;
-                    if (googleBtn) googleBtn.onclick = handleLogin;
-                }, 50);
             }
 
-            window.addEventListener('DOMContentLoaded', updateAuthCard);
-            window.addEventListener('hashchange', updateAuthCard);
-            setTimeout(updateAuthCard, 300);
+            window.addEventListener('DOMContentLoaded', renderSingleAuthBox);
+            window.addEventListener('hashchange', renderSingleAuthBox);
+            setTimeout(renderSingleAuthBox, 300);
 
             // توجيه أزرار الباقات لروابط PayPal فقط
             document.addEventListener('click', function (e) {
