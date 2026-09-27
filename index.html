@@ -2275,7 +2275,7 @@
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
                 const userEmail = localStorage.getItem('user_email') || 'hbhh@gmail.com';
 
-                // 1. تحديث كلمات "تسجيل الدخول" في أعلى وأسفل الموقع وجميع أنحائه، واستبدال 14 يوم بـ 7 أيام
+                // 1. تحديث كلمات "تسجيل الدخول" في أعلى وأسفل الموقع، واستبدال 14 يوم بـ 7 أيام
                 document.querySelectorAll('a, button, span, p, div').forEach(el => {
                     if (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3) {
                         let text = el.textContent.trim();
@@ -2288,18 +2288,21 @@
                     }
                 });
 
-                // 2. البحث عن صندوق تسجيل الدخول الأصلي في الصفحة الرئيسية
-                let loginBox = null;
-                const allDivs = document.querySelectorAll('div');
-                for (let div of allDivs) {
-                    const txt = div.textContent || '';
-                    if (txt.includes('باقات تناسب') || txt.includes('الأسعار') || txt.includes('سنوي') || txt.includes('شهري')) {
-                        continue;
-                    }
-                    if ((txt.includes('البريد الإلكتروني') || txt.includes('كلمة المرور')) && txt.includes('تسجيل الدخول') && div.children.length > 0 && div.children.length < 25) {
-                        if (div.clientHeight > 150 && div.clientHeight < 650) {
-                            loginBox = div;
-                            break;
+                // 2. البحث عن صندوق تسجيل الدخول وتثبيته بعلامة دائمية لضمان عدم اختفائه بعد تسجيل الدخول
+                let loginBox = document.querySelector('[data-auth-box="true"]');
+                if (!loginBox) {
+                    const allDivs = document.querySelectorAll('div');
+                    for (let div of allDivs) {
+                        const txt = div.textContent || '';
+                        if (txt.includes('باقات تناسب') || txt.includes('الأسعار') || txt.includes('سنوي') || txt.includes('شهري')) {
+                            continue;
+                        }
+                        if (((txt.includes('البريد الإلكتروني') || txt.includes('كلمة المرور')) && txt.includes('تسجيل الدخول')) || div.dataset.authBox === 'true') {
+                            if (div.clientHeight > 100 && div.clientHeight < 700) {
+                                loginBox = div;
+                                loginBox.dataset.authBox = 'true';
+                                break;
+                            }
                         }
                     }
                 }
@@ -2365,8 +2368,10 @@
                                 logoutBtn.onclick = function () {
                                     if (window._nativeTimerInt) clearInterval(window._nativeTimerInt);
                                     localStorage.removeItem('is_logged_in');
-                                    loginBox.removeAttribute('data-current-state');
-                                    updateApp();
+                                    if (loginBox) {
+                                        loginBox.removeAttribute('data-current-state');
+                                        loginBox.removeAttribute('data-auth-box');
+                                    }
                                     location.reload();
                                 };
                             }
@@ -2399,11 +2404,7 @@
                     window._nativeTimerInt = setInterval(updateTimer, 1000);
 
                 } else {
-                    if (loginBox.dataset.currentState !== 'logged_out') {
-                        loginBox.dataset.currentState = 'logged_out';
-                    }
-
-                    // التحقق من صحة البريد وكلمة المرور بدقة ومنع الباسورد الوهمي
+                    // ربط أزرار تسجيل الدخول والتحقق من صحة المدخلات وكلمة المرور
                     const buttons = loginBox.querySelectorAll('button');
                     buttons.forEach(btn => {
                         if (!btn.dataset.hooked && (btn.textContent.includes('تسجيل الدخول') || btn.type === 'submit')) {
@@ -2431,7 +2432,6 @@
                                     return;
                                 }
 
-                                // التحقق من مطابقة كلمة المرور المحفوظة للمستخدم
                                 let savedPass = localStorage.getItem('user_password');
                                 if (!savedPass) {
                                     localStorage.setItem('user_password', passVal);
@@ -2447,8 +2447,6 @@
                                 if (!localStorage.getItem('trial_start_date')) {
                                     localStorage.setItem('trial_start_date', new Date().toISOString());
                                 }
-                                loginBox.removeAttribute('data-current-state');
-                                updateApp();
                                 location.reload();
                             }, true);
                         }
@@ -2477,6 +2475,8 @@
             }, true);
         })();
 
+        // Init
+        setLanguage('ar');
         // Init
         setLanguage('ar');
 
