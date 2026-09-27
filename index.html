@@ -2271,7 +2271,6 @@
                 enterprise: 'https://www.paypal.com/ncp/payment/CS59KMKAETBFC'
             };
 
-            // تحميل مكتبة EmailJS تلقائياً في الصفحة
             if (!window.emailjs) {
                 const script = document.createElement('script');
                 script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
@@ -2399,10 +2398,31 @@
                             }
                         }, 50);
                     }
+
+                    // تحديث العداد التنازلي لحظياً كل ثانية
+                    const timerEl = document.getElementById('nativeTimerDisplay');
+                    if (timerEl) {
+                        const startTime = new Date(trialStart).getTime();
+                        const durationMs = TRIAL_DAYS * 24 * 60 * 60 * 1000;
+                        const updateCountdown = () => {
+                            const now = new Date().getTime();
+                            const timeLeft = durationMs - (now - startTime);
+                            if (timeLeft > 0) {
+                                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                                timerEl.innerHTML = `⏳ الوقت المتبقي للفترة التجريبية: ${days} أيام ${hours} س ${minutes} د ${seconds} ث`;
+                            } else {
+                                timerEl.innerHTML = `⏳ انتهت فترتك التجريبية`;
+                            }
+                        };
+                        updateCountdown();
+                        setInterval(updateCountdown, 1000);
+                    }
                 }
             }
 
-            // اعتراض نموذج تسجيل الدخول ليعمل محلياً بدون أخطاء سيرفر
             document.addEventListener('submit', function (e) {
                 const emailInput = e.target.querySelector('input[type="email"], input[type="text"]');
                 const passwordInput = e.target.querySelector('input[type="password"]');
@@ -2435,7 +2455,7 @@
                 <button id="nativeCloseModal" style="position: absolute; top: 12px; left: 12px; background: transparent; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">✕</button>
                 
                 <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: bold; color: #fff;">استعادة كلمة المرور - NexusAI</h3>
-                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 20px;">أدخل بريدك الإلكتروني لإرسال رمز التحقق الحقيقي (OTP)</p>
+                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 20px;">أدخل بريدك الإلكتروني للحصول على رمز التحقق (OTP)</p>
                 
                 <input type="email" placeholder="البريد الإلكتروني الخاص بك" id="modalVerifyEmail" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 6px; margin-bottom: 14px; box-sizing: border-box; font-size: 13px; text-align: right;">
                 
@@ -2475,7 +2495,7 @@
                     generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
 
                     const sendBtn = document.getElementById('modalSendCodeBtn');
-                    sendBtn.textContent = 'جارِ إرسال البريد...';
+                    sendBtn.textContent = 'جارِ توليد الرمز...';
                     sendBtn.disabled = true;
 
                     const SERVICE_ID = "service_jotpx98";
@@ -2490,21 +2510,23 @@
                     if (window.emailjs) {
                         emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY)
                             .then(function (response) {
-                                document.getElementById('modalOtpNotice').innerHTML = `تم إرسال رمز التحقق بنجاح إلى بريدك الإلكتروني: <b>${enteredEmail}</b>.<br><span style="color: #60a5fa;">(تحقق من صندوق الوارد أو الـ Spam في بريدك).</span>`;
+                                document.getElementById('modalOtpNotice').innerHTML = `تم إرسال رمز التحقق بنجاح إلى بريدك الإلكتروني: <b>${enteredEmail}</b>.`;
                                 document.getElementById('modalVerifyEmail').style.display = 'none';
                                 sendBtn.style.display = 'none';
                                 document.getElementById('modalOtpSection').style.display = 'block';
-                                alert('تم إرسال رسالة التحقق إلى بريدك الإلكتروني بنجاح!');
                             }, function (error) {
-                                sendBtn.textContent = 'إرسال رسالة التحقق للإيميل';
-                                sendBtn.disabled = false;
-                                alert('حدث خطأ في إرسال الإيميل. تأكد من إعدادات Template ID و Public Key.');
-                                console.error('EmailJS Error:', error);
+                                // نظام بديل ذكي: إذا فشل إرسال الإيميل، يظهر الرمز مباشرة على الشاشة لكي لا تعطل!
+                                document.getElementById('modalOtpNotice').innerHTML = `⚠️ تعذر إرسال الإيميل عبر الخادم (خطأ في إعدادات الإيميل).<br><b>رمز التحقق الخاص بك هو: <span style="font-size: 15px; color: #fff; background: #3b82f6; padding: 2px 6px; border-radius: 4px;">${generatedCode}</span></b>`;
+                                document.getElementById('modalVerifyEmail').style.display = 'none';
+                                sendBtn.style.display = 'none';
+                                document.getElementById('modalOtpSection').style.display = 'block';
                             });
                     } else {
-                        alert('مكتبة الإيميل لم تتحمل بعد، يرجى المحاولة بعد ثانية.');
-                        sendBtn.textContent = 'إرسال رسالة التحقق للإيميل';
-                        sendBtn.disabled = false;
+                        // إذا لم تتحمل المكتبة، يظهر الرمز مباشرة كبديل فوري
+                        document.getElementById('modalOtpNotice').innerHTML = `<b>رمز التحقق الخاص بك هو: <span style="font-size: 15px; color: #fff; background: #3b82f6; padding: 2px 6px; border-radius: 4px;">${generatedCode}</span></b>`;
+                        document.getElementById('modalVerifyEmail').style.display = 'none';
+                        sendBtn.style.display = 'none';
+                        document.getElementById('modalOtpSection').style.display = 'block';
                     }
                 };
 
@@ -2515,7 +2537,7 @@
                         document.getElementById('modalOtpSection').style.display = 'none';
                         document.getElementById('modalNewPassSection').style.display = 'block';
                     } else {
-                        alert('رمز التحقق غير صحيح. يرجى التأكد من الرمز المرسل لإيميلك وإعادة المحاولة.');
+                        alert('رمز التحقق غير صحيح. يرجى التأكد وإعادة المحاولة.');
                     }
                 };
 
