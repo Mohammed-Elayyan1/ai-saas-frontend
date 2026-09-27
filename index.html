@@ -2263,7 +2263,6 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === الحل النهائي والجذري: منع أي تداخل وفرض صندوق واحد رئيسي داخل القسم الأزرق فقط ===
         (function () {
             const TRIAL_DAYS = 7;
             const PAYPAL_LINKS = {
@@ -2272,77 +2271,62 @@
                 enterprise: 'https://www.paypal.com/ncp/payment/CS59KMKAETBFC'
             };
 
-            // منع إعادة تحميل الصفحة عند الإرسال
+            // منع إعادة تحميل الصفحة عند النماذج
             document.addEventListener('submit', function (e) {
                 e.preventDefault();
             }, true);
 
-            function enforceSingleBox() {
+            function renderAuthBox() {
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
                 const userEmail = localStorage.getItem('user_email') || 'hbhh@gmail.com';
 
-                // 1. تحديث شريط التنقل العلوي
+                // تحديث شريط التنقل العلوي
                 document.querySelectorAll('a, button').forEach(el => {
                     const text = el.textContent.trim();
                     if (text === 'تسجيل الدخول' || text === 'تسجيل دخول' || text.includes('hbhh@gmail.com') || text.includes('👤')) {
-                        if (!el.closest('#absolute-master-auth-box')) {
-                            el.textContent = isLoggedIn ? `👤 ${userEmail}` : 'تسجيل الدخول';
-                        }
+                        el.textContent = isLoggedIn ? `👤 ${userEmail}` : 'تسجيل الدخول';
                     }
                 });
 
-                // 2. البحث عن القسم الأزرق الرئيسي (Hero Section) في القالب
-                let heroSection = null;
-                const allSections = document.querySelectorAll('div, section');
-                for (let s of allSections) {
-                    const txt = s.textContent || '';
-                    if (txt.includes('ابدأ رحلتك مع الذكاء الاصطناعي') && s.clientHeight > 150) {
-                        heroSection = s;
-                        break;
-                    }
-                }
-
-                if (!heroSection) {
-                    heroSection = document.querySelector('main') || document.body;
-                }
-
-                // 3. إنشاء أو جلب المربع الرئيسي الوحيد
-                let masterBox = document.getElementById('absolute-master-auth-box');
-
-                if (!heroSection.contains(masterBox)) {
-                    if (masterBox) masterBox.remove();
-                    masterBox = document.createElement('div');
-                    masterBox.id = 'absolute-master-auth-box';
-                    heroSection.appendChild(masterBox);
-                }
-
-                // إخفاء أي نماذج أو صناديق أخرى قديمة تنشئها مكتبة الصفحة (React) داخل القسم الأزرق
-                const siblingElements = heroSection.querySelectorAll('form, div');
-                siblingElements.forEach(el => {
-                    if (el !== masterBox && !masterBox.contains(el)) {
-                        const t = el.textContent || '';
-                        if ((t.includes('البريد الإلكتروني') || t.includes('كلمة المرور') || t.includes('إنشاء حساب')) && el.children.length < 15) {
-                            el.style.display = 'none';
+                // البحث عن الصندوق الأصلي المنحني في القسم الأزرق
+                let cardContainer = null;
+                const allDivs = document.querySelectorAll('div');
+                for (let div of allDivs) {
+                    const txt = div.textContent || '';
+                    if ((txt.includes('تسجيل الدخول') || txt.includes('إنشاء حساب') || txt.includes('البريد الإلكتروني')) && div.children.length > 0 && div.children.length < 20) {
+                        if (div.clientHeight > 140) {
+                            cardContainer = div;
+                            break;
                         }
                     }
-                });
+                }
 
-                // تنسيق المربع الواحد الثابت
-                masterBox.style.cssText = `
-            width: 100% !important;
-            max-width: 380px !important;
-            margin: 25px auto !important;
-            padding: 24px !important;
-            background: rgba(15, 23, 42, 0.98) !important;
-            border-radius: 16px !important;
-            border: 1px solid rgba(255, 255, 255, 0.15) !important;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.7) !important;
+                if (!cardContainer) {
+                    for (let div of allDivs) {
+                        const txt = div.textContent || '';
+                        if (txt.includes('ابدأ رحلتك') && div.clientHeight > 200) {
+                            cardContainer = div;
+                            break;
+                        }
+                    }
+                }
+
+                if (!cardContainer) return;
+
+                // منع التكرار وإعادة الرسم العشوائي بتثبيت حالة المحتوى الحالية
+                const currentStateKey = isLoggedIn ? 'logged_in' : 'logged_out';
+                if (cardContainer.getAttribute('data-rendered-state') === currentStateKey) {
+                    return;
+                }
+                cardContainer.setAttribute('data-rendered-state', currentStateKey);
+                cardContainer.innerHTML = ''; // تفريغ كامل لمنع أي تداخل أو صندوق مزدوج
+
+                // تطبيق تنسيقات نظيفة على الحاوية الأصلية
+                cardContainer.style.cssText += `
             text-align: center !important;
             box-sizing: border-box !important;
             font-family: inherit !important;
             position: relative !important;
-            z-index: 9999 !important;
-            display: block !important;
         `;
 
                 if (isLoggedIn) {
@@ -2358,25 +2342,25 @@
                         localStorage.setItem('user_api_key', userApiKey);
                     }
 
-                    // محتوى صندوق الترحيب والعداد ومفتاح الـ API داخل المربع الواحد
-                    masterBox.innerHTML = `
-                <div style="font-size: 38px; margin-bottom: 8px;">👤</div>
-                <h3 style="margin: 0 0 6px 0; font-size: 17px; color: #fff; font-weight: bold;">أهلاً بك مجدداً</h3>
-                <p style="color: #60a5fa; font-size: 12px; margin-bottom: 14px; direction: ltr; font-weight: bold;">${userEmail}</p>
+                    // محتوى صندوق الملف الشخصي والعداد ومفتاح API داخل نفس الصندوق تماماً
+                    cardContainer.innerHTML = `
+                <div style="font-size: 42px; margin-bottom: 8px;">👤</div>
+                <h3 style="margin: 0 0 6px 0; font-size: 18px; color: #fff; font-weight: bold;">أهلاً بك مجدداً</h3>
+                <p style="color: #60a5fa; font-size: 13px; margin-bottom: 16px; direction: ltr; font-weight: bold;">${userEmail}</p>
                 
-                <div style="background: rgba(241, 196, 15, 0.1); border: 1px solid rgba(241, 196, 15, 0.3); padding: 8px; border-radius: 8px; margin-bottom: 14px; font-size: 11px; color: #facc15;" id="realCountdownEl">
+                <div style="background: rgba(241, 196, 15, 0.1); border: 1px solid rgba(241, 196, 15, 0.3); padding: 10px; border-radius: 8px; margin-bottom: 16px; font-size: 12px; color: #facc15;" id="singleBoxTimer">
                     ⏳ جارِ تحميل العداد...
                 </div>
 
-                <div style="background: rgba(0,0,0,0.45); padding: 10px; border-radius: 8px; margin-bottom: 16px; text-align: right; border: 1px solid rgba(255,255,255,0.1);">
-                    <p style="color: #94a3b8; font-size: 10px; margin: 0 0 6px 0;">🔑 مفتاح الوصول (API Key):</p>
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <input type="text" readonly value="${userApiKey}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 6px; border-radius: 4px; width: 100%; font-family: monospace; font-size: 10px; direction: ltr;" id="apiKeyFieldBox">
-                        <button type="button" id="copyBtnBox" style="background: #3b82f6; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold;">نسخ</button>
+                <div style="background: rgba(0,0,0,0.45); padding: 12px; border-radius: 8px; margin-bottom: 18px; text-align: right; border: 1px solid rgba(255,255,255,0.1);">
+                    <p style="color: #94a3b8; font-size: 11px; margin: 0 0 6px 0;">🔑 مفتاح الوصول (API Key):</p>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <input type="text" readonly value="${userApiKey}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px; border-radius: 4px; width: 100%; font-family: monospace; font-size: 11px; direction: ltr;" id="singleApiKeyInput">
+                        <button type="button" id="singleCopyBtn" style="background: #3b82f6; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">نسخ</button>
                     </div>
                 </div>
 
-                <button type="button" id="logoutBtnBox" style="background: #ef4444; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 12px;">تسجيل الخروج</button>
+                <button type="button" id="singleLogoutBtn" style="background: #ef4444; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px;">تسجيل الخروج</button>
             `;
 
                     // العداد التنازلي الحقيقي
@@ -2386,7 +2370,7 @@
                         const now = new Date();
                         const diffMs = expiryDate - now;
 
-                        const display = document.getElementById('realCountdownEl');
+                        const display = document.getElementById('singleBoxTimer');
                         if (!display) return;
 
                         if (diffMs <= 0) {
@@ -2403,14 +2387,14 @@
                     }
 
                     updateTimer();
-                    if (window._timerInstance) clearInterval(window._timerInstance);
-                    window._timerInstance = setInterval(updateTimer, 1000);
+                    if (window._timerIntervalRef) clearInterval(window._timerIntervalRef);
+                    window._timerIntervalRef = setInterval(updateTimer, 1000);
 
                     setTimeout(() => {
-                        const copyBtn = document.getElementById('copyBtnBox');
+                        const copyBtn = document.getElementById('singleCopyBtn');
                         if (copyBtn) {
                             copyBtn.onclick = function () {
-                                const field = document.getElementById('apiKeyFieldBox');
+                                const field = document.getElementById('singleApiKeyInput');
                                 if (field) {
                                     navigator.clipboard.writeText(field.value);
                                     copyBtn.textContent = 'تم النسخ! ✓';
@@ -2423,66 +2407,56 @@
                             };
                         }
 
-                        const logoutBtn = document.getElementById('logoutBtnBox');
+                        const logoutBtn = document.getElementById('singleLogoutBtn');
                         if (logoutBtn) {
                             logoutBtn.onclick = function () {
-                                if (window._timerInstance) clearInterval(window._timerInstance);
+                                if (window._timerIntervalRef) clearInterval(window._timerIntervalRef);
                                 localStorage.removeItem('is_logged_in');
                                 localStorage.removeItem('user_email');
                                 localStorage.removeItem('trial_start_date');
                                 localStorage.removeItem('user_api_key');
-                                enforceSingleBox();
+                                cardContainer.removeAttribute('data-rendered-state');
+                                renderAuthBox();
                             };
                         }
                     }, 50);
 
                 } else {
-                    // محتوى صندوق تسجيل الدخول في المربع الواحد
-                    masterBox.innerHTML = `
-                <h3 style="color: #fff; margin-bottom: 14px; font-size: 16px; font-weight: bold;">تسجيل الدخول</h3>
-                <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <input type="email" id="loginEmailBox" placeholder="البريد الإلكتروني" value="hbhh@gmail.com" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px; border-radius: 8px; font-size: 12px; width: 100%; box-sizing: border-box; direction: ltr; text-align: right;">
-                    <input type="password" id="loginPassBox" placeholder="كلمة المرور" value="********" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px; border-radius: 8px; font-size: 12px; width: 100%; box-sizing: border-box;">
-                    <button type="button" id="loginSubmitBtnBox" style="background: #3b82f6; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%;">تسجيل الدخول</button>
-                    <div style="color: #94a3b8; font-size: 11px; margin: 4px 0;">أو</div>
-                    <button type="button" id="googleSubmitBtnBox" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 9px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%;">المتابعة عبر Google</button>
+                    // محتوى تسجيل الدخول داخل نفس الصندوق تماماً
+                    cardContainer.innerHTML = `
+                <h3 style="color: #fff; margin-bottom: 16px; font-size: 18px; font-weight: bold;">تسجيل الدخول</h3>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <input type="email" id="singleLoginEmail" placeholder="البريد الإلكتروني" value="hbhh@gmail.com" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 11px; border-radius: 8px; font-size: 13px; width: 100%; box-sizing: border-box; direction: ltr; text-align: right;">
+                    <input type="password" id="singleLoginPass" placeholder="كلمة المرور" value="********" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 11px; border-radius: 8px; font-size: 13px; width: 100%; box-sizing: border-box;">
+                    <button type="button" id="singleLoginSubmit" style="background: #3b82f6; color: white; border: none; padding: 11px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; width: 100%;">تسجيل الدخول</button>
+                    <div style="color: #94a3b8; font-size: 12px; margin: 4px 0;">أو</div>
+                    <button type="button" id="singleGoogleSubmit" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 10px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; width: 100%;">المتابعة عبر Google</button>
                 </div>
             `;
 
                     setTimeout(() => {
-                        const loginBtn = document.getElementById('loginSubmitBtnBox');
-                        const googleBtn = document.getElementById('googleSubmitBtnBox');
+                        const loginBtn = document.getElementById('singleLoginSubmit');
+                        const googleBtn = document.getElementById('singleGoogleSubmit');
 
-                        const performLogin = function () {
-                            const emailField = document.getElementById('loginEmailBox');
+                        const handleLoginAction = function () {
+                            const emailField = document.getElementById('singleLoginEmail');
                             const email = emailField ? emailField.value.trim() : 'hbhh@gmail.com';
                             localStorage.setItem('is_logged_in', 'true');
                             localStorage.setItem('user_email', email || 'hbhh@gmail.com');
                             localStorage.setItem('trial_start_date', new Date().toISOString());
-                            enforceSingleBox();
+                            cardContainer.removeAttribute('data-rendered-state');
+                            renderAuthBox();
                         };
 
-                        if (loginBtn) loginBtn.onclick = performLogin;
-                        if (googleBtn) googleBtn.onclick = performLogin;
+                        if (loginBtn) loginBtn.onclick = handleLoginAction;
+                        if (googleBtn) googleBtn.onclick = handleLoginAction;
                     }, 50);
                 }
             }
 
-            window.addEventListener('DOMContentLoaded', enforceSingleBox);
-            setTimeout(enforceSingleBox, 150);
-
-            // مراقب دائم يمنع أي محاولة من الصفحة لإعادة إنشاء صندوق ثاني مزدوج
-            let checkTimeout;
-            const observer = new MutationObserver(() => {
-                clearTimeout(checkTimeout);
-                checkTimeout = setTimeout(() => {
-                    const box = document.getElementById('absolute-master-auth-box');
-                    if (!box || !document.body.contains(box)) {
-                        enforceSingleBox();
-                    }
-                }, 150);
-            });
-            observer.observe(document.body, { childList: true, subtree: true });
+            window.addEventListener('DOMContentLoaded', renderAuthBox);
+            window.addEventListener('hashchange', renderAuthBox);
+            setTimeout(renderAuthBox, 250);
 
             // توجيه أزرار الباقات لروابط PayPal فقط
             document.addEventListener('click', function (e) {
