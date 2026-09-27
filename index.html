@@ -2271,7 +2271,6 @@
                 enterprise: 'https://www.paypal.com/ncp/payment/CS59KMKAETBFC'
             };
 
-            // منع إعادة تحميل الصفحة عند النماذج
             document.addEventListener('submit', function (e) {
                 e.preventDefault();
             }, true);
@@ -2288,7 +2287,7 @@
                     }
                 });
 
-                // البحث عن الصندوق الأصلي المنحني في القسم الأزرق
+                // البحث عن الصندوق الأصلي للقالب
                 let cardContainer = null;
                 const allDivs = document.querySelectorAll('div');
                 for (let div of allDivs) {
@@ -2313,20 +2312,23 @@
 
                 if (!cardContainer) return;
 
-                // منع التكرار وإعادة الرسم العشوائي بتثبيت حالة المحتوى الحالية
-                const currentStateKey = isLoggedIn ? 'logged_in' : 'logged_out';
+                const currentStateKey = isLoggedIn ? 'logged_in_fixed' : 'logged_out_fixed';
                 if (cardContainer.getAttribute('data-rendered-state') === currentStateKey) {
                     return;
                 }
                 cardContainer.setAttribute('data-rendered-state', currentStateKey);
-                cardContainer.innerHTML = ''; // تفريغ كامل لمنع أي تداخل أو صندوق مزدوج
+                cardContainer.innerHTML = '';
 
-                // تطبيق تنسيقات نظيفة على الحاوية الأصلية
+                // تنسيق الصندوق الرئيسي لمنع أي تداخل أو انقلاب في العناصر
                 cardContainer.style.cssText += `
-            text-align: center !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
             box-sizing: border-box !important;
             font-family: inherit !important;
             position: relative !important;
+            text-align: right !important;
         `;
 
                 if (isLoggedIn) {
@@ -2342,28 +2344,29 @@
                         localStorage.setItem('user_api_key', userApiKey);
                     }
 
-                    // محتوى صندوق الملف الشخصي والعداد ومفتاح API داخل نفس الصندوق تماماً
+                    // الترتيب الصحيح والمرتب عمودياً داخل الصندوق
                     cardContainer.innerHTML = `
-                <div style="font-size: 42px; margin-bottom: 8px;">👤</div>
-                <h3 style="margin: 0 0 6px 0; font-size: 18px; color: #fff; font-weight: bold;">أهلاً بك مجدداً</h3>
-                <p style="color: #60a5fa; font-size: 13px; margin-bottom: 16px; direction: ltr; font-weight: bold;">${userEmail}</p>
-                
-                <div style="background: rgba(241, 196, 15, 0.1); border: 1px solid rgba(241, 196, 15, 0.3); padding: 10px; border-radius: 8px; margin-bottom: 16px; font-size: 12px; color: #facc15;" id="singleBoxTimer">
-                    ⏳ جارِ تحميل العداد...
-                </div>
-
-                <div style="background: rgba(0,0,0,0.45); padding: 12px; border-radius: 8px; margin-bottom: 18px; text-align: right; border: 1px solid rgba(255,255,255,0.1);">
-                    <p style="color: #94a3b8; font-size: 11px; margin: 0 0 6px 0;">🔑 مفتاح الوصول (API Key):</p>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <input type="text" readonly value="${userApiKey}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px; border-radius: 4px; width: 100%; font-family: monospace; font-size: 11px; direction: ltr;" id="singleApiKeyInput">
-                        <button type="button" id="singleCopyBtn" style="background: #3b82f6; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">نسخ</button>
+                <div style="display: flex; flex-direction: column; align-items: center; width: 100%; box-sizing: border-box;">
+                    <div style="font-size: 38px; margin-bottom: 6px; line-height: 1;">👤</div>
+                    <h3 style="margin: 0 0 4px 0; font-size: 18px; color: #fff; font-weight: bold; text-align: center;">أهلاً بك مجدداً</h3>
+                    <p style="color: #60a5fa; font-size: 13px; margin: 0 0 14px 0; direction: ltr; font-weight: bold; text-align: center;">${userEmail}</p>
+                    
+                    <div style="background: rgba(241, 196, 15, 0.1); border: 1px solid rgba(241, 196, 15, 0.3); padding: 8px 12px; border-radius: 8px; margin-bottom: 14px; font-size: 12px; color: #facc15; width: 100%; box-sizing: border-box; text-align: center;" id="singleBoxTimer">
+                        ⏳ جارِ تحميل العداد...
                     </div>
-                </div>
 
-                <button type="button" id="singleLogoutBtn" style="background: #ef4444; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px;">تسجيل الخروج</button>
+                    <div style="background: rgba(0,0,0,0.45); padding: 10px; border-radius: 8px; margin-bottom: 14px; text-align: right; border: 1px solid rgba(255,255,255,0.1); width: 100%; box-sizing: border-box;">
+                        <p style="color: #94a3b8; font-size: 11px; margin: 0 0 6px 0; text-align: right;">🔑 مفتاح الوصول (API Key):</p>
+                        <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
+                            <input type="text" readonly value="${userApiKey}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px; border-radius: 4px; flex-grow: 1; font-family: monospace; font-size: 11px; direction: ltr; box-sizing: border-box;" id="singleApiKeyInput">
+                            <button type="button" id="singleCopyBtn" style="background: #3b82f6; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; white-space: nowrap;">نسخ</button>
+                        </div>
+                    </div>
+
+                    <button type="button" id="singleLogoutBtn" style="background: #ef4444; color: white; border: none; padding: 11px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px; box-sizing: border-box;">تسجيل الخروج</button>
+                </div>
             `;
 
-                    // العداد التنازلي الحقيقي
                     function updateTimer() {
                         const startDate = new Date(trialStart);
                         const expiryDate = new Date(startDate.getTime() + (TRIAL_DAYS * 24 * 60 * 60 * 1000));
@@ -2422,15 +2425,17 @@
                     }, 50);
 
                 } else {
-                    // محتوى تسجيل الدخول داخل نفس الصندوق تماماً
+                    // واجهة تسجيل الدخول المرتبة
                     cardContainer.innerHTML = `
-                <h3 style="color: #fff; margin-bottom: 16px; font-size: 18px; font-weight: bold;">تسجيل الدخول</h3>
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <input type="email" id="singleLoginEmail" placeholder="البريد الإلكتروني" value="hbhh@gmail.com" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 11px; border-radius: 8px; font-size: 13px; width: 100%; box-sizing: border-box; direction: ltr; text-align: right;">
-                    <input type="password" id="singleLoginPass" placeholder="كلمة المرور" value="********" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 11px; border-radius: 8px; font-size: 13px; width: 100%; box-sizing: border-box;">
-                    <button type="button" id="singleLoginSubmit" style="background: #3b82f6; color: white; border: none; padding: 11px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; width: 100%;">تسجيل الدخول</button>
-                    <div style="color: #94a3b8; font-size: 12px; margin: 4px 0;">أو</div>
-                    <button type="button" id="singleGoogleSubmit" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 10px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; width: 100%;">المتابعة عبر Google</button>
+                <div style="display: flex; flex-direction: column; width: 100%; box-sizing: border-box;">
+                    <h3 style="color: #fff; margin: 0 0 16px 0; font-size: 18px; font-weight: bold; text-align: center;">تسجيل الدخول</h3>
+                    <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
+                        <input type="email" id="singleLoginEmail" placeholder="البريد الإلكتروني" value="hbhh@gmail.com" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 11px; border-radius: 8px; font-size: 13px; width: 100%; box-sizing: border-box; direction: ltr; text-align: right;">
+                        <input type="password" id="singleLoginPass" placeholder="كلمة المرور" value="********" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 11px; border-radius: 8px; font-size: 13px; width: 100%; box-sizing: border-box; text-align: right;">
+                        <button type="button" id="singleLoginSubmit" style="background: #3b82f6; color: white; border: none; padding: 11px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; width: 100%; box-sizing: border-box;">تسجيل الدخول</button>
+                        <div style="color: #94a3b8; font-size: 12px; margin: 2px 0; text-align: center;">أو</div>
+                        <button type="button" id="singleGoogleSubmit" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 10px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; width: 100%; box-sizing: border-box;">المتابعة عبر Google</button>
+                    </div>
                 </div>
             `;
 
@@ -2458,7 +2463,6 @@
             window.addEventListener('hashchange', renderAuthBox);
             setTimeout(renderAuthBox, 250);
 
-            // توجيه أزرار الباقات لروابط PayPal فقط
             document.addEventListener('click', function (e) {
                 const target = e.target.closest('a, button');
                 if (!target) return;
