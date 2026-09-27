@@ -2263,7 +2263,7 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === الحل النهائي والشامل لجميع الملاحظات ===
+        // === الحل الجذري: صندوق واحد يتغير ديناميكياً في نفس المكان دون أي تكرار ===
         (function () {
             const TRIAL_DAYS = 7;
             const PAYPAL_LINKS = {
@@ -2277,32 +2277,23 @@
             }, true);
 
             function initUnifiedAuth() {
-                // إخفاء أي نماذج قديمة إضافية لمنع تكرار المربعات
-                document.querySelectorAll('form, .auth-form, .login-container').forEach(el => {
-                    if (!el.classList.contains('custom-single-auth-box') && !el.closest('.custom-single-auth-box')) {
-                        if (el.innerHTML && (el.innerHTML.includes('كلمة المرور') || el.innerHTML.includes('المتابعة عبر Google') || el.innerHTML.includes('إنشاء حساب'))) {
-                            el.style.display = 'none';
-                        }
-                    }
-                });
-
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
                 const userEmail = localStorage.getItem('user_email') || 'hbhh@gmail.com';
 
-                // 1. تحديث شريط التنقل العلوي وتوجيه أزرار "ابدأ رحلتك" لتنقلك إلى مكان تسجيل الدخول
+                // 1. تحديث شريط التنقل العلوي
                 document.querySelectorAll('a, button').forEach(el => {
                     const text = el.textContent.trim();
                     if (text === 'تسجيل الدخول' || text === 'تسجيل دخول' || text.includes('hbhh@gmail.com') || text.includes('👤')) {
-                        if (!el.closest('.custom-single-auth-box')) {
+                        if (!el.closest('.auth-slot-container')) {
                             el.textContent = isLoggedIn ? `👤 ${userEmail}` : 'تسجيل الدخول';
                         }
                     }
                     if (text.includes('ابدأ رحلتك الآن') || text.includes('ابدأ تجربتك المجانية') || text.includes('ابدأ رحلتك')) {
                         el.onclick = function (e) {
                             e.preventDefault();
-                            const targetBox = document.querySelector('.custom-single-auth-box') || document.querySelector('#auth');
-                            if (targetBox) {
-                                targetBox.scrollIntoView({ behavior: 'smooth' });
+                            const slot = document.querySelector('.auth-slot-container');
+                            if (slot) {
+                                slot.scrollIntoView({ behavior: 'smooth' });
                             }
                         };
                     }
@@ -2329,16 +2320,27 @@
                     localStorage.setItem('user_api_key', userApiKey);
                 }
 
-                // إزالة الصناديق القديمة لمنع التكرار
-                document.querySelectorAll('.custom-single-auth-box').forEach(el => el.remove());
+                // البحث عن الحاوية الأصلية أو المربع الخاص بتسجيل الدخول داخل القسم الأزرق
+                let authSlot = document.querySelector('.auth-slot-container');
+                if (!authSlot) {
+                    // البحث عن العنصر الذي يحتوي على نماذج الدخول الأصلية في الصفحة
+                    const elements = document.querySelectorAll('div, section');
+                    for (let el of elements) {
+                        if (el.textContent && (el.textContent.includes('إنشاء حساب') || el.textContent.includes('البريد الإلكتروني')) && el.children.length < 15 && el.children.length > 0) {
+                            authSlot = el;
+                            authSlot.className = 'auth-slot-container';
+                            break;
+                        }
+                    }
+                }
 
-                // بناء الصندوق الموحد بداخل المربع الكبير
-                const box = document.createElement('div');
-                box.className = 'custom-single-auth-box';
-                box.style.cssText = `
+                if (!authSlot) return;
+
+                // تنسيق الحاوية لتكون مرتبة داخل المربع الكبير الأزرق
+                authSlot.style.cssText = `
             width: 100%;
             max-width: 380px;
-            margin: 15px auto;
+            margin: 0 auto;
             padding: 20px;
             background: rgba(15, 23, 42, 0.96);
             border-radius: 14px;
@@ -2347,13 +2349,11 @@
             text-align: center;
             box-sizing: border-box;
             font-family: inherit;
-            position: relative;
-            z-index: 50;
         `;
 
+                // حقن المحتوى الصحيح حسب حالة تسجيل الدخول (بدون تكرار)
                 if (isLoggedIn) {
-                    // حالة تسجيل الدخول: عرض الملف الشخصي ومفتاح API وزر الخروج فقط
-                    box.innerHTML = `
+                    authSlot.innerHTML = `
                 <div style="font-size: 34px; margin-bottom: 6px;">👤</div>
                 <h3 style="margin: 0 0 4px 0; font-size: 16px; color: #fff;">أهلاً بك مجدداً</h3>
                 <p style="color: #60a5fa; font-size: 12px; margin-bottom: 10px; direction: ltr; font-weight: bold;">${userEmail}</p>
@@ -2373,8 +2373,7 @@
                 <button type="button" id="singleLogoutBtn" style="background: #ef4444; color: white; border: none; padding: 9px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 12px;">تسجيل الخروج</button>
             `;
                 } else {
-                    // حالة عدم تسجيل الدخول: عرض نموذج تسجيل الدخول مع خيار Google في نفس المربع
-                    box.innerHTML = `
+                    authSlot.innerHTML = `
                 <h3 style="color: #fff; margin-bottom: 12px; font-size: 15px;">تسجيل الدخول / إنشاء حساب</h3>
                 <div style="display: flex; flex-direction: column; gap: 8px;">
                     <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" value="hbhh@gmail.com" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px; border-radius: 6px; font-size: 12px; width: 100%; box-sizing: border-box; direction: ltr; text-align: right;">
@@ -2386,23 +2385,7 @@
             `;
                 }
 
-                // إدراج الصندوق حصرياً داخل المربع الكبير الأزرق
-                let targetContainer = null;
-                const allElements = document.querySelectorAll('div, section');
-                for (let el of allElements) {
-                    if (el.textContent && el.textContent.includes('ابدأ رحلتك مع الذكاء الاصطناعي') && el.children.length < 30 && el.children.length > 0) {
-                        targetContainer = el;
-                    }
-                }
-
-                if (targetContainer) {
-                    targetContainer.appendChild(box);
-                } else {
-                    const fallback = document.querySelector('section') || document.body;
-                    fallback.appendChild(box);
-                }
-
-                // تفاعلات الأزرار
+                // ربط أزرار التفاعل
                 setTimeout(() => {
                     const copyBtn = document.getElementById('singleCopyBtn');
                     if (copyBtn) {
