@@ -2263,7 +2263,7 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === الحل الجذري لمنع خطأ 405 وإيقاف النماذج الافتراضية وضبط الواجهة ===
+        // === الحل الشامل والجاهز بدون حذف أي شيء من ملفاتك ===
         (function () {
             const TRIAL_DAYS = 7;
             const PAYPAL_LINKS = {
@@ -2272,19 +2272,16 @@
                 enterprise: 'https://www.paypal.com/ncp/payment/CS59KMKAETBFC'
             };
 
-            // منع أي نموذج أساسي في الموقع من التسبب في خطأ 405
-            document.querySelectorAll('form').forEach(form => {
-                form.onsubmit = function (e) {
-                    e.preventDefault();
-                    return false;
-                };
-            });
+            // منع أي نموذج في الصفحة من التسبب في خطأ 405 نهائياً
+            document.addEventListener('submit', function (e) {
+                e.preventDefault();
+            }, true);
 
             function updatePortal() {
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
                 const userEmail = localStorage.getItem('user_email') || 'hbhh@gmail.com';
 
-                // 1. تحديث القائمة العلوية
+                // 1. تحديث زر القائمة العلوية ليعرض البريد أو كلمة تسجيل الدخول
                 document.querySelectorAll('a, button').forEach(el => {
                     const text = el.textContent.trim();
                     if (text === 'تسجيل الدخول' || text === 'تسجيل دخول' || text.includes('hbhh@gmail.com') || text.includes('👤')) {
@@ -2300,7 +2297,7 @@
                     }
                 });
 
-                // إدارة التجربة والمفتاح
+                // إدارة أيام التجربة والمفتاح
                 let trialStart = localStorage.getItem('trial_start_date');
                 if (!trialStart && isLoggedIn) {
                     trialStart = new Date().toISOString();
@@ -2321,10 +2318,10 @@
                     localStorage.setItem('user_api_key', userApiKey);
                 }
 
-                // إزالة الحاويات القديمة
+                // إزالة الصناديق القديمة لتجنب التكرار
                 document.querySelectorAll('.custom-unified-auth-box').forEach(el => el.remove());
 
-                // بناء صندوق تسجيل الدخول / حساب المستخدم داخل قسم "ابدأ رحلتك"
+                // بناء صندوق الحساب المرتب داخل قسم "ابدأ رحلتك"
                 const box = document.createElement('div');
                 box.className = 'custom-unified-auth-box';
                 box.style.cssText = `
@@ -2374,7 +2371,7 @@
             `;
                 }
 
-                // وضع الصندوق حصرياً داخل قسم "ابدأ رحلتك مع الذكاء الاصطناعي"
+                // إدراج الصندوق حصرياً داخل قسم "ابدأ رحلتك مع الذكاء الاصطناعي"
                 let targetContainer = null;
                 const allElements = document.querySelectorAll('div, section');
                 for (let el of allElements) {
@@ -2391,7 +2388,7 @@
                     fallback.appendChild(box);
                 }
 
-                // تفاعلات الأزرار دون إعادة تحميل أو أخطاء
+                // ربط التفاعلات والأزرار بسلاسة
                 setTimeout(() => {
                     const copyBtn = document.getElementById('singleCopyBtn');
                     if (copyBtn) {
