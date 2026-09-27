@@ -2399,22 +2399,32 @@
                     window._nativeTimerInt = setInterval(updateTimer, 1000);
 
                 } else if (isForgotState) {
-                    // واجهة التحقق وتغيير كلمة المرور بشكل آمن
+                    // واجهة أمان متقدمة: إدخال البريد -> إرسال رمز تحقق -> إدخال الرمز -> تغيير الباسورد
                     if (loginForm.dataset.renderedForgot !== 'true') {
                         loginForm.dataset.renderedForgot = 'true';
                         loginForm.innerHTML = `
                     <div style="width: 100%; max-width: 400px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; text-align: center; box-sizing: border-box; padding: 20px;">
-                        <h3 style="margin: 0 0 6px 0; font-size: 18px; color: #fff; font-weight: bold;">التحقق واستعادة كلمة المرور</h3>
-                        <p style="color: #94a3b8; font-size: 12px; margin-bottom: 16px;">أدخل بريدك الإلكتروني المسجل للتأكد من هويتك أولاً</p>
+                        <h3 style="margin: 0 0 6px 0; font-size: 18px; color: #fff; font-weight: bold;">استعادة كلمة المرور الآمنة</h3>
+                        <p style="color: #94a3b8; font-size: 12px; margin-bottom: 16px;">أدخل بريدك الإلكتروني لتلقي رمز التحقق</p>
                         
                         <input type="email" placeholder="البريد الإلكتروني المسجل" id="nativeVerifyEmail" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px; border-radius: 6px; margin-bottom: 12px; box-sizing: border-box; font-size: 13px;">
                         
+                        <!-- صندوق إدخال رمز التحقق -->
+                        <div id="nativeOtpContainer" style="display: none; width: 100%;">
+                            <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); padding: 8px; border-radius: 6px; margin-bottom: 12px; font-size: 11px; color: #60a5fa;" id="nativeOtpNotice">
+                                تم إرسال رمز التحقق (OTP) إلى بريدك.
+                            </div>
+                            <input type="text" placeholder="أدخل رمز التحقق المكون من 6 أرقام" id="nativeOtpInput" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px; border-radius: 6px; margin-bottom: 12px; box-sizing: border-box; font-size: 13px; text-align: center; letter-spacing: 2px;">
+                            <button type="button" id="nativeConfirmOtpBtn" style="background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px; margin-bottom: 10px; box-sizing: border-box;">تأكيد الرمز</button>
+                        </div>
+
+                        <!-- صندوق كلمة المرور الجديدة -->
                         <div id="nativeNewPassContainer" style="display: none; width: 100%;">
                             <input type="password" placeholder="كلمة المرور الجديدة (6 أحرف على الأقل)" id="nativeForgotPass" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px; border-radius: 6px; margin-bottom: 12px; box-sizing: border-box; font-size: 13px;">
                             <button type="button" id="nativeResetBtn" style="background: #22c55e; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px; margin-bottom: 10px; box-sizing: border-box;">حفظ كلمة المرور الجديدة</button>
                         </div>
 
-                        <button type="button" id="nativeVerifyBtn" style="background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px; margin-bottom: 10px; box-sizing: border-box;">تحقق من البريد</button>
+                        <button type="button" id="nativeSendCodeBtn" style="background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px; margin-bottom: 10px; box-sizing: border-box;">إرسال رمز التحقق</button>
                         
                         <span id="nativeBackLoginBtn" style="color: #60a5fa; font-size: 12px; text-decoration: underline; cursor: pointer;">العودة لتسجيل الدخول</span>
                     </div>
@@ -2422,12 +2432,18 @@
 
                         setTimeout(() => {
                             const verifyEmailInput = document.getElementById('nativeVerifyEmail');
-                            const verifyBtn = document.getElementById('nativeVerifyBtn');
+                            const sendCodeBtn = document.getElementById('nativeSendCodeBtn');
+                            const otpContainer = document.getElementById('nativeOtpContainer');
+                            const otpInput = document.getElementById('nativeOtpInput');
+                            const confirmOtpBtn = document.getElementById('nativeConfirmOtpBtn');
                             const newPassContainer = document.getElementById('nativeNewPassContainer');
                             const resetBtn = document.getElementById('nativeResetBtn');
                             const forgotPassInput = document.getElementById('nativeForgotPass');
+                            const otpNotice = document.getElementById('nativeOtpNotice');
 
-                            verifyBtn.onclick = function () {
+                            let generatedCode = '';
+
+                            sendCodeBtn.onclick = function () {
                                 const enteredEmail = verifyEmailInput.value.trim();
                                 const savedEmail = localStorage.getItem('user_email') || 'hbhh@gmail.com';
 
@@ -2437,12 +2453,30 @@
                                 }
 
                                 if (enteredEmail.toLowerCase() === savedEmail.toLowerCase()) {
-                                    alert('تم التحقق من هويتك بنجاح! يمكنك الآن إدخال كلمة المرور الجديدة.');
+                                    // توليد رمز تحقق عشوائي من 6 أرقام
+                                    generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+                                    // محاكاة إرسال الإيميل (لغرض التأكد والتسهيل أثناء التطوير، سيظهر الرمز في التنبيه وفي الصندوق)
+                                    otpNotice.innerHTML = `تم إرسال الرمز إلى ${savedEmail}.<br><b>[رمز المحاكاة للتجربة: ${generatedCode}]</b>`;
+
                                     verifyEmailInput.style.display = 'none';
-                                    verifyBtn.style.display = 'none';
+                                    sendCodeBtn.style.display = 'none';
+                                    otpContainer.style.display = 'block';
+
+                                    alert(`تم إرسال رمز التحقق بنجاح. رمز التحقق الخاص بك هو: ${generatedCode}`);
+                                } else {
+                                    alert('البريد الإلكتروني غير مسجل لدينا.');
+                                }
+                            };
+
+                            confirmOtpBtn.onclick = function () {
+                                const enteredOtp = otpInput.value.trim();
+                                if (enteredOtp === generatedCode) {
+                                    alert('تم التحقق من الرمز بنجاح! يمكنك الآن تعيين كلمة مرور جديدة.');
+                                    otpContainer.style.display = 'none';
                                     newPassContainer.style.display = 'block';
                                 } else {
-                                    alert('البريد الإلكتروني غير مطابق للبريد المسجل لدينا.');
+                                    alert('رمز التحقق غير صحيح. يرجى المحاولة مرة أخرى.');
                                 }
                             };
 
@@ -2560,8 +2594,6 @@
             }, true);
         })();
 
-        // Init
-        setLanguage('ar');
         // Init
         setLanguage('ar');
     </script>
