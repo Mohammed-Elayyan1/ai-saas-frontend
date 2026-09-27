@@ -2263,7 +2263,7 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === الحل النهائي لمنع خطأ 405 وعرض البريد وكلمة المرور وتسجيل الخروج ===
+        // === الحل الجذري لمنع خطأ 405 وإيقاف النماذج الافتراضية وضبط الواجهة ===
         (function () {
             const TRIAL_DAYS = 7;
             const PAYPAL_LINKS = {
@@ -2271,6 +2271,14 @@
                 pro: 'https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6',
                 enterprise: 'https://www.paypal.com/ncp/payment/CS59KMKAETBFC'
             };
+
+            // منع أي نموذج أساسي في الموقع من التسبب في خطأ 405
+            document.querySelectorAll('form').forEach(form => {
+                form.onsubmit = function (e) {
+                    e.preventDefault();
+                    return false;
+                };
+            });
 
             function updatePortal() {
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
@@ -2292,7 +2300,7 @@
                     }
                 });
 
-                // إدارة أيام التجربة والمفتاح
+                // إدارة التجربة والمفتاح
                 let trialStart = localStorage.getItem('trial_start_date');
                 if (!trialStart && isLoggedIn) {
                     trialStart = new Date().toISOString();
@@ -2313,10 +2321,10 @@
                     localStorage.setItem('user_api_key', userApiKey);
                 }
 
-                // إزالة الصناديق القديمة لتجنب التكرار
+                // إزالة الحاويات القديمة
                 document.querySelectorAll('.custom-unified-auth-box').forEach(el => el.remove());
 
-                // بناء الصندوق داخل قسم "ابدأ رحلتك"
+                // بناء صندوق تسجيل الدخول / حساب المستخدم داخل قسم "ابدأ رحلتك"
                 const box = document.createElement('div');
                 box.className = 'custom-unified-auth-box';
                 box.style.cssText = `
@@ -2366,7 +2374,7 @@
             `;
                 }
 
-                // إيجاد قسم "ابدأ رحلتك"
+                // وضع الصندوق حصرياً داخل قسم "ابدأ رحلتك مع الذكاء الاصطناعي"
                 let targetContainer = null;
                 const allElements = document.querySelectorAll('div, section');
                 for (let el of allElements) {
@@ -2383,7 +2391,7 @@
                     fallback.appendChild(box);
                 }
 
-                // تفاعلات الأزرار دون حدوث أي خطأ 405
+                // تفاعلات الأزرار دون إعادة تحميل أو أخطاء
                 setTimeout(() => {
                     const copyBtn = document.getElementById('singleCopyBtn');
                     if (copyBtn) {
