@@ -2399,41 +2399,62 @@
                     window._nativeTimerInt = setInterval(updateTimer, 1000);
 
                 } else if (isForgotState) {
-                    // واجهة استعادة كلمة المرور المباشرة داخل الصندوق بدون أي انتقال لصفحة أخرى
+                    // واجهة التحقق وتغيير كلمة المرور بشكل آمن
                     if (loginForm.dataset.renderedForgot !== 'true') {
                         loginForm.dataset.renderedForgot = 'true';
                         loginForm.innerHTML = `
                     <div style="width: 100%; max-width: 400px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; text-align: center; box-sizing: border-box; padding: 20px;">
-                        <h3 style="margin: 0 0 6px 0; font-size: 18px; color: #fff; font-weight: bold;">استعادة كلمة المرور</h3>
-                        <p style="color: #94a3b8; font-size: 12px; margin-bottom: 16px;">أدخل بريدك الإلكتروني وكلمة المرور الجديدة</p>
+                        <h3 style="margin: 0 0 6px 0; font-size: 18px; color: #fff; font-weight: bold;">التحقق واستعادة كلمة المرور</h3>
+                        <p style="color: #94a3b8; font-size: 12px; margin-bottom: 16px;">أدخل بريدك الإلكتروني المسجل للتأكد من هويتك أولاً</p>
                         
-                        <input type="email" placeholder="البريد الإلكتروني" id="nativeForgotEmail" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px; border-radius: 6px; margin-bottom: 12px; box-sizing: border-box; font-size: 13px;">
+                        <input type="email" placeholder="البريد الإلكتروني المسجل" id="nativeVerifyEmail" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px; border-radius: 6px; margin-bottom: 12px; box-sizing: border-box; font-size: 13px;">
                         
-                        <input type="password" placeholder="كلمة المرور الجديدة (6 أحرف على الأقل)" id="nativeForgotPass" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px; border-radius: 6px; margin-bottom: 16px; box-sizing: border-box; font-size: 13px;">
-                        
-                        <button type="button" id="nativeResetBtn" style="background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px; margin-bottom: 10px; box-sizing: border-box;">حفظ كلمة المرور الجديدة</button>
+                        <div id="nativeNewPassContainer" style="display: none; width: 100%;">
+                            <input type="password" placeholder="كلمة المرور الجديدة (6 أحرف على الأقل)" id="nativeForgotPass" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px; border-radius: 6px; margin-bottom: 12px; box-sizing: border-box; font-size: 13px;">
+                            <button type="button" id="nativeResetBtn" style="background: #22c55e; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px; margin-bottom: 10px; box-sizing: border-box;">حفظ كلمة المرور الجديدة</button>
+                        </div>
+
+                        <button type="button" id="nativeVerifyBtn" style="background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px; margin-bottom: 10px; box-sizing: border-box;">تحقق من البريد</button>
                         
                         <span id="nativeBackLoginBtn" style="color: #60a5fa; font-size: 12px; text-decoration: underline; cursor: pointer;">العودة لتسجيل الدخول</span>
                     </div>
                 `;
 
                         setTimeout(() => {
-                            document.getElementById('nativeResetBtn').onclick = function () {
-                                const emailVal = document.getElementById('nativeForgotEmail').value.trim();
-                                const passVal = document.getElementById('nativeForgotPass').value;
+                            const verifyEmailInput = document.getElementById('nativeVerifyEmail');
+                            const verifyBtn = document.getElementById('nativeVerifyBtn');
+                            const newPassContainer = document.getElementById('nativeNewPassContainer');
+                            const resetBtn = document.getElementById('nativeResetBtn');
+                            const forgotPassInput = document.getElementById('nativeForgotPass');
 
-                                if (!emailVal || !emailVal.includes('@')) {
-                                    alert('الرجاء إدخال بريد إلكتروني صحيح.');
+                            verifyBtn.onclick = function () {
+                                const enteredEmail = verifyEmailInput.value.trim();
+                                const savedEmail = localStorage.getItem('user_email') || 'hbhh@gmail.com';
+
+                                if (!enteredEmail) {
+                                    alert('الرجاء إدخال البريد الإلكتروني.');
                                     return;
                                 }
+
+                                if (enteredEmail.toLowerCase() === savedEmail.toLowerCase()) {
+                                    alert('تم التحقق من هويتك بنجاح! يمكنك الآن إدخال كلمة المرور الجديدة.');
+                                    verifyEmailInput.style.display = 'none';
+                                    verifyBtn.style.display = 'none';
+                                    newPassContainer.style.display = 'block';
+                                } else {
+                                    alert('البريد الإلكتروني غير مطابق للبريد المسجل لدينا.');
+                                }
+                            };
+
+                            resetBtn.onclick = function () {
+                                const passVal = forgotPassInput.value;
                                 if (!passVal || passVal.length < 6) {
                                     alert('كلمة المرور يجب ألا تقل عن 6 أحرف.');
                                     return;
                                 }
 
                                 localStorage.setItem('user_password', passVal);
-                                localStorage.setItem('user_email', emailVal);
-                                alert('تم تحديث كلمة المرور بنجاح! يمكنك تسجيل الدخول الآن.');
+                                alert('تم تغيير كلمة المرور بنجاح! يمكنك تسجيل الدخول الآن.');
 
                                 loginForm.removeAttribute('data-current-state');
                                 loginForm.removeAttribute('data-rendered-forgot');
@@ -2448,7 +2469,7 @@
                         }, 50);
                     }
                 } else {
-                    // إضافة زر "نسيت كلمة المرور؟" كعنصر Span آمن لا يصعد لأعلى الصفحة
+                    // إضافة رابط "نسيت كلمة المرور؟" كعنصر Span آمن لا يصعد لأعلى الصفحة
                     if (!loginForm.querySelector('#nativeForgotLink')) {
                         const forgotDiv = document.createElement('div');
                         forgotDiv.style.cssText = 'text-align: center; margin-top: 12px; width: 100%;';
@@ -2539,6 +2560,8 @@
             }, true);
         })();
 
+        // Init
+        setLanguage('ar');
         // Init
         setLanguage('ar');
     </script>
