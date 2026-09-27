@@ -2271,39 +2271,193 @@
                 enterprise: 'https://www.paypal.com/ncp/payment/CS59KMKAETBFC'
             };
 
-            function initAuthHandler() {
+            // منع أي إعادة تحميل أو أخطاء عند إرسال النماذج
+            document.addEventListener('submit', function (e) {
+                e.preventDefault();
+            }, true);
+
+            function updateAuthUI() {
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
                 const userEmail = localStorage.getItem('user_email') || 'hbhh@gmail.com';
 
-                // تحديث شريط التنقل والأزرار العليا
+                // تحديث شريط التنقل العلوي
                 document.querySelectorAll('a, button').forEach(el => {
                     const text = el.textContent.trim();
-                    if (text === 'تسجيل الدخول' || text === 'تسجيل دخول' || text.includes('hbhh@gmail.com')) {
+                    if (text === 'تسجيل الدخول' || text === 'تسجيل دخول' || text.includes('hbhh@gmail.com') || text.includes('👤')) {
                         el.textContent = isLoggedIn ? `👤 ${userEmail}` : 'تسجيل الدخول';
                     }
                 });
 
-                // البحث عن أزرار الإرسال أو تسجيل الدخول الأصلية في الصفحة وتفعيلها
-                const submitButtons = document.querySelectorAll('button');
-                submitButtons.forEach(btn => {
-                    const txt = btn.textContent.trim();
-                    if ((txt.includes('تسجيل الدخول') || txt.includes('Login')) && !btn.dataset.bound) {
-                        btn.dataset.bound = 'true';
-                        btn.addEventListener('click', function (e) {
-                            e.preventDefault();
-                            localStorage.setItem('is_logged_in', 'true');
-                            localStorage.setItem('user_email', userEmail);
-                            localStorage.setItem('trial_start_date', new Date().toISOString());
-                            alert('تم تسجيل الدخول بنجاح!');
-                            location.reload();
-                        }, true);
+                // البحث عن صندوق تسجيل الدخول الرئيسي في الصفحة
+                let cardContainer = null;
+                const allDivs = document.querySelectorAll('div');
+                for (let div of allDivs) {
+                    const txt = div.textContent || '';
+                    if ((txt.includes('تسجيل الدخول') || txt.includes('البريد الإلكتروني')) && div.children.length > 0 && div.children.length < 25) {
+                        if (div.clientHeight > 100 && div.clientHeight < 600) {
+                            cardContainer = div;
+                            break;
+                        }
                     }
-                });
+                }
+
+                if (!cardContainer) return;
+
+                const stateKey = isLoggedIn ? 'logged_in_dashboard_v3' : 'logged_out_form_v3';
+                if (cardContainer.dataset.appState === stateKey) {
+                    return;
+                }
+                cardContainer.dataset.appState = stateKey;
+                cardContainer.style.display = 'flex';
+                cardContainer.style.flexDirection = 'column';
+                cardContainer.style.alignItems = 'center';
+                cardContainer.style.justifyContent = 'center';
+
+                if (isLoggedIn) {
+                    let trialStart = localStorage.getItem('trial_start_date');
+                    if (!trialStart) {
+                        trialStart = new Date().toISOString();
+                        localStorage.setItem('trial_start_date', trialStart);
+                    }
+
+                    let userApiKey = localStorage.getItem('user_api_key');
+                    if (!userApiKey) {
+                        userApiKey = 'ai_saas_' + Math.random().toString(36).substring(2, 10) + '_' + Math.random().toString(36).substring(2, 10);
+                        localStorage.setItem('user_api_key', userApiKey);
+                    }
+
+                    // عرض معلومات الحساب وعداد التجربة وزر تسجيل الخروج داخل المربع
+                    cardContainer.innerHTML = `
+                <div style="width: 100%; max-width: 380px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; text-align: center; box-sizing: border-box; padding: 20px;">
+                    <div style="font-size: 38px; margin-bottom: 8px;">👤</div>
+                    <h3 style="margin: 0 0 6px 0; font-size: 18px; color: #fff; font-weight: bold;">أهلاً بك مجدداً</h3>
+                    <p style="color: #60a5fa; font-size: 13px; margin-bottom: 16px; direction: ltr; font-weight: bold;">${userEmail}</p>
+                    
+                    <div style="background: rgba(241, 196, 15, 0.1); border: 1px solid rgba(241, 196, 15, 0.3); padding: 10px; border-radius: 8px; margin-bottom: 16px; font-size: 12px; color: #facc15; width: 100%; box-sizing: border-box;" id="dashboardTimer">
+                        ⏳ جارِ تحميل العداد...
+                    </div>
+
+                    <div style="background: rgba(0,0,0,0.45); padding: 12px; border-radius: 8px; margin-bottom: 18px; text-align: right; border: 1px solid rgba(255,255,255,0.1); width: 100%; box-sizing: border-box;">
+                        <p style="color: #94a3b8; font-size: 11px; margin: 0 0 6px 0; text-align: right;">🔑 مفتاح الوصول (API Key):</p>
+                        <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
+                            <input type="text" readonly value="${userApiKey}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px; border-radius: 4px; flex-grow: 1; font-family: monospace; font-size: 11px; direction: ltr; box-sizing: border-box;" id="dashboardApiKeyInput">
+                            <button type="button" id="dashboardCopyBtn" style="background: #3b82f6; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; white-space: nowrap;">نسخ</button>
+                        </div>
+                    </div>
+
+                    <button type="button" id="dashboardLogoutBtn" style="background: #ef4444; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px; box-sizing: border-box;">تسجيل الخروج</button>
+                </div>
+            `;
+
+                    function updateTimer() {
+                        const startDate = new Date(trialStart);
+                        const expiryDate = new Date(startDate.getTime() + (TRIAL_DAYS * 24 * 60 * 60 * 1000));
+                        const now = new Date();
+                        const diffMs = expiryDate - now;
+
+                        const display = document.getElementById('dashboardTimer');
+                        if (!display) return;
+
+                        if (diffMs <= 0) {
+                            display.innerHTML = `⚠️ انتهت التجربة المجانية. يرجى الترقية.`;
+                            display.style.color = '#ef4444';
+                        } else {
+                            const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                            const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                            const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+                            display.innerHTML = `⏳ التجربة المجانية نشطة: متبقي ${days} أيام، ${hours} س، ${minutes} د، ${seconds} ث`;
+                        }
+                    }
+
+                    updateTimer();
+                    if (window._dashTimerInterval) clearInterval(window._dashTimerInterval);
+                    window._dashTimerInterval = setInterval(updateTimer, 1000);
+
+                    setTimeout(() => {
+                        const copyBtn = document.getElementById('dashboardCopyBtn');
+                        if (copyBtn) {
+                            copyBtn.onclick = function () {
+                                const field = document.getElementById('dashboardApiKeyInput');
+                                if (field) {
+                                    navigator.clipboard.writeText(field.value);
+                                    copyBtn.textContent = 'تم النسخ! ✓';
+                                    copyBtn.style.background = '#22c55e';
+                                    setTimeout(() => {
+                                        copyBtn.textContent = 'نسخ';
+                                        copyBtn.style.background = '#3b82f6';
+                                    }, 2000);
+                                }
+                            };
+                        }
+
+                        const logoutBtn = document.getElementById('dashboardLogoutBtn');
+                        if (logoutBtn) {
+                            logoutBtn.onclick = function () {
+                                if (window._dashTimerInterval) clearInterval(window._dashTimerInterval);
+                                localStorage.removeItem('is_logged_in');
+                                localStorage.removeItem('user_email');
+                                localStorage.removeItem('trial_start_date');
+                                localStorage.removeItem('user_api_key');
+                                cardContainer.removeAttribute('data-app-state');
+                                updateAuthUI();
+                            };
+                        }
+                    }, 50);
+
+                } else {
+                    // عرض نموذج تسجيل الدخول النظيف
+                    cardContainer.innerHTML = `
+                <div style="width: 100%; max-width: 380px; margin: 0 auto; display: flex; flex-direction: column; box-sizing: border-box; padding: 20px;">
+                    <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+                        <span style="background: rgba(255,255,255,0.08); color: #fff; padding: 6px 20px; border-radius: 20px; font-size: 13px; font-weight: bold; border: 1px solid rgba(255,255,255,0.15);">تسجيل الدخول</span>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 14px; width: 100%;">
+                        <div style="display: flex; flex-direction: column; text-align: right;">
+                            <label style="color: #94a3b8; font-size: 12px; margin-bottom: 6px;">البريد الإلكتروني</label>
+                            <input type="email" id="customLoginEmail" value="hbhh@gmail.com" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 12px; border-radius: 8px; font-size: 13px; width: 100%; box-sizing: border-box; direction: ltr; text-align: right;">
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; text-align: right;">
+                            <label style="color: #94a3b8; font-size: 12px; margin-bottom: 6px;">كلمة المرور</label>
+                            <input type="password" id="customLoginPass" value="********" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 12px; border-radius: 8px; font-size: 13px; width: 100%; box-sizing: border-box; direction: ltr; text-align: right;">
+                        </div>
+
+                        <button type="button" id="customLoginSubmit" style="background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; width: 100%; box-sizing: border-box; margin-top: 6px;">تسجيل الدخول</button>
+                        
+                        <div style="text-align: center; color: #64748b; font-size: 12px; margin: 4px 0;">أو</div>
+
+                        <button type="button" id="customGoogleSubmit" style="background: rgba(255,255,255,0.06); color: white; border: 1px solid rgba(255,255,255,0.15); padding: 12px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; width: 100%; box-sizing: border-box; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            المتابعة عبر Google
+                        </button>
+                    </div>
+                </div>
+            `;
+
+                    setTimeout(() => {
+                        const loginBtn = document.getElementById('customLoginSubmit');
+                        const googleBtn = document.getElementById('customGoogleSubmit');
+
+                        const handleLogin = function () {
+                            const emailField = document.getElementById('customLoginEmail');
+                            const email = emailField ? emailField.value.trim() : 'hbhh@gmail.com';
+                            localStorage.setItem('is_logged_in', 'true');
+                            localStorage.setItem('user_email', email || 'hbhh@gmail.com');
+                            localStorage.setItem('trial_start_date', new Date().toISOString());
+                            cardContainer.removeAttribute('data-app-state');
+                            updateAuthUI();
+                        };
+
+                        if (loginBtn) loginBtn.onclick = handleLogin;
+                        if (googleBtn) googleBtn.onclick = handleLogin;
+                    }, 50);
+                }
             }
 
-            // تشغيل الدالة بانتظام لضمان بقاء الحالة مفعلة مع تنقلات الموقع
-            setInterval(initAuthHandler, 1000);
-            window.addEventListener('DOMContentLoaded', initAuthHandler);
+            setInterval(updateAuthUI, 1000);
+            window.addEventListener('DOMContentLoaded', updateAuthUI);
 
             // توجيه باقات الأسعار لروابط باي بال
             document.addEventListener('click', function (e) {
