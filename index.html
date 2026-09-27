@@ -2263,7 +2263,7 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        // === الحل الدقيق: استبدال صندوق إنشاء الحساب داخل المربع الأصلي دون تغيير حجمه ===
+        // === الحل النهائي: إدراج الصندوق مباشرة داخل المربع الكبير الأزرق الخاص بـ "ابدأ رحلتك" ===
         (function () {
             const TRIAL_DAYS = 7;
             const PAYPAL_LINKS = {
@@ -2272,7 +2272,6 @@
                 enterprise: 'https://www.paypal.com/ncp/payment/CS59KMKAETBFC'
             };
 
-            // منع أي نموذج في الصفحة من التسبب في خطأ 405
             document.addEventListener('submit', function (e) {
                 e.preventDefault();
             }, true);
@@ -2312,33 +2311,16 @@
                     localStorage.setItem('user_api_key', userApiKey);
                 }
 
-                // البحث عن مكان عنصر المصادقة الأصلي في القالب (مثل #auth أو الحاوية التي تحتوي على "إنشاء حساب")
-                let targetSlot = document.querySelector('#auth');
-                if (!targetSlot) {
-                    // بحث احتياطي عن العنصر الذي يحوي كلمة "إنشاء حساب"
-                    const allEls = document.querySelectorAll('div, section, form');
-                    for (let el of allEls) {
-                        if (el.textContent && el.textContent.includes('إنشاء حساب') && el.children.length < 5) {
-                            targetSlot = el;
-                            break;
-                        }
-                    }
-                }
-
-                if (!targetSlot) {
-                    targetSlot = document.querySelector('section') || document.body;
-                }
-
-                // إزالة الحاوية القديمة إن وجدت لتجنب التكرار
+                // إزالة أي صندوق قديم مكرر
                 document.querySelectorAll('.custom-injected-auth-box').forEach(el => el.remove());
 
-                // بناء الصندوق الجديد ليتطابق مع أبعاد مكان "إنشاء حساب" الأصلي تماماً
+                // بناء صندوق المحتوى الجديد بحجم متناسق ليدخل بداخل المربع الكبير
                 const box = document.createElement('div');
                 box.className = 'custom-injected-auth-box';
                 box.style.cssText = `
             width: 100%;
-            max-width: 380px;
-            margin: 0 auto;
+            max-width: 350px;
+            margin: 15px auto;
             padding: 20px;
             background: rgba(15, 23, 42, 0.95);
             border-radius: 12px;
@@ -2347,7 +2329,8 @@
             text-align: center;
             box-sizing: border-box;
             font-family: inherit;
-            z-index: 99;
+            z-index: 10;
+            position: relative;
         `;
 
                 if (isLoggedIn) {
@@ -2381,14 +2364,21 @@
             `;
                 }
 
-                // إخفاء محتوى slot الأصلي إن وجد ووضع صندوقنا مكانه بدقة
-                if (targetSlot.id === 'auth' || targetSlot.classList.contains('auth-container')) {
-                    targetSlot.innerHTML = '';
-                    targetSlot.appendChild(box);
+                // البحث الدقيق عن المربع الكبير الذي يحتوي على عبارة "ابدأ رحلتك مع الذكاء الاصطناعي" ووضع الصندوق بداخله
+                let targetCard = null;
+                const elements = document.querySelectorAll('div, section');
+                for (let el of elements) {
+                    if (el.textContent && el.textContent.includes('ابدأ رحلتك مع الذكاء الاصطناعي') && el.children.length < 35 && el.children.length > 0) {
+                        targetCard = el;
+                    }
+                }
+
+                if (targetCard) {
+                    // إخفاء أي نماذج قديمة أخرى بداخله
+                    targetCard.querySelectorAll('form, .auth-form').forEach(f => f.style.display = 'none');
+                    targetCard.appendChild(box);
                 } else {
-                    // وضع الصندوق بدلاً من محتوى قسم "إنشاء حساب"
-                    targetSlot.innerHTML = '';
-                    targetSlot.appendChild(box);
+                    document.body.appendChild(box);
                 }
 
                 // تفاعلات الأزرار
