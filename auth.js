@@ -8,7 +8,7 @@ import {
     signOut
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-// الحصول على كائن المصادقة المعرّف مسبقاً في المشروع
+// الحصول على كائن المصادقة المعرّف مسبقاً
 const auth = window.auth;
 
 /**
@@ -17,9 +17,8 @@ const auth = window.auth;
 export function registerWithEmail(email, password) {
     return createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-            const user = userCredential.user;
-            console.log("تم إنشاء الحساب بنجاح:", user.email);
-            return user;
+            console.log("تم إنشاء الحساب بنجاح:", userCredential.user.email);
+            return userCredential.user;
         })
         .catch((error) => {
             console.error("خطأ في إنشاء الحساب:", error.message);
@@ -33,9 +32,8 @@ export function registerWithEmail(email, password) {
 export function loginWithEmail(email, password) {
     return signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-            const user = userCredential.user;
-            console.log("تم تسجيل الدخول بنجاح:", user.email);
-            return user;
+            console.log("تم تسجيل الدخول بنجاح:", userCredential.user.email);
+            return userCredential.user;
         })
         .catch((error) => {
             console.error("خطأ في تسجيل الدخول:", error.message);
@@ -50,9 +48,8 @@ export function loginWithGoogle() {
     const provider = new GoogleAuthProvider();
     return signInWithPopup(auth, provider)
         .then((result) => {
-            const user = result.user;
-            console.log("تم تسجيل الدخول عبر جوجل بنجاح:", user.email);
-            return user;
+            console.log("تم تسجيل الدخول عبر جوجل بنجاح:", result.user.email);
+            return result.user;
         })
         .catch((error) => {
             console.error("خطأ في تسجيل الدخول عبر جوجل:", error.message);
@@ -69,19 +66,23 @@ export function logoutUser() {
 
 // ربط أزرار الواجهة تلقائياً عند تحميل الصفحة
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. ربط زر جوجل (تأكد أن الـ id للزر في HTML هو googleLoginBtn)
     const googleBtn = document.getElementById("googleLoginBtn");
+
     if (googleBtn) {
         googleBtn.addEventListener("click", (e) => {
             e.preventDefault();
+            console.ج("تم الضغط على زر جوجل بنجاح!");
+
             loginWithGoogle()
-                .then(() => {
-                    alert("مرحباً بك! تم تسجيل الدخول عبر Google بنجاح.");
-                    // يمكنك هنا تحديث الواجهة لإظهار لوحة التحكم
+                .then((user) => {
+                    alert("تم تسجيل الدخول عبر Google بنجاح: " + user.email);
+                    // يمكنك هنا توجيه المستخدم للوحة التحكم
                 })
                 .catch((error) => {
-                    alert("حدث خطأ: " + error.message);
+                    alert("فشل تسجيل الدخول عبر جوجل: " + error.message);
                 });
         });
+    } else {
+        console.warn("تنبيه: لم يتم العثور على عنصر يحمل المعرف googleLoginBtn في الصفحة الحالية.");
     }
 });
