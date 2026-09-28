@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصّة | الذكاء الاصطناعي للشركات — Platform | Enterprise AI</title>
+    <title>NexusAI | منصة الذكاء الاصطناعي للشركات</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -1807,8 +1807,8 @@
                     haveAccount: "ليس لديك حساب؟", noAccount: "لديك حساب بالفعل؟", signupLink: "أنشئ حسابًا", loginLink: "سجّل الدخول",
                     toastSubmit: "هذا نموذج عرض تصميمي — يجب ربطه بواجهة API الخاصة بالخادم",
 
-                    googleComingSoon: "سيتوفر تسجيل الدخول عبر Google قريبًا.",
-                    signupNetworkError: "تعذّر الاتصال بالخادم. تحقق من اتصالك بالإنترنت وحاول مجددًا."
+                    "googleSuccess": "تم تسجيل الدخول عبر Google بنجاح",
+                    "signupNetworkError": "تعذر الاتصال بالخادم، تحقق من اتصالك بالإنترنت وحاول مجدداً"
                 },
                 pay: {
                     kicker: "طرق الدفع", title: "اشترك عبر PayPal بخطوتين", sub: "ادفع بأمان عبر PayPal، واستلم مفتاح API فورًا لتبدأ الاستخدام مباشرة.",
@@ -2577,7 +2577,8 @@
         // Init
         setLanguage('ar');
     </script>
-
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="auth.js"></script>
 </body>
 
 </html>
