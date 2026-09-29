@@ -1613,126 +1613,101 @@
                             </div>
                         </section>
 
-                        <!-- Real <form> with autocomplete so browsers offer to save passwords -->
-                        <form id="authForm" method="post" action="#" autocomplete="on">
 
-                            <div class="field" id="nameField" style="display:none;">
-                                <label for="companyName" data-i18n="auth.companyLabel"></label>
-                                <input id="companyName" name="organization" type="text" autocomplete="organization">
+
+                        <section>
+                            <div class="wrap">
+                                <div class="section-head center">
+                                    <span class="kicker" data-i18n="pay.kicker"></span>
+                                    <h2 class="section-title" data-i18n="pay.title"></h2>
+                                    <p class="section-sub" data-i18n="pay.sub"></p>
+                                </div>
+                                <div class="pay-grid"
+                                    style="grid-template-columns:1fr; max-width:520px; margin:0 auto;">
+                                    <div class="pay-card">
+                                        <div class="pay-head">
+                                            <div class="pay-logo paypal">P</div>
+                                            <div>
+                                                <h3 data-i18n="pay.paypalTitle"></h3>
+                                                <div class="pay-sub" data-i18n="pay.paypalSub"></div>
+                                            </div>
+                                        </div>
+                                        <p style="color:var(--text-1); font-size:0.9rem;" data-i18n="pay.paypalDesc">
+                                        </p>
+
+                                        <div class="amount-row" id="paypalLinkRow">
+                                            <a class="amount-chip active"
+                                                href="https://www.paypal.com/ncp/payment/23V3WQK4NVTG4"
+                                                data-plan="basic" target="_blank" rel="noopener noreferrer">Basic
+                                                $29</a>
+                                            <a class="amount-chip"
+                                                href="https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6" data-plan="pro"
+                                                target="_blank" rel="noopener noreferrer">Pro $79</a>
+                                            <a class="amount-chip"
+                                                href="https://www.paypal.com/ncp/payment/CS59KMKAETBFC"
+                                                data-plan="enterprise" target="_blank"
+                                                rel="noopener noreferrer">Enterprise $199</a>
+                                        </div>
+
+                                        <form id="paypalClaimForm" onsubmit="return false;"
+                                            style="margin-top:16px; display:flex; flex-direction:column; gap:12px;">
+                                            <div class="field" style="margin-bottom:0;">
+                                                <label for="ppName" data-i18n="pay.nameLabel"></label>
+                                                <input id="ppName" type="text" required>
+                                            </div>
+                                            <div class="field" style="margin-bottom:0;">
+                                                <label for="ppEmail" data-i18n="pay.emailLabel"></label>
+                                                <input id="ppEmail" type="email" required
+                                                    placeholder="name@company.com">
+                                            </div>
+                                            <div class="field" style="margin-bottom:0;">
+                                                <label for="ppRef" data-i18n="pay.refLabel"></label>
+                                                <input id="ppRef" type="text" placeholder="Transaction ID (optional)">
+                                            </div>
+                                            <button type="submit" class="btn btn-gold btn-block" id="paypalClaimBtn"
+                                                data-i18n="pay.paypalClaimBtn"></button>
+                                        </form>
+                                        <p class="pay-note" data-i18n="pay.paypalNote"></p>
+                                    </div>
+                                </div>
+
+                                <div id="apiKeyResult"
+                                    style="display:none; max-width:640px; margin:26px auto 0; background:var(--glass); border:1px solid var(--border); border-radius:var(--radius-md); padding:22px 24px; text-align:center;">
+                                    <div style="font-size:0.85rem; color:var(--text-2); margin-bottom:8px;"
+                                        data-i18n="pay.keyReadyLabel"></div>
+                                    <div
+                                        style="display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap;">
+                                        <code id="apiKeyValue"
+                                            style="background:rgba(255,255,255,0.08); padding:8px 14px; border-radius:8px; font-size:0.9rem; word-break:break-all;"></code>
+                                        <button class="btn btn-ghost btn-sm" id="copyKeyBtn"
+                                            data-i18n="pay.copyBtn"></button>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="field">
-                                <label for="email" data-i18n="auth.emailLabel"></label>
-                                <input id="email" name="email" type="email" placeholder="name@company.com"
-                                    autocomplete="email" required>
+                        </section>
+
+                        <section id="faq" style="background:var(--bg-1);">
+                            <div class="wrap">
+                                <div class="section-head center">
+                                    <span class="kicker" data-i18n="faq.kicker"></span>
+                                    <h2 class="section-title" data-i18n="faq.title"></h2>
+                                </div>
+                                <div class="faq-list" id="faqList"></div>
                             </div>
-                            <div class="field">
-                                <label for="password" data-i18n="auth.passwordLabel"></label>
-                                <input id="password" name="password" type="password" placeholder="••••••••"
-                                    autocomplete="current-password" required minlength="6">
+                        </section>
+
+                        <section>
+                            <div class="wrap">
+                                <div class="cta-final">
+                                    <h2 data-i18n="ctaFinal.title"></h2>
+                                    <p data-i18n="ctaFinal.sub"></p>
+                                    <div class="cta-buttons">
+                                        <a href="#pricing" class="btn btn-primary" data-i18n="ctaFinal.primary"></a>
+                                        <a href="#auth" class="btn btn-ghost" data-i18n="ctaFinal.secondary"></a>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="field-row">
-                                <label><input type="checkbox" checked style="accent-color:var(--violet);"> <span
-                                        data-i18n="auth.remember"></span></label>
-                                <a href="#" data-i18n="auth.forgot"></a>
-                            </div>
-                            <!-- type="submit" is essential for browsers to trigger the save-password dialog -->
-                            <button type="submit" class="btn btn-primary btn-block" id="authSubmit"></button>
-                            <div class="divider" data-i18n="auth.or"></div>
-                            <button type="button" class="btn btn-ghost btn-block" id="googleBtn"
-                                data-i18n="auth.google"></button>
-                            <div class="switch-mode" id="switchModeText"></div>
-
-
-                        </form>
-                    </div>
-                </div>
-            </div>
-            </div>
-        </section>
-
-        <section>
-            <div class="wrap">
-                <div class="section-head center">
-                    <span class="kicker" data-i18n="pay.kicker"></span>
-                    <h2 class="section-title" data-i18n="pay.title"></h2>
-                    <p class="section-sub" data-i18n="pay.sub"></p>
-                </div>
-                <div class="pay-grid" style="grid-template-columns:1fr; max-width:520px; margin:0 auto;">
-                    <div class="pay-card">
-                        <div class="pay-head">
-                            <div class="pay-logo paypal">P</div>
-                            <div>
-                                <h3 data-i18n="pay.paypalTitle"></h3>
-                                <div class="pay-sub" data-i18n="pay.paypalSub"></div>
-                            </div>
-                        </div>
-                        <p style="color:var(--text-1); font-size:0.9rem;" data-i18n="pay.paypalDesc"></p>
-
-                        <div class="amount-row" id="paypalLinkRow">
-                            <a class="amount-chip active" href="https://www.paypal.com/ncp/payment/23V3WQK4NVTG4"
-                                data-plan="basic" target="_blank" rel="noopener noreferrer">Basic $29</a>
-                            <a class="amount-chip" href="https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6"
-                                data-plan="pro" target="_blank" rel="noopener noreferrer">Pro $79</a>
-                            <a class="amount-chip" href="https://www.paypal.com/ncp/payment/CS59KMKAETBFC"
-                                data-plan="enterprise" target="_blank" rel="noopener noreferrer">Enterprise $199</a>
-                        </div>
-
-                        <form id="paypalClaimForm" onsubmit="return false;"
-                            style="margin-top:16px; display:flex; flex-direction:column; gap:12px;">
-                            <div class="field" style="margin-bottom:0;">
-                                <label for="ppName" data-i18n="pay.nameLabel"></label>
-                                <input id="ppName" type="text" required>
-                            </div>
-                            <div class="field" style="margin-bottom:0;">
-                                <label for="ppEmail" data-i18n="pay.emailLabel"></label>
-                                <input id="ppEmail" type="email" required placeholder="name@company.com">
-                            </div>
-                            <div class="field" style="margin-bottom:0;">
-                                <label for="ppRef" data-i18n="pay.refLabel"></label>
-                                <input id="ppRef" type="text" placeholder="Transaction ID (optional)">
-                            </div>
-                            <button type="submit" class="btn btn-gold btn-block" id="paypalClaimBtn"
-                                data-i18n="pay.paypalClaimBtn"></button>
-                        </form>
-                        <p class="pay-note" data-i18n="pay.paypalNote"></p>
-                    </div>
-                </div>
-
-                <div id="apiKeyResult"
-                    style="display:none; max-width:640px; margin:26px auto 0; background:var(--glass); border:1px solid var(--border); border-radius:var(--radius-md); padding:22px 24px; text-align:center;">
-                    <div style="font-size:0.85rem; color:var(--text-2); margin-bottom:8px;"
-                        data-i18n="pay.keyReadyLabel"></div>
-                    <div style="display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap;">
-                        <code id="apiKeyValue"
-                            style="background:rgba(255,255,255,0.08); padding:8px 14px; border-radius:8px; font-size:0.9rem; word-break:break-all;"></code>
-                        <button class="btn btn-ghost btn-sm" id="copyKeyBtn" data-i18n="pay.copyBtn"></button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="faq" style="background:var(--bg-1);">
-            <div class="wrap">
-                <div class="section-head center">
-                    <span class="kicker" data-i18n="faq.kicker"></span>
-                    <h2 class="section-title" data-i18n="faq.title"></h2>
-                </div>
-                <div class="faq-list" id="faqList"></div>
-            </div>
-        </section>
-
-        <section>
-            <div class="wrap">
-                <div class="cta-final">
-                    <h2 data-i18n="ctaFinal.title"></h2>
-                    <p data-i18n="ctaFinal.sub"></p>
-                    <div class="cta-buttons">
-                        <a href="#pricing" class="btn btn-primary" data-i18n="ctaFinal.primary"></a>
-                        <a href="#auth" class="btn btn-ghost" data-i18n="ctaFinal.secondary"></a>
-                    </div>
-                </div>
-            </div>
-        </section>
+                        </section>
     </main>
 
     <footer>
