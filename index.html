@@ -1526,7 +1526,67 @@
         </section>
 
 
-        <!-- 1. قسم باقات الدفع الثلاث (Basic, Pro, Enterprise) -->
+        <section id="auth">
+            <div class="wrap">
+                <div class="auth-section">
+                    <div class="auth-grid">
+                        <div class="auth-copy">
+                            <span class="eyebrow"><span class="dot"></span> <span
+                                    data-i18n="auth.eyebrow"></span></span>
+                            <h2 data-i18n="auth.title"></h2>
+                            <p data-i18n="auth.sub"></p>
+                            <ul id="authList"></ul>
+                        </div>
+
+                        <div class="auth-card">
+                            <div class="auth-tabs">
+                                <button class="active" id="tabLogin" type="button" data-i18n="auth.tabLogin"></button>
+                                <button id="tabSignup" type="button" data-i18n="auth.tabSignup"></button>
+                            </div>
+
+                            <form id="authForm" method="post" action="#" autocomplete="on">
+                                <div class="field" id="nameField" style="display:none;">
+                                    <label for="companyName" data-i18n="auth.companyLabel"></label>
+                                    <input id="companyName" name="organization" type="text" autocomplete="organization">
+                                </div>
+
+                                <div class="field">
+                                    <label for="email" data-i18n="auth.emailLabel"></label>
+                                    <input id="email" name="email" type="email" placeholder="name@company.com"
+                                        autocomplete="email" required>
+                                </div>
+
+                                <div class="field">
+                                    <label for="password" data-i18n="auth.passwordLabel"></label>
+                                    <input id="password" name="password" type="password" placeholder="••••••••"
+                                        autocomplete="current-password" required minlength="6">
+                                </div>
+
+                                <div class="field-row">
+                                    <a href="#" id="forgotPasswordLink" style="color: var(--violet-2);"
+                                        data-i18n="auth.forgot"></a>
+                                    <label>
+                                        <input type="checkbox" checked style="accent-color: var(--violet);">
+                                        <span data-i18n="auth.remember"></span>
+                                    </label>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-block" id="authSubmit"
+                                    data-i18n="auth.submitLogin"></button>
+
+                                <div class="divider"><span data-i18n="auth.or"></span></div>
+
+                                <button type="button" class="btn btn-ghost btn-block" id="googleBtn"
+                                    data-i18n="auth.google"></button>
+
+                                <div class="switch-mode" id="switchModeText"></div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section>
             <div class="wrap">
                 <div class="section-head center">
@@ -1590,69 +1650,6 @@
             </div>
         </section>
 
-        <!-- 2. قسم تسجيل الدخول (ابدأ رحلتك) أصبح هنا تحت باقات الدفع الثلاث مباشرة -->
-        <section id="auth">
-            <div class="wrap">
-                <div class="auth-section">
-                    <div class="auth-grid">
-                        <div class="auth-copy">
-                            <span class="eyebrow"><span class="dot"></span> <span
-                                    data-i18n="auth.eyebrow"></span></span>
-                            <h2 data-i18n="auth.title"></h2>
-                            <p data-i18n="auth.sub"></p>
-                            <ul id="authList"></ul>
-                        </div>
-
-                        <div class="auth-card">
-                            <div class="auth-tabs">
-                                <button class="active" id="tabLogin" type="button" data-i18n="auth.tabLogin"></button>
-                                <button id="tabSignup" type="button" data-i18n="auth.tabSignup"></button>
-                            </div>
-
-                            <form id="authForm" method="post" action="#" autocomplete="on">
-                                <div class="field" id="nameField" style="display:none;">
-                                    <label for="companyName" data-i18n="auth.companyLabel"></label>
-                                    <input id="companyName" name="organization" type="text" autocomplete="organization">
-                                </div>
-
-                                <div class="field">
-                                    <label for="email" data-i18n="auth.emailLabel"></label>
-                                    <input id="email" name="email" type="email" placeholder="name@company.com"
-                                        autocomplete="email" required>
-                                </div>
-
-                                <div class="field">
-                                    <label for="password" data-i18n="auth.passwordLabel"></label>
-                                    <input id="password" name="password" type="password" placeholder="••••••••"
-                                        autocomplete="current-password" required minlength="6">
-                                </div>
-
-                                <div class="field-row">
-                                    <a href="#" id="forgotPasswordLink" style="color: var(--violet-2);"
-                                        data-i18n="auth.forgot"></a>
-                                    <label>
-                                        <input type="checkbox" checked style="accent-color: var(--violet);">
-                                        <span data-i18n="auth.remember"></span>
-                                    </label>
-                                </div>
-
-                                <button type="submit" class="btn btn-primary btn-block" id="authSubmit"
-                                    data-i18n="auth.submitLogin"></button>
-
-                                <div class="divider"><span data-i18n="auth.or"></span></div>
-
-                                <button type="button" class="btn btn-ghost btn-block" id="googleBtn"
-                                    data-i18n="auth.google"></button>
-
-                                <div class="switch-mode" id="switchModeText"></div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 3. الأسئلة الشائعة -->
         <section id="faq" style="background:var(--bg-1);">
             <div class="wrap">
                 <div class="section-head center">
@@ -1663,7 +1660,6 @@
             </div>
         </section>
 
-        <!-- 4. القسم الأخير -->
         <section>
             <div class="wrap">
                 <div class="cta-final">
