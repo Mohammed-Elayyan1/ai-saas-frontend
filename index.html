@@ -1537,66 +1537,83 @@
                             <ul id="authList"></ul>
                         </div>
 
-                        <div class="auth-card">
-                            <!-- التبويبات في الأعلى -->
-                            <div class="auth-tabs">
-                                <button class="active" id="tabLogin" data-i18n="auth.tabLogin">تسجيل الدخول</button>
-                                <button id="tabSignup" data-i18n="auth.tabSignup">إنشاء حساب</button>
+                        <section id="auth">
+                            <div class="wrap">
+                                <div class="auth-section">
+                                    <div class="auth-grid">
+                                        <!-- القسم الترويجي والنصوص الجانبية -->
+                                        <div class="auth-copy">
+                                            <span class="eyebrow"><span class="dot"></span><span
+                                                    data-i18n="auth.eyebrow">منصة الذكاء الاصطناعي</span></span>
+                                            <h2 data-i18n="auth.title"></h2>
+                                            <p data-i18n="auth.sub"></p>
+                                            <ul id="authList"></ul>
+                                        </div>
+
+                                        <!-- صندوق تسجيل الدخول الرئيسي والوحيد -->
+                                        <div class="auth-card">
+                                            <div class="auth-tabs">
+                                                <button class="active" id="tabLogin" data-i18n="auth.tabLogin">تسجيل
+                                                    الدخول</button>
+                                                <button id="tabSignup" data-i18n="auth.tabSignup">إنشاء حساب</button>
+                                            </div>
+
+                                            <form id="authForm" method="post" action="#" autocomplete="on">
+                                                <div class="field" id="nameField" style="display:none;">
+                                                    <label for="companyName" data-i18n="auth.companyLabel">اسم
+                                                        الشركة</label>
+                                                    <input id="companyName" name="organization" type="text"
+                                                        autocomplete="organization">
+                                                </div>
+
+                                                <div class="field">
+                                                    <label for="email" data-i18n="auth.emailLabel">البريد
+                                                        الإلكتروني</label>
+                                                    <input id="email" name="email" type="email"
+                                                        placeholder="name@company.com" autocomplete="email" required>
+                                                </div>
+
+                                                <div class="field">
+                                                    <label for="password" data-i18n="auth.passwordLabel">كلمة
+                                                        المرور</label>
+                                                    <input id="password" name="password" type="password"
+                                                        placeholder="••••••••" autocomplete="current-password" required
+                                                        minlength="6">
+                                                </div>
+
+                                                <div
+                                                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 13px;">
+                                                    <a href="#" id="forgotPasswordLink" data-i18n="auth.forgot"
+                                                        style="color: #60a5fa; text-decoration: none;">هل نسيت كلمة
+                                                        المرور؟</a>
+                                                    <label
+                                                        style="display: flex; align-items: center; gap: 5px; color: #a0aec0; cursor: pointer;">
+                                                        <input type="checkbox" checked
+                                                            style="accent-color: var(--violet);">
+                                                        <span data-i18n="auth.remember">تذكرني</span>
+                                                    </label>
+                                                </div>
+
+                                                <button type="submit" class="btn btn-primary btn-block" id="authSubmit"
+                                                    data-i18n="auth.submit">تسجيل الدخول</button>
+
+                                                <div class="divider" data-i18n="auth.or"
+                                                    style="text-align: center; margin: 12px 0; color: #a0aec0;">أو</div>
+
+                                                <button type="button" class="btn btn-ghost btn-block" id="googleBtn"
+                                                    data-i18n="auth.google">
+                                                    المتابعة عبر Google
+                                                </button>
+
+                                                <div class="switch-mode" id="switchModeText"
+                                                    style="text-align: center; margin-top: 15px; font-size: 13px; color: #a0aec0;">
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-
-                            <!-- نموذج تسجيل الدخول -->
-                            <form id="authForm" method="post" action="#" autocomplete="on">
-
-                                <!-- حقل اسم الشركة (يظهر في إنشاء الحساب) -->
-                                <div class="field" id="nameField" style="display:none;">
-                                    <label for="companyName" data-i18n="auth.companyLabel">اسم الشركة</label>
-                                    <input id="companyName" name="organization" type="text">
-                                </div>
-
-                                <!-- حقل البريد الإلكتروني -->
-                                <div class="field">
-                                    <label for="email" data-i18n="auth.emailLabel">البريد الإلكتروني</label>
-                                    <input id="email" name="email" type="email" placeholder="name@company.com"
-                                        autocomplete="email" required>
-                                </div>
-
-                                <!-- حقل كلمة المرور -->
-                                <div class="field">
-                                    <label for="password" data-i18n="auth.passwordLabel">كلمة المرور</label>
-                                    <input id="password" name="password" type="password" placeholder="••••••••"
-                                        autocomplete="current-password" required minlength="6">
-                                </div>
-
-                                <!-- رابط هل نسيت كلمة المرور؟ مرتب ومدمج هنا بدون مربعات إضافية -->
-                                <div
-                                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 13px;">
-                                    <a href="#" id="forgotPasswordLink" data-i18n="auth.forgot"
-                                        style="color: #60a5fa; text-decoration: none;">هل نسيت كلمة المرور؟</a>
-                                    <label
-                                        style="display: flex; align-items: center; gap: 5px; color: #a0aec0; cursor: pointer;">
-                                        <input type="checkbox" style="accent-color: var(--violet);"> تذكرني
-                                    </label>
-                                </div>
-
-                                <!-- زر تسجيل الدخول الرئيسي -->
-                                <button type="submit" class="btn btn-primary btn-block" id="submitBtn">تسجيل
-                                    الدخول</button>
-
-                                <!-- الفاصل "أو" -->
-                                <div class="divider" data-i18n="auth.or"
-                                    style="text-align: center; margin: 12px 0; color: #a0aec0;">أو</div>
-
-                                <!-- زر جوجل -->
-                                <button type="button" class="btn btn-ghost btn-block" id="googleLoginBtn">
-                                    المتابعة عبر Google
-                                </button>
-
-                                <!-- نص التبديل السفلي البسيط بدون صندوق منفصل -->
-                                <div class="switch-mode" id="switchModeText"
-                                    style="text-align: center; margin-top: 15px; font-size: 13px; color: #a0aec0;">
-                                </div>
-                            </form>
-                        </div>
+                        </section>
 
                         <!-- Real <form> with autocomplete so browsers offer to save passwords -->
                         <form id="authForm" method="post" action="#" autocomplete="on">
