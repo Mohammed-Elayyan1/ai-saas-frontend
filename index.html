@@ -1538,37 +1538,63 @@
                         </div>
 
                         <div class="auth-card">
+                            <!-- التبويبات في الأعلى -->
                             <div class="auth-tabs">
-                                <button class="active" id="tabLogin" data-i18n="auth.tabLogin"></button>
-                                <button id="tabSignup" data-i18n="auth.tabSignup"></button>
+                                <button class="active" id="tabLogin" data-i18n="auth.tabLogin">تسجيل الدخول</button>
+                                <button id="tabSignup" data-i18n="auth.tabSignup">إنشاء حساب</button>
                             </div>
 
+                            <!-- نموذج تسجيل الدخول -->
                             <form id="authForm" method="post" action="#" autocomplete="on">
+
+                                <!-- حقل اسم الشركة (يظهر في إنشاء الحساب) -->
                                 <div class="field" id="nameField" style="display:none;">
-                                    <label for="companyName" data-i18n="auth.companyLabel"></label>
+                                    <label for="companyName" data-i18n="auth.companyLabel">اسم الشركة</label>
                                     <input id="companyName" name="organization" type="text">
                                 </div>
 
+                                <!-- حقل البريد الإلكتروني -->
                                 <div class="field">
-                                    <label for="email" data-i18n="auth.emailLabel"></label>
+                                    <label for="email" data-i18n="auth.emailLabel">البريد الإلكتروني</label>
                                     <input id="email" name="email" type="email" placeholder="name@company.com"
                                         autocomplete="email" required>
                                 </div>
 
+                                <!-- حقل كلمة المرور -->
                                 <div class="field">
-                                    <label for="password" data-i18n="auth.passwordLabel"></label>
+                                    <label for="password" data-i18n="auth.passwordLabel">كلمة المرور</label>
                                     <input id="password" name="password" type="password" placeholder="••••••••"
                                         autocomplete="current-password" required minlength="6">
                                 </div>
 
-                                <button type="submit" class="btn btn-primary btn-block" id="submitBtn"></button>
+                                <!-- رابط هل نسيت كلمة المرور؟ مرتب ومدمج هنا بدون مربعات إضافية -->
+                                <div
+                                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 13px;">
+                                    <a href="#" id="forgotPasswordLink" data-i18n="auth.forgot"
+                                        style="color: #60a5fa; text-decoration: none;">هل نسيت كلمة المرور؟</a>
+                                    <label
+                                        style="display: flex; align-items: center; gap: 5px; color: #a0aec0; cursor: pointer;">
+                                        <input type="checkbox" style="accent-color: var(--violet);"> تذكرني
+                                    </label>
+                                </div>
 
+                                <!-- زر تسجيل الدخول الرئيسي -->
+                                <button type="submit" class="btn btn-primary btn-block" id="submitBtn">تسجيل
+                                    الدخول</button>
+
+                                <!-- الفاصل "أو" -->
                                 <div class="divider" data-i18n="auth.or"
-                                    style="text-align: center; margin: 12px 0; color: #a0aec0;"></div>
+                                    style="text-align: center; margin: 12px 0; color: #a0aec0;">أو</div>
 
+                                <!-- زر جوجل -->
                                 <button type="button" class="btn btn-ghost btn-block" id="googleLoginBtn">
                                     المتابعة عبر Google
                                 </button>
+
+                                <!-- نص التبديل السفلي البسيط بدون صندوق منفصل -->
+                                <div class="switch-mode" id="switchModeText"
+                                    style="text-align: center; margin-top: 15px; font-size: 13px; color: #a0aec0;">
+                                </div>
                             </form>
                         </div>
 
