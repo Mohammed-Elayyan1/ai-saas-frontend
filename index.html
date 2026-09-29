@@ -1541,41 +1541,41 @@
                             <div class="wrap">
                                 <div class="auth-section">
                                     <div class="auth-grid">
-                                        <!-- القسم الترويجي والنصوص الجانبية -->
+                                        <!-- القسم الترويجي الجانبي -->
                                         <div class="auth-copy">
-                                            <span class="eyebrow"><span class="dot"></span><span
-                                                    data-i18n="auth.eyebrow">منصة الذكاء الاصطناعي</span></span>
-                                            <h2 data-i18n="auth.title"></h2>
-                                            <p data-i18n="auth.sub"></p>
-                                            <ul id="authList"></ul>
+                                            <span class="eyebrow"><span class="dot"></span> منصة الذكاء الاصطناعي</span>
+                                            <h2>أبدأ رحلتك مع الذكاء الاصطناعي لشركتك</h2>
+                                            <p>أنشئ حساباً واحصل على مفتاح API فوري، أو سجل الدخول لمتابعة إدارة مساعدك
+                                                الذكي.</p>
+                                            <ul id="authList">
+                                                <li>إعداد فوري بدون خبرة تقنية</li>
+                                                <li>إلغاء الاشتراك في أي وقت</li>
+                                                <li>دعم عربي كامل</li>
+                                            </ul>
                                         </div>
 
                                         <!-- صندوق تسجيل الدخول الرئيسي والوحيد -->
                                         <div class="auth-card">
                                             <div class="auth-tabs">
-                                                <button class="active" id="tabLogin" data-i18n="auth.tabLogin">تسجيل
-                                                    الدخول</button>
-                                                <button id="tabSignup" data-i18n="auth.tabSignup">إنشاء حساب</button>
+                                                <button class="active" id="tabLogin">تسجيل الدخول</button>
+                                                <button id="tabSignup">إنشاء حساب</button>
                                             </div>
 
                                             <form id="authForm" method="post" action="#" autocomplete="on">
                                                 <div class="field" id="nameField" style="display:none;">
-                                                    <label for="companyName" data-i18n="auth.companyLabel">اسم
-                                                        الشركة</label>
+                                                    <label for="companyName">اسم الشركة</label>
                                                     <input id="companyName" name="organization" type="text"
                                                         autocomplete="organization">
                                                 </div>
 
                                                 <div class="field">
-                                                    <label for="email" data-i18n="auth.emailLabel">البريد
-                                                        الإلكتروني</label>
+                                                    <label for="email">البريد الإلكتروني</label>
                                                     <input id="email" name="email" type="email"
                                                         placeholder="name@company.com" autocomplete="email" required>
                                                 </div>
 
                                                 <div class="field">
-                                                    <label for="password" data-i18n="auth.passwordLabel">كلمة
-                                                        المرور</label>
+                                                    <label for="password">كلمة المرور</label>
                                                     <input id="password" name="password" type="password"
                                                         placeholder="••••••••" autocomplete="current-password" required
                                                         minlength="6">
@@ -1583,25 +1583,23 @@
 
                                                 <div
                                                     style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 13px;">
-                                                    <a href="#" id="forgotPasswordLink" data-i18n="auth.forgot"
+                                                    <a href="#" id="forgotPasswordLink"
                                                         style="color: #60a5fa; text-decoration: none;">هل نسيت كلمة
                                                         المرور؟</a>
                                                     <label
                                                         style="display: flex; align-items: center; gap: 5px; color: #a0aec0; cursor: pointer;">
                                                         <input type="checkbox" checked
-                                                            style="accent-color: var(--violet);">
-                                                        <span data-i18n="auth.remember">تذكرني</span>
+                                                            style="accent-color: var(--violet);"> تذكرني
                                                     </label>
                                                 </div>
 
-                                                <button type="submit" class="btn btn-primary btn-block" id="authSubmit"
-                                                    data-i18n="auth.submit">تسجيل الدخول</button>
+                                                <button type="submit" class="btn btn-primary btn-block"
+                                                    id="authSubmit">تسجيل الدخول</button>
 
-                                                <div class="divider" data-i18n="auth.or"
+                                                <div class="divider"
                                                     style="text-align: center; margin: 12px 0; color: #a0aec0;">أو</div>
 
-                                                <button type="button" class="btn btn-ghost btn-block" id="googleBtn"
-                                                    data-i18n="auth.google">
+                                                <button type="button" class="btn btn-ghost btn-block" id="googleBtn">
                                                     المتابعة عبر Google
                                                 </button>
 
