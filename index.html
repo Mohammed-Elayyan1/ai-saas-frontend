@@ -2330,112 +2330,85 @@
                     };
                 }
 
-                // لوحة الملف الشخصي للمستخدم المسجل
+                const passInput = document.querySelector('input[type="password"]');
+                const loginBox = document.querySelector('form') || passInput?.closest('div') || document.querySelector('.auth-container');
+
+                // إدارة حالة تسجيل الدخول بطريقة امنة دون تخريب تصميم الموقع
                 if (isLoggedIn) {
-                    let trialStart = localStorage.getItem('trial_start_date');
-                    if (!trialStart) {
-                        trialStart = new Date().toISOString();
-                        localStorage.setItem('trial_start_date', trialStart);
-                    }
+                    if (loginBox) loginBox.style.display = 'none'; // إخفاء نموذج تسجيل الدخول الأصلي بأمان
 
-                    // تم تصحيح الخطأ النحوي هنا بإغلاق القوس بشكل صحيح ()
-                    let userApiKey = localStorage.getItem('user_api_key') || 'nexus_key_demo';
-                    const passInput = document.querySelector('input[type="password"]');
-                    const loginBox = document.querySelector('form') || passInput?.closest('div');
+                    let profileCard = document.getElementById('nativeSecureProfileCard');
+                    if (!profileCard && loginBox && loginBox.parentNode) {
+                        let userApiKey = localStorage.getItem('user_api_key') || 'nexus_key_demo';
+                        profileCard = document.createElement('div');
+                        profileCard.id = 'nativeSecureProfileCard';
+                        profileCard.style.cssText = 'width: 100%; max-width: 450px; margin: 40px auto; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(59, 130, 246, 0.3); padding: 25px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); text-align: center; direction: rtl; z-index: 9999; position: relative;';
 
-                    if (loginBox && loginBox.dataset.currentState !== 'logged_in') {
-                        loginBox.dataset.currentState = 'logged_in';
-                        loginBox.innerHTML = `
-                    <div style="width: 100%; max-width: 400px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; text-align: center; box-sizing: border-box; padding: 20px;">
-                        <div style="font-size: 38px; margin-bottom: 8px;">👤</div>
-                        <h3 style="margin: 0 0 6px 0; font-size: 18px; color: #fff; font-weight: bold;">أهلاً بك في فترتك التجريبية (NexusAI)</h3>
-                        <p style="color: #60a5fa; font-size: 13px; margin-bottom: 16px; direction: ltr; font-weight: bold;">${userEmail}</p>
-                        
-                        <div style="background: rgba(241, 196, 15, 0.1); border: 1px solid rgba(241, 196, 15, 0.3); padding: 10px; border-radius: 8px; margin-bottom: 16px; font-size: 12px; color: #facc15; width: 100%; box-sizing: border-box;" id="nativeTimerDisplay">
-                            ⏳ جارِ حساب الوقت المتبقي...
-                        </div>
-
-                        <div style="background: rgba(0,0,0,0.45); padding: 12px; border-radius: 8px; margin-bottom: 18px; text-align: right; border: 1px solid rgba(255,255,255,0.1); width: 100%; box-sizing: border-box;">
-                            <p style="color: #94a3b8; font-size: 11px; margin: 0 0 6px 0; text-align: right;">🔑 مفتاح التجربة (API Key):</p>
-                            <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
-                                <input type="text" readonly value="${userApiKey}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px; border-radius: 4px; flex-grow: 1; font-family: monospace; font-size: 11px; direction: ltr; box-sizing: border-box;" id="nativeApiKeyInput">
-                                <button type="button" id="nativeCopyBtn" style="background: #3b82f6; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; white-space: nowrap;">نسخ</button>
-                            </div>
-                        </div>
-
-                        <button type="button" id="nativeLogoutBtn" style="background: #ef4444; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px; box-sizing: border-box;">تسجيل الخروج</button>
+                        profileCard.innerHTML = `
+                    <div style="font-size: 42px; margin-bottom: 10px;">👤</div>
+                    <h3 style="margin: 0 0 8px 0; font-size: 19px; color: #fff; font-weight: bold;">أهلاً بك في فترتك التجريبية (NexusAI)</h3>
+                    <p style="color: #60a5fa; font-size: 13px; margin-bottom: 20px; direction: ltr; font-weight: bold;">${userEmail}</p>
+                    
+                    <div style="background: rgba(241, 196, 15, 0.1); border: 1px solid rgba(241, 196, 15, 0.3); padding: 12px; border-radius: 8px; margin-bottom: 18px; font-size: 12px; color: #facc15; font-weight: bold;">
+                        ⏳ حساب التجربة نشط لمدة 7 أيام كاملة
                     </div>
+
+                    <div style="background: rgba(0,0,0,0.5); padding: 14px; border-radius: 8px; margin-bottom: 20px; text-align: right; border: 1px solid rgba(255,255,255,0.1);">
+                        <p style="color: #94a3b8; font-size: 11px; margin: 0 0 6px 0;">🔑 مفتاح التجربة (API Key):</p>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <input type="text" readonly value="${userApiKey}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 9px; border-radius: 6px; flex-grow: 1; font-family: monospace; font-size: 11px; direction: ltr;" id="nativeApiKeyInput">
+                            <button type="button" id="nativeCopyBtn" style="background: #3b82f6; color: white; border: none; padding: 9px 14px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: bold;">نسخ</button>
+                        </div>
+                    </div>
+
+                    <button type="button" id="nativeLogoutBtn" style="background: #ef4444; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px;">تسجيل الخروج</button>
                 `;
 
-                        setTimeout(() => {
-                            const copyBtn = document.getElementById('nativeCopyBtn');
-                            if (copyBtn) {
-                                copyBtn.onclick = function () {
-                                    const field = document.getElementById('nativeApiKeyInput');
-                                    if (field) {
-                                        navigator.clipboard.writeText(field.value);
-                                        copyBtn.textContent = 'تم النسخ! ✓';
-                                        copyBtn.style.background = '#22c55e';
-                                        setTimeout(() => {
-                                            copyBtn.textContent = 'نسخ';
-                                            copyBtn.style.background = '#3b82f6';
-                                        }, 2000);
-                                    }
-                                };
-                            }
+                        loginBox.parentNode.insertBefore(profileCard, loginBox.nextSibling);
 
-                            const logoutBtn = document.getElementById('nativeLogoutBtn');
-                            if (logoutBtn) {
-                                logoutBtn.onclick = function () {
-                                    localStorage.removeItem('is_logged_in');
-                                    localStorage.removeItem('user_email');
-                                    localStorage.removeItem('user_api_key');
-                                    location.reload();
-                                };
-                            }
-                        }, 50);
+                        document.getElementById('nativeCopyBtn').onclick = function () {
+                            const field = document.getElementById('nativeApiKeyInput');
+                            navigator.clipboard.writeText(field.value);
+                            this.textContent = 'تم النسخ! ✓';
+                            this.style.background = '#22c55e';
+                            setTimeout(() => {
+                                this.textContent = 'نسخ';
+                                this.style.background = '#3b82f6';
+                            }, 2000);
+                        };
+
+                        document.getElementById('nativeLogoutBtn').onclick = function () {
+                            localStorage.removeItem('is_logged_in');
+                            localStorage.removeItem('user_email');
+                            localStorage.removeItem('user_api_key');
+                            location.reload();
+                        };
                     }
-                }
-
-                // تحسين البحث عن قسم الباقات ونقل نموذج تسجيل الدخول تحته مباشرة
-                let pricingSection = null;
-                document.querySelectorAll('section, div').forEach(el => {
-                    let t = el.textContent || '';
-                    if (t.includes('الأساسية') || t.includes('الاحترافية') || t.includes('Enterprise') || t.includes('Pro')) {
-                        if (el.clientHeight > 100 && !pricingSection) {
-                            pricingSection = el;
-                        }
-                    }
-                });
-
-                const activeFormOrBox = document.querySelector('form') || passInput?.closest('div');
-                if (pricingSection && activeFormOrBox && !activeFormOrBox.dataset.movedUnderPricing) {
-                    activeFormOrBox.dataset.movedUnderPricing = 'true';
-                    pricingSection.insertAdjacentElement('afterend', activeFormOrBox);
-                    activeFormOrBox.style.margin = '40px auto';
                 }
             }
 
-            // تسجيل الدخول عبر Google مع تحقق صارم
+            // تسجيل الدخول عبر Google مع فحص صارم جداً للإيميل (منع الإيميلات الوهمية)
             function handleGoogleLogin() {
-                const googleEmail = prompt("أدخل بريدك الإلكتروني الصحيح (مثال: name@gmail.com) للمتابعة عبر Google:", "user@gmail.com");
-                if (googleEmail !== null) {
-                    const trimmedEmail = googleEmail.trim();
-                    if (trimmedEmail.includes('@') && trimmedEmail.includes('.') && trimmedEmail.length > 5) {
-                        localStorage.setItem('is_logged_in', 'true');
-                        localStorage.setItem('user_email', trimmedEmail);
-                        localStorage.setItem('user_api_key', 'nexus_google_' + Math.random().toString(36).substring(2, 9));
-                        alert('تم تسجيل الدخول عبر Google بنجاح!');
-                        location.reload();
-                    } else {
-                        alert('خطأ: يرجى إدخال بريد إلكتروني حقيقي وصحيح يحتوي على @ و .');
-                    }
+                const googleEmail = prompt("أدخل بريدك الإلكتروني الصحيح (مثال: name@gmail.com) للمتابعة عبر Google:", "");
+                if (googleEmail === null) return; // المستخدم اضغط إلغاء
+
+                const trimmedEmail = googleEmail.trim();
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // فحص نمط البريد الإلكتروني الحقيقي
+
+                if (emailRegex.test(trimmedEmail)) {
+                    localStorage.setItem('is_logged_in', 'true');
+                    localStorage.setItem('user_email', trimmedEmail);
+                    localStorage.setItem('user_api_key', 'nexus_google_' + Math.random().toString(36).substring(2, 9));
+                    alert('تم تسجيل الدخول عبر Google بنجاح!');
+                    location.reload();
+                } else {
+                    alert('خطأ: البريد الإلكتروني غير صحيح! يجب إدخال بريد حقيقي يحتوي على @ و .com');
                 }
             }
 
-            // ربط الحدث بأزرار Google الحقيقية فقط
+            // ربط الحدث حصرياً بأزرار Google أو النصوص المرتبطة بها
             document.addEventListener('click', function (e) {
-                const btn = e.target.closest('button, a');
+                const btn = e.target.closest('button, a, div');
                 if (!btn) return;
                 const text = btn.textContent || '';
                 if (text.includes('Google') || text.includes('قوقل') || text.includes('جوجل') || text.includes('المتابعة عبر')) {
@@ -2445,7 +2418,7 @@
                 }
             }, true);
 
-            // نموذج تسجيل الدخول التقليدي
+            // نموذج تسجيل الدخول التقليدي مع فحص دقيق
             document.addEventListener('submit', function (e) {
                 const emailInput = e.target.querySelector('input[type="email"], input[type="text"]');
                 const passwordInput = e.target.querySelector('input[type="password"]');
@@ -2453,7 +2426,9 @@
                     e.preventDefault();
                     const emailVal = emailInput.value.trim();
                     const passVal = passwordInput.value.trim();
-                    if (!emailVal.includes('@') || !emailVal.includes('.')) {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                    if (!emailRegex.test(emailVal)) {
                         alert('الرجاء إدخال بريد إلكتروني صحيح.');
                         return;
                     }
@@ -2504,7 +2479,8 @@
 
                 document.getElementById('modalSendCodeBtn').onclick = function () {
                     const enteredEmail = document.getElementById('modalVerifyEmail').value.trim();
-                    if (!enteredEmail || !enteredEmail.includes('@') || !enteredEmail.includes('.')) {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(enteredEmail)) {
                         alert('الرجاء إدخال بريد إلكتروني صحيح.');
                         return;
                     }
