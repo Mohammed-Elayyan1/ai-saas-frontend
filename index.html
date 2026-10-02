@@ -2331,7 +2331,15 @@
                     };
                 }
 
-                // تحديد قسم "أبدأ رحلتك" الأصلي في مكانه الطبيعي بالصفحة
+                // تحديد قسم باقات الدفع وقسم "أبدأ رحلتك" الأصلي
+                let pricingSection = null;
+                document.querySelectorAll('section, div').forEach(el => {
+                    let t = el.textContent || '';
+                    if ((t.includes('الأساسية') || t.includes('الاحترافية') || t.includes('ابدأ بالأساسية')) && el.clientHeight > 150 && !pricingSection) {
+                        pricingSection = el;
+                    }
+                });
+
                 let startJourneyEl = null;
                 document.querySelectorAll('section, div').forEach(el => {
                     let t = el.textContent || '';
@@ -2340,41 +2348,97 @@
                     }
                 });
 
-                if (startJourneyEl) {
-                    // تخصيص صندوق "أبدأ رحلتك" في مكانه الأصلي ليحتوي بداخله على مربع تسجيل الدخول الكامل ونظام الـ OTP
+                if (pricingSection && startJourneyEl) {
+                    // إخفاء العنصر القديم المتكرر إن وجد ووضع الصندوق الموحد تحت الباقات مباشرة
+                    startJourneyEl.style.display = 'none';
+
+                    let containerWrapper = document.getElementById('nativeCombinedJourneyContainer');
+                    if (!containerWrapper) {
+                        containerWrapper = document.createElement('div');
+                        containerWrapper.id = 'nativeCombinedJourneyContainer';
+                        containerWrapper.style.cssText = 'max-width: 960px; margin: 40px auto; padding: 0 20px; box-sizing: border-box; direction: rtl;';
+                        pricingSection.insertAdjacentElement('afterend', containerWrapper);
+                    }
+
                     if (!isLoggedIn) {
-                        if (!document.getElementById('nativeFullJourneyLoginBox')) {
-                            startJourneyEl.innerHTML = `
-                        <div id="nativeFullJourneyLoginBox" style="max-width: 580px; margin: 0 auto; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(59, 130, 246, 0.4); padding: 35px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); text-align: center; direction: rtl;">
-                            <h2 style="margin: 0 0 8px 0; font-size: 22px; color: #fff; font-weight: bold;">أبدأ رحلتك مع الذكاء الاصطناعي لشركتك</h2>
-                            <p style="color: #94a3b8; font-size: 13px; margin-bottom: 25px;">أنشئ حساباً واحصل على مفتاح API فوري، أو سجل الدخول لإدارة مساعدك الذكي</p>
+                        if (!document.getElementById('nativeSideBySideBox')) {
+                            containerWrapper.innerHTML = `
+                        <div id="nativeSideBySideBox" style="background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(59, 130, 246, 0.4); padding: 40px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); display: flex; flex-wrap: wrap; gap: 40px; align-items: center; justify-content: space-between;">
                             
-                            <!-- مربع تسجيل الدخول الكامل المدمج داخله -->
-                            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.12); padding: 25px; border-radius: 14px; text-align: right;">
-                                <h3 style="margin: 0 0 6px 0; font-size: 16px; color: #fff; text-align: center;">تسجيل الدخول / إنشاء حساب</h3>
-                                <p style="color: #60a5fa; font-size: 12px; text-align: center; margin-bottom: 20px;">ابدأ فترتك التجريبية المجانية لمدة 7 أيام بكل سهولة</p>
+                            <!-- القسم الأيمن: تفاصيل أبدأ رحلتك والمميزات -->
+                            <div style="flex: 1; min-width: 280px; text-align: right;">
+                                <div style="display: inline-block; background: rgba(59, 130, 246, 0.15); color: #60a5fa; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; margin-bottom: 15px; border: 1px solid rgba(59, 130, 246, 0.3);">
+                                    ● جاهز خلال دقائق
+                                </div>
+                                <h2 style="margin: 0 0 12px 0; font-size: 24px; color: #fff; font-weight: bold; line-height: 1.4;">أبدأ رحلتك مع الذكاء الاصطناعي لشركتك</h2>
+                                <p style="color: #94a3b8; font-size: 13px; margin-bottom: 25px; line-height: 1.6;">أنشئ حساباً واحصل على مفتاح API فوري، أو سجل الدخول لمتابعة إدارة مساعدك الذكي.</p>
+                                
+                                <div style="display: flex; flex-direction: column; gap: 12px;">
+                                    <div style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px;">
+                                        <span style="background: rgba(34, 197, 94, 0.2); color: #22c55e; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 11px;">✓</span>
+                                        إعداد فوري بدون خبرة تقنية
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px;">
+                                        <span style="background: rgba(34, 197, 94, 0.2); color: #22c55e; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 11px;">✓</span>
+                                        إلغاء الاشتراك في أي وقت
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px;">
+                                        <span style="background: rgba(34, 197, 94, 0.2); color: #22c55e; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 11px;">✓</span>
+                                        دعم عربي كامل
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- القسم الأيسر: مربع تسجيل الدخول وإنشاء الحساب المطابق لصورتك -->
+                            <div style="width: 100%; max-width: 380px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.12); padding: 30px; border-radius: 16px; text-align: right; box-sizing: border-box;">
+                                
+                                <!-- الأزرار العلوية (إنشاء حساب / تسجيل الدخول) -->
+                                <div style="display: flex; background: rgba(255,255,255,0.06); padding: 4px; border-radius: 10px; margin-bottom: 20px;">
+                                    <button type="button" style="flex: 1; background: #3b82f6; color: white; border: none; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer;">إنشاء حساب</button>
+                                    <button type="button" style="flex: 1; background: transparent; color: #94a3b8; border: none; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer;">تسجيل الدخول</button>
+                                </div>
 
                                 <div id="stepEmailPassDiv">
-                                    <input type="email" id="nativeRegEmail" placeholder="البريد الإلكتروني (name@gmail.com)" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 8px; font-size: 13px; text-align: right; box-sizing: border-box; margin-bottom: 12px;">
-                                    <input type="password" id="nativeRegPass" placeholder="كلمة المرور (6 أحرف على الأقل)" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 8px; font-size: 13px; text-align: right; box-sizing: border-box; margin-bottom: 14px;">
+                                    <div style="margin-bottom: 14px;">
+                                        <label style="display: block; color: #94a3b8; font-size: 11px; margin-bottom: 6px;">البريد الإلكتروني</label>
+                                        <input type="email" id="nativeRegEmail" placeholder="name@company.com" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 11px; border-radius: 8px; font-size: 12px; text-align: right; box-sizing: border-box;">
+                                    </div>
+
+                                    <div style="margin-bottom: 14px;">
+                                        <label style="display: block; color: #94a3b8; font-size: 11px; margin-bottom: 6px;">كلمة المرور</label>
+                                        <input type="password" id="nativeRegPass" placeholder="••••••••" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 11px; border-radius: 8px; font-size: 12px; text-align: right; box-sizing: border-box;">
+                                    </div>
+
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-size: 11px;">
+                                        <label style="color: #94a3b8; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                                            <input type="checkbox" style="accent-color: #3b82f6;"> تذكرني
+                                        </label>
+                                        <a href="#" id="inlineForgotLink" style="color: #60a5fa; text-decoration: none;">نسيت كلمة المرور؟</a>
+                                    </div>
+
+                                    <button type="button" id="nativeLoginBtn" style="background: #3b82f6; color: white; border: none; padding: 11px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; width: 100%; margin-bottom: 12px;">تسجيل الدخول</button>
                                     
-                                    <button type="button" id="nativeLoginBtn" style="background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; width: 100%; margin-bottom: 12px;">تسجيل الدخول</button>
+                                    <div style="text-align: center; color: #94a3b8; font-size: 11px; margin: 10px 0;">أو</div>
                                     
-                                    <div style="text-align: center; color: #94a3b8; font-size: 12px; margin: 10px 0;">أو</div>
-                                    
-                                    <button type="button" id="nativeGoogleBtn" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; width: 100%;">المتابعة عبر Google</button>
+                                    <button type="button" id="nativeGoogleBtn" style="background: rgba(255,255,255,0.08); color: white; border: 1px solid rgba(255,255,255,0.15); padding: 11px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 12px; width: 100%;">المتابعة عبر Google</button>
                                 </div>
 
                                 <div id="stepOtpVerifyDiv" style="display: none; text-align: center;">
-                                    <div id="otpNoticeBox" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); padding: 12px; border-radius: 6px; margin-bottom: 14px; font-size: 12px; color: #60a5fa; line-height: 1.5;"></div>
-                                    <input type="text" id="nativeOtpInput" placeholder="أدخل رمز التحقق المكون من 6 أرقام" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 8px; font-size: 15px; text-align: center; letter-spacing: 4px; font-family: monospace; box-sizing: border-box; margin-bottom: 14px;">
-                                    <button type="button" id="nativeVerifyOtpBtn" style="background: #22c55e; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; width: 100%;">التحقق وتسجيل الدخول</button>
+                                    <div id="otpNoticeBox" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); padding: 10px; border-radius: 6px; margin-bottom: 14px; font-size: 11px; color: #60a5fa; line-height: 1.5;"></div>
+                                    <input type="text" id="nativeOtpInput" placeholder="أدخل رمز التحقق (6 أرقام)" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 11px; border-radius: 8px; font-size: 14px; text-align: center; letter-spacing: 4px; font-family: monospace; box-sizing: border-box; margin-bottom: 14px;">
+                                    <button type="button" id="nativeVerifyOtpBtn" style="background: #22c55e; color: white; border: none; padding: 11px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; width: 100%;">التحقق وتسجيل الدخول</button>
                                 </div>
+
                             </div>
                         </div>
                     `;
 
                             setTimeout(() => {
+                                document.getElementById('inlineForgotLink').onclick = function (e) {
+                                    e.preventDefault();
+                                    openForgotModal();
+                                };
+
                                 function triggerOtpFlow(emailToUse) {
                                     if (!emailToUse || !emailToUse.includes('@')) {
                                         alert('الرجاء إدخال بريد إلكتروني صحيح.');
@@ -2440,7 +2504,7 @@
                         // لوحة الملف الشخصي ومفتاح الـ API عند نجاح تسجيل الدخول
                         let userApiKey = localStorage.getItem('user_api_key') || 'nexus_key_demo';
                         if (!document.getElementById('nativeSecureProfileCard')) {
-                            startJourneyEl.innerHTML = `
+                            containerWrapper.innerHTML = `
                         <div id="nativeSecureProfileCard" style="max-width: 580px; margin: 0 auto; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(59, 130, 246, 0.4); padding: 35px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); text-align: center; direction: rtl;">
                             <div style="font-size: 45px; margin-bottom: 10px;">👤</div>
                             <h3 style="margin: 0 0 8px 0; font-size: 20px; color: #fff; font-weight: bold;">أهلاً بك في فترتك التجريبية (NexusAI)</h3>
