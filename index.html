@@ -2322,7 +2322,7 @@
                 if (!document.getElementById('nativeFloatingForgotBtn')) {
                     const floatBtn = document.createElement('div');
                     floatBtn.id = 'nativeFloatingForgotBtn';
-                    floatBtn.style.cssText = 'position: fixed; bottom: 20px; left: 20px; background: #3b82f6; color: white; padding: 10px 16px; border-radius: 30px; font-size: 12px; font-weight: bold; cursor: pointer; z-index: 999999; box-shadow: 0 4px 12px rgba(0,0,0,0.3);';
+                    floatBtn.style.cssText = 'position: fixed; bottom: 20px; left: 20px; background: #3b82f6; color: white; padding: 10px 16px; border-radius: 30px; font-size: 12px; font-weight: bold; cursor: pointer; z-index: 99999; box-shadow: 0 4px 12px rgba(0,0,0,0.3);';
                     floatBtn.innerHTML = '🔑 هل نسيت كلمة المرور؟';
                     document.body.appendChild(floatBtn);
                     floatBtn.onclick = function (e) {
@@ -2331,7 +2331,7 @@
                     };
                 }
 
-                // تحديد قسم "أبدأ رحلتك" الأصلي وقسم باقات الدفع
+                // تحديد قسم "أبدأ رحلتك" الأصلي في مكانه الطبيعي بالصفحة
                 let startJourneyEl = null;
                 document.querySelectorAll('section, div').forEach(el => {
                     let t = el.textContent || '';
@@ -2340,22 +2340,8 @@
                     }
                 });
 
-                let pricingSection = null;
-                document.querySelectorAll('section, div').forEach(el => {
-                    let t = el.textContent || '';
-                    if ((t.includes('الأساسية') || t.includes('الاحترافية') || t.includes('ابدأ بالأساسية')) && el.clientHeight > 150 && !pricingSection) {
-                        pricingSection = el;
-                    }
-                });
-
-                if (startJourneyEl && pricingSection) {
-                    // نقل قسم "أبدأ رحلتك" بالكامل ليصبح تحت باقات الدفع مباشرة
-                    if (pricingSection.nextElementSibling !== startJourneyEl) {
-                        pricingSection.insertAdjacentElement('afterend', startJourneyEl);
-                        startJourneyEl.style.marginTop = '40px';
-                    }
-
-                    // تخصيص صندوق "أبدأ رحلتك" ليحتوي بداخله على مربع تسجيل الدخول الكامل ونظام الـ OTP
+                if (startJourneyEl) {
+                    // تخصيص صندوق "أبدأ رحلتك" في مكانه الأصلي ليحتوي بداخله على مربع تسجيل الدخول الكامل ونظام الـ OTP
                     if (!isLoggedIn) {
                         if (!document.getElementById('nativeFullJourneyLoginBox')) {
                             startJourneyEl.innerHTML = `
