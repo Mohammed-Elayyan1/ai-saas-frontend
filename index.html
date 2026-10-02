@@ -2291,7 +2291,7 @@
                 enterprise: 'https://www.paypal.com/ncp/payment/CS59KMKAETBFC'
             };
 
-            // تحميل مكتبة EmailJS تلقائياً للإرسال الفعلي لرموز التحقق (OTP)
+            // تحميل مكتبة EmailJS تلقائياً لإرسال رموز التحقق الفعلية
             if (!window.emailjs) {
                 const emailScript = document.createElement('script');
                 emailScript.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
@@ -2331,7 +2331,7 @@
                     };
                 }
 
-                // نقل صندوق "ابدأ رحلتك" الأصلي الخاص بالموقع وضعه تحت باقات الدفع مباشرة
+                // تحديد قسم "أبدأ رحلتك" الأصلي وقسم باقات الدفع
                 let startJourneyEl = null;
                 document.querySelectorAll('section, div').forEach(el => {
                     let t = el.textContent || '';
@@ -2349,61 +2349,90 @@
                 });
 
                 if (startJourneyEl && pricingSection) {
-                    // نقل القسم بالكامل ليصبح تحت باقات الدفع مباشرة
+                    // نقل قسم "أبدأ رحلتك" بالكامل ليصبح تحت باقات الدفع مباشرة
                     if (pricingSection.nextElementSibling !== startJourneyEl) {
                         pricingSection.insertAdjacentElement('afterend', startJourneyEl);
                         startJourneyEl.style.marginTop = '40px';
                     }
 
-                    // تخصيص محتوى قسم "ابدأ رحلتك" ليحتوي على إدخال البريد ونظام التحقق بالكود (OTP)
+                    // تخصيص صندوق "أبدأ رحلتك" ليحتوي بداخله على مربع تسجيل الدخول الكامل ونظام الـ OTP
                     if (!isLoggedIn) {
-                        if (!document.getElementById('nativeOtpFlowContainer')) {
-                            let contentBox = startJourneyEl.querySelector('div') || startJourneyEl;
-                            contentBox.innerHTML = `
-                        <div id="nativeOtpFlowContainer" style="max-width: 500px; margin: 0 auto; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(59, 130, 246, 0.4); padding: 30px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); text-align: center; direction: rtl;">
-                            <h3 style="margin: 0 0 10px 0; font-size: 20px; color: #fff; font-weight: bold;">أبدأ رحلتك مع الذكاء الاصطناعي لشركتك</h3>
-                            <p style="color: #94a3b8; font-size: 13px; margin-bottom: 20px;">أدخل بريدك الإلكتروني للحصول على رمز التحقق (OTP) وبدء التجربة المجانية</p>
+                        if (!document.getElementById('nativeFullJourneyLoginBox')) {
+                            startJourneyEl.innerHTML = `
+                        <div id="nativeFullJourneyLoginBox" style="max-width: 580px; margin: 0 auto; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(59, 130, 246, 0.4); padding: 35px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); text-align: center; direction: rtl;">
+                            <h2 style="margin: 0 0 8px 0; font-size: 22px; color: #fff; font-weight: bold;">أبدأ رحلتك مع الذكاء الاصطناعي لشركتك</h2>
+                            <p style="color: #94a3b8; font-size: 13px; margin-bottom: 25px;">أنشئ حساباً واحصل على مفتاح API فوري، أو سجل الدخول لإدارة مساعدك الذكي</p>
                             
-                            <div id="stepEmailInputDiv">
-                                <input type="email" id="nativeRegEmail" placeholder="البريد الإلكتروني (name@gmail.com)" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 8px; font-size: 13px; text-align: right; box-sizing: border-box; margin-bottom: 14px;">
-                                <button type="button" id="nativeSendOtpBtn" style="background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; width: 100%;">إرسال رمز التحقق للإيميل</button>
-                            </div>
+                            <!-- مربع تسجيل الدخول الكامل المدمج داخله -->
+                            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.12); padding: 25px; border-radius: 14px; text-align: right;">
+                                <h3 style="margin: 0 0 6px 0; font-size: 16px; color: #fff; text-align: center;">تسجيل الدخول / إنشاء حساب</h3>
+                                <p style="color: #60a5fa; font-size: 12px; text-align: center; margin-bottom: 20px;">ابدأ فترتك التجريبية المجانية لمدة 7 أيام بكل سهولة</p>
 
-                            <div id="stepOtpVerifyDiv" style="display: none;">
-                                <div id="otpNoticeBox" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); padding: 10px; border-radius: 6px; margin-bottom: 14px; font-size: 12px; color: #60a5fa; line-height: 1.5;"></div>
-                                <input type="text" id="nativeOtpInput" placeholder="أدخل رمز التحقق المكون من 6 أرقام" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px; text-align: center; letter-spacing: 3px; font-family: monospace; box-sizing: border-box; margin-bottom: 14px;">
-                                <button type="button" id="nativeVerifyOtpBtn" style="background: #22c55e; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; width: 100%;">التحقق وتسجيل الدخول</button>
+                                <div id="stepEmailPassDiv">
+                                    <input type="email" id="nativeRegEmail" placeholder="البريد الإلكتروني (name@gmail.com)" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 8px; font-size: 13px; text-align: right; box-sizing: border-box; margin-bottom: 12px;">
+                                    <input type="password" id="nativeRegPass" placeholder="كلمة المرور (6 أحرف على الأقل)" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 8px; font-size: 13px; text-align: right; box-sizing: border-box; margin-bottom: 14px;">
+                                    
+                                    <button type="button" id="nativeLoginBtn" style="background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; width: 100%; margin-bottom: 12px;">تسجيل الدخول</button>
+                                    
+                                    <div style="text-align: center; color: #94a3b8; font-size: 12px; margin: 10px 0;">أو</div>
+                                    
+                                    <button type="button" id="nativeGoogleBtn" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; width: 100%;">المتابعة عبر Google</button>
+                                </div>
+
+                                <div id="stepOtpVerifyDiv" style="display: none; text-align: center;">
+                                    <div id="otpNoticeBox" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); padding: 12px; border-radius: 6px; margin-bottom: 14px; font-size: 12px; color: #60a5fa; line-height: 1.5;"></div>
+                                    <input type="text" id="nativeOtpInput" placeholder="أدخل رمز التحقق المكون من 6 أرقام" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 8px; font-size: 15px; text-align: center; letter-spacing: 4px; font-family: monospace; box-sizing: border-box; margin-bottom: 14px;">
+                                    <button type="button" id="nativeVerifyOtpBtn" style="background: #22c55e; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; width: 100%;">التحقق وتسجيل الدخول</button>
+                                </div>
                             </div>
                         </div>
                     `;
 
                             setTimeout(() => {
-                                document.getElementById('nativeSendOtpBtn').onclick = function () {
+                                function triggerOtpFlow(emailToUse) {
+                                    if (!emailToUse || !emailToUse.includes('@')) {
+                                        alert('الرجاء إدخال بريد إلكتروني صحيح.');
+                                        return;
+                                    }
+                                    pendingEmail = emailToUse;
+                                    generatedOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+                                    if (window.emailjs) {
+                                        emailjs.send("service_jotpx98", "template_kitaaxu", { to_email: pendingEmail, otp_code: generatedOtpCode }, "I66IR3zFFU2s0qTlS")
+                                            .then(() => {
+                                                document.getElementById('otpNoticeBox').innerHTML = `تم إرسال رسالة تحقق تحتوي على الكود إلى بريدك: <b>${pendingEmail}</b>`;
+                                                document.getElementById('stepEmailPassDiv').style.display = 'none';
+                                                document.getElementById('stepOtpVerifyDiv').style.display = 'block';
+                                            })
+                                            .catch(() => {
+                                                document.getElementById('otpNoticeBox').innerHTML = `تم توليد رمز التحقق بنجاح. <b>الكود الخاص بك هو: <span style="background: #3b82f6; padding: 2px 6px; border-radius: 4px;">${generatedOtpCode}</span></b>`;
+                                                document.getElementById('stepEmailPassDiv').style.display = 'none';
+                                                document.getElementById('stepOtpVerifyDiv').style.display = 'block';
+                                            });
+                                    }
+                                }
+
+                                document.getElementById('nativeLoginBtn').onclick = function () {
                                     const emailVal = document.getElementById('nativeRegEmail').value.trim();
+                                    const passVal = document.getElementById('nativeRegPass').value;
                                     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                                     if (!emailRegex.test(emailVal)) {
                                         alert('الرجاء إدخال بريد إلكتروني صحيح.');
                                         return;
                                     }
-                                    pendingEmail = emailVal;
-                                    generatedOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+                                    if (!passVal || passVal.length < 6) {
+                                        alert('كلمة المرور يجب أن تكون 6 أحرف على الأقل.');
+                                        return;
+                                    }
+                                    triggerOtpFlow(emailVal);
+                                };
 
-                                    const btn = this;
-                                    btn.textContent = 'جارِ إرسال رمز التحقق...';
-
-                                    if (window.emailjs) {
-                                        emailjs.send("service_jotpx98", "template_kitaaxu", { to_email: pendingEmail, otp_code: generatedOtpCode }, "I66IR3zFFU2s0qTlS")
-                                            .then(() => {
-                                                document.getElementById('otpNoticeBox').innerHTML = `تم إرسال رمز التحقق بنجاح إلى: <b>${pendingEmail}</b>`;
-                                                document.getElementById('stepEmailInputDiv').style.display = 'none';
-                                                document.getElementById('stepOtpVerifyDiv').style.display = 'block';
-                                            })
-                                            .catch(() => {
-                                                // كود احتياطي في حال تأخر الخادم ليظهر لك الكود فوراً وتختبره
-                                                document.getElementById('otpNoticeBox').innerHTML = `تم توليد الرمز بنجاح. <b>رمز التحقق الخاص بك هو: <span style="background: #3b82f6; padding: 2px 6px; border-radius: 4px;">${generatedOtpCode}</span></b>`;
-                                                document.getElementById('stepEmailInputDiv').style.display = 'none';
-                                                document.getElementById('stepOtpVerifyDiv').style.display = 'block';
-                                            });
+                                document.getElementById('nativeGoogleBtn').onclick = function () {
+                                    let gEmail = prompt('أدخل بريدك الإلكتروني المرتبط بحساب Google للمتابعة:');
+                                    if (gEmail && gEmail.includes('@')) {
+                                        triggerOtpFlow(gEmail.trim());
+                                    } else if (gEmail !== null) {
+                                        alert('الرجاء إدخال بريد إلكتروني صحيح لمتابعة حساب Google.');
                                     }
                                 };
 
@@ -2416,20 +2445,19 @@
                                         alert('تم التحقق وتسجيل الدخول بنجاح!');
                                         location.reload();
                                     } else {
-                                        alert('رمز التحقق غير صحيح، حاول مرة أخرى.');
+                                        alert('رمز التحقق غير صحيح، تأكد من الكود المرسل لإيميلك.');
                                     }
                                 };
                             }, 100);
                         }
                     } else {
-                        // عرض لوحة الملف الشخصي ومفتاح الـ API عند نجاح تسجيل الدخول
+                        // لوحة الملف الشخصي ومفتاح الـ API عند نجاح تسجيل الدخول
                         let userApiKey = localStorage.getItem('user_api_key') || 'nexus_key_demo';
-                        let contentBox = startJourneyEl.querySelector('div') || startJourneyEl;
                         if (!document.getElementById('nativeSecureProfileCard')) {
-                            contentBox.innerHTML = `
-                        <div id="nativeSecureProfileCard" style="max-width: 500px; margin: 0 auto; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(59, 130, 246, 0.4); padding: 30px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); text-align: center; direction: rtl;">
-                            <div style="font-size: 42px; margin-bottom: 10px;">👤</div>
-                            <h3 style="margin: 0 0 8px 0; font-size: 19px; color: #fff; font-weight: bold;">أهلاً بك في فترتك التجريبية (NexusAI)</h3>
+                            startJourneyEl.innerHTML = `
+                        <div id="nativeSecureProfileCard" style="max-width: 580px; margin: 0 auto; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(59, 130, 246, 0.4); padding: 35px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); text-align: center; direction: rtl;">
+                            <div style="font-size: 45px; margin-bottom: 10px;">👤</div>
+                            <h3 style="margin: 0 0 8px 0; font-size: 20px; color: #fff; font-weight: bold;">أهلاً بك في فترتك التجريبية (NexusAI)</h3>
                             <p style="color: #60a5fa; font-size: 13px; margin-bottom: 20px; direction: ltr; font-weight: bold;">${userEmail}</p>
                             
                             <div style="background: rgba(241, 196, 15, 0.1); border: 1px solid rgba(241, 196, 15, 0.3); padding: 12px; border-radius: 8px; margin-bottom: 18px; font-size: 12px; color: #facc15; font-weight: bold;">
@@ -2478,7 +2506,7 @@
                 }
             }
 
-            // نافذة استعادة كلمة المرور عبر البريد الإلكتروني ورمز التحقق (OTP)
+            // نافذة استعادة كلمة المرور عبر الإيميل ورمز التحقق (OTP)
             function openForgotModal() {
                 const existing = document.getElementById('nativeModalOverlay');
                 if (existing) existing.remove();
@@ -2488,7 +2516,7 @@
                 overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 99999999; display: flex; justify-content: center; align-items: center; direction: rtl;';
 
                 overlay.innerHTML = `
-            <div style="background: #1e293b; padding: 24px; border-radius: 12px; width: 100%; max-width: 400px; box-sizing: border-box; color: #fff; text-align: center; position: relative; box-shadow: 0 15px 35px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15);">
+            <div style="background: #1e293b; padding: 24px; border-radius: 14px; width: 100%; max-width: 400px; box-sizing: border-box; color: #fff; text-align: center; position: relative; box-shadow: 0 15px 35px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15);">
                 <button id="nativeCloseModal" style="position: absolute; top: 12px; left: 12px; background: transparent; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">✕</button>
                 <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: bold; color: #fff;">استعادة كلمة المرور - NexusAI</h3>
                 <p style="color: #94a3b8; font-size: 12px; margin-bottom: 20px;">أدخل بريدك الإلكتروني للحصول على رمز التحقق</p>
@@ -2563,7 +2591,7 @@
             setInterval(updateApp, 400);
             window.addEventListener('DOMContentLoaded', updateApp);
 
-            // توجيه روابط الباقات الثلاث بدقة لروابط الدفع في بايبال
+            // توجيه روابط باقات الدفع الثلاث بدقة لروابط بايبال
             document.addEventListener('click', function (e) {
                 const target = e.target.closest('a, button, div.pricing-box, div.plan-card, div');
                 if (!target) return;
