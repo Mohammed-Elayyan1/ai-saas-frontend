@@ -2321,19 +2321,6 @@
                     }
                 });
 
-                // حقن زر "نسيت كلمة المرور" داخل حقل كلمة المرور
-                const passInput = document.querySelector('input[type="password"]');
-                if (passInput) {
-                    let parentContainer = passInput.closest('form') || passInput.parentElement;
-                    if (parentContainer && !parentContainer.dataset.forgotInjected) {
-                        parentContainer.dataset.forgotInjected = 'true';
-                        const forgotDiv = document.createElement('div');
-                        forgotDiv.style.cssText = 'text-align: center; margin-top: 12px; width: 100%; z-index: 99; position: relative;';
-                        forgotDiv.innerHTML = `<span class="native-forgot-trigger" style="color: #60a5fa; font-size: 13px; text-decoration: underline; cursor: pointer; font-weight: bold; display: inline-block;">نسيت كلمة المرور؟</span>`;
-                        parentContainer.appendChild(forgotDiv);
-                    }
-                }
-
                 // زر عائم لاستعادة كلمة المرور
                 if (!document.getElementById('nativeFloatingForgotBtn')) {
                     const floatBtn = document.createElement('div');
@@ -2356,8 +2343,9 @@
                     }
 
                     let userApiKey = localStorage.getItem('user_api_key') || 'nexus_key_demo';
-
+                    const passInput = document.querySelector('input[type="password"]');
                     const loginBox = document.querySelector('form') || passInput?.closest('div');
+
                     if (loginBox && loginBox.dataset.currentState !== 'logged_in') {
                         loginBox.dataset.currentState = 'logged_in';
                         loginBox.innerHTML = `
@@ -2410,55 +2398,16 @@
                             }
                         }, 50);
                     }
-
-                    const timerEl = document.getElementById('nativeTimerDisplay');
-                    if (timerEl) {
-                        const startTime = new Date(trialStart).getTime();
-                        const durationMs = TRIAL_DAYS * 24 * 60 * 60 * 1000;
-                        const updateCountdown = () => {
-                            const now = new Date().getTime();
-                            const timeLeft = durationMs - (now - startTime);
-                            if (timeLeft > 0) {
-                                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-                                timerEl.innerHTML = `⏳ الوقت المتبقي للفترة التجريبية: ${days} أيام ${hours} س ${minutes} د ${seconds} ث`;
-                            } else {
-                                timerEl.innerHTML = `⏳ انتهت فترتك التجريبية`;
-                            }
-                        };
-                        updateCountdown();
-                        setInterval(updateCountdown, 1000);
-                    }
-                }
-
-                // نقل صندوق "ابدأ رحلتك" بالكامل ليصبح تحت قسم الباقات الثلاث مباشرة
-                const pricingSection = document.querySelector('.pricing, #pricing, [class*="pricing"], [class*="plan"], [id*="pricing"]');
-                // البحث عن الحاوية التي تحتوي على نص "ابدأ رحلتك مع الذكاء الاصطناعي"
-                let heroContainer = null;
-                document.querySelectorAll('div, section').forEach(el => {
-                    if (el.textContent && el.textContent.includes('ابدأ رحلتك مع الذكاء الاصطناعي') && el.textContent.length < 1000) {
-                        // التقاط العنصر الأب الأنسب (الصندوق الكبير)
-                        let box = el.closest('section') || el.closest('div[class*="hero"]') || el.closest('div');
-                        if (box && !heroContainer) heroContainer = box;
-                    }
-                });
-
-                if (pricingSection && heroContainer && !heroContainer.dataset.movedUnderPricing) {
-                    heroContainer.dataset.movedUnderPricing = 'true';
-                    pricingSection.insertAdjacentElement('afterend', heroContainer);
-                    heroContainer.style.margin = '50px auto';
                 }
             }
 
-            // حل مشكلة تسجيل الدخول عبر Google نهائياً بدون أخطاء API Key
+            // تسجيل الدخول عبر Google بشكل سلس وبدون مشاكل Firebase API Key
             function handleGoogleLogin() {
-                const googleEmail = prompt("أدخل بريدك الإلكتروني لتسجيل الدخول عبر Google:", "user@gmail.com");
+                const googleEmail = prompt("أدخل بريدك الإلكتروني للمتابعة عبر Google:", "user@gmail.com");
                 if (googleEmail && googleEmail.includes('@')) {
                     localStorage.setItem('is_logged_in', 'true');
                     localStorage.setItem('user_email', googleEmail);
-                    localStorage.setItem('user_api_key', 'nexus_google_' + Math.random().toString(36.substring(2, 9)));
+                    localStorage.setItem('user_api_key', 'nexus_google_' + Math.random().toString(36).substring(2, 9));
                     alert('تم تسجيل الدخول عبر Google بنجاح!');
                     location.reload();
                 } else if (googleEmail !== null) {
@@ -2466,7 +2415,6 @@
                 }
             }
 
-            // ربط أزرار المتابعة عبر Google تلقائياً
             document.addEventListener('click', function (e) {
                 const btn = e.target.closest('button, a, div');
                 if (!btn) return;
