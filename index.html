@@ -2291,7 +2291,6 @@
                 enterprise: 'https://www.paypal.com/ncp/payment/CS59KMKAETBFC'
             };
 
-            // تحميل مكتبة EmailJS لإرسال رموز التحقق الفعلية
             if (!window.emailjs) {
                 const emailScript = document.createElement('script');
                 emailScript.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
@@ -2300,13 +2299,12 @@
 
             let generatedOtpCode = '';
             let pendingEmail = '';
-            let activeFormTab = 'register'; // 'register' أو 'login'
+            let activeFormTab = 'login'; // افتراضياً تبويب تسجيل الدخول
 
             function updateApp() {
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
                 const userEmail = localStorage.getItem('user_email') || 'user@nexus.ai';
 
-                // تعديل النصوص وزر تسجيل الدخول العلوي للانتقال للصندوق بسلاسة
                 document.querySelectorAll('a, button, span, p, div, li, td').forEach(el => {
                     if (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3) {
                         let text = el.textContent.trim();
@@ -2333,7 +2331,6 @@
                     }
                 });
 
-                // زر عائم لاستعادة كلمة المرور
                 if (!document.getElementById('nativeFloatingForgotBtn')) {
                     const floatBtn = document.createElement('div');
                     floatBtn.id = 'nativeFloatingForgotBtn';
@@ -2346,7 +2343,6 @@
                     };
                 }
 
-                // تحديد قسم باقات الدفع وقسم "أبدأ رحلتك" الأصلي
                 let pricingSection = null;
                 document.querySelectorAll('section, div').forEach(el => {
                     let t = el.textContent || '';
@@ -2370,45 +2366,45 @@
                     if (!containerWrapper) {
                         containerWrapper = document.createElement('div');
                         containerWrapper.id = 'nativeCombinedJourneyContainer';
-                        containerWrapper.style.cssText = 'max-width: 960px; margin: 40px auto; padding: 0 20px; box-sizing: border-box; direction: rtl;';
+                        containerWrapper.style.cssText = 'max-width: 1000px; margin: 50px auto; padding: 0 20px; box-sizing: border-box; direction: rtl;';
                         pricingSection.insertAdjacentElement('afterend', containerWrapper);
                     }
 
                     if (!isLoggedIn) {
                         containerWrapper.innerHTML = `
-                    <div id="nativeSideBySideBox" style="background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(59, 130, 246, 0.4); padding: 40px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); display: flex; flex-wrap: wrap; gap: 40px; align-items: center; justify-content: space-between;">
+                    <div id="nativeSideBySideBox" style="background: rgba(15, 23, 42, 0.98); border: 1px solid rgba(59, 130, 246, 0.4); padding: 40px; border-radius: 20px; box-shadow: 0 25px 60px rgba(0,0,0,0.8); display: flex; flex-wrap: wrap; gap: 40px; align-items: center; justify-content: space-between;">
                         
-                        <!-- القسم الأيمن: المميزات والنصوص تماماً كالصورة الأولى -->
+                        <!-- القسم الأيمن: المميزات والنصوص -->
                         <div style="flex: 1; min-width: 280px; text-align: right;">
-                            <div style="display: inline-block; background: rgba(59, 130, 246, 0.15); color: #60a5fa; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; margin-bottom: 15px; border: 1px solid rgba(59, 130, 246, 0.3);">
+                            <div style="display: inline-block; background: rgba(59, 130, 246, 0.15); color: #60a5fa; padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: bold; margin-bottom: 18px; border: 1px solid rgba(59, 130, 246, 0.3);">
                                 ● جاهز خلال دقائق
                             </div>
-                            <h2 style="margin: 0 0 12px 0; font-size: 24px; color: #fff; font-weight: bold; line-height: 1.4;">أبدأ رحلتك مع الذكاء الاصطناعي لشركتك</h2>
-                            <p style="color: #94a3b8; font-size: 13px; margin-bottom: 25px; line-height: 1.6;">أنشئ حساباً واحصل على مفتاح API فوري، أو سجل الدخول لمتابعة إدارة مساعدك الذكي.</p>
+                            <h2 style="margin: 0 0 14px 0; font-size: 26px; color: #fff; font-weight: bold; line-height: 1.4;">أبدأ رحلتك مع الذكاء الاصطناعي لشركتك</h2>
+                            <p style="color: #94a3b8; font-size: 13px; margin-bottom: 30px; line-height: 1.6;">أنشئ حساباً واحصل على مفتاح API فوري، أو سجل الدخول لمتابعة إدارة مساعدك الذكي.</p>
                             
-                            <div style="display: flex; flex-direction: column; gap: 12px;">
-                                <div style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px;">
+                            <div style="display: flex; flex-direction: column; gap: 14px;">
+                                <div style="display: flex; align-items: center; gap: 12px; color: #e2e8f0; font-size: 13px;">
                                     <span style="background: rgba(34, 197, 94, 0.2); color: #22c55e; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 11px;">✓</span>
                                     إعداد فوري بدون خبرة تقنية
                                 </div>
-                                <div style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px;">
+                                <div style="display: flex; align-items: center; gap: 12px; color: #e2e8f0; font-size: 13px;">
                                     <span style="background: rgba(34, 197, 94, 0.2); color: #22c55e; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 11px;">✓</span>
                                     إلغاء الاشتراك في أي وقت
                                 </div>
-                                <div style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px;">
+                                <div style="display: flex; align-items: center; gap: 12px; color: #e2e8f0; font-size: 13px;">
                                     <span style="background: rgba(34, 197, 94, 0.2); color: #22c55e; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 11px;">✓</span>
                                     دعم عربي كامل
                                 </div>
                             </div>
                         </div>
 
-                        <!-- القسم الأيسر: صندوق الدخول والتسجيل مطابق تماماً للصورة الأولى -->
+                        <!-- القسم الأيسر: صندوق الدخول والتسجيل المطابق للصورة الثانية تماماً -->
                         <div style="width: 100%; max-width: 380px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.12); padding: 30px; border-radius: 16px; text-align: right; box-sizing: border-box;">
                             
-                            <!-- الأزرار العلوية تماماً كالصورة الأولى (إنشاء حساب على اليسار، تسجيل الدخول على اليمين ضمن الـ RTL) -->
-                            <div style="display: flex; background: rgba(255,255,255,0.06); padding: 4px; border-radius: 10px; margin-bottom: 20px;">
-                                <button type="button" id="tabRegisterBtn" style="flex: 1; background: ${activeFormTab === 'register' ? '#3b82f6' : 'transparent'}; color: ${activeFormTab === 'register' ? 'white' : '#94a3b8'}; border: none; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer;">إنشاء حساب</button>
-                                <button type="button" id="tabLoginBtn" style="flex: 1; background: ${activeFormTab === 'login' ? '#3b82f6' : 'transparent'}; color: ${activeFormTab === 'login' ? 'white' : '#94a3b8'}; border: none; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer;">تسجيل الدخول</button>
+                            <!-- الأزرار العلوية للتبديل (تسجيل الدخول يمين، إنشاء حساب يسار) -->
+                            <div style="display: flex; background: rgba(255,255,255,0.06); padding: 4px; border-radius: 10px; margin-bottom: 22px;">
+                                <button type="button" id="tabLoginBtn" style="flex: 1; background: ${activeFormTab === 'login' ? '#3b82f6' : 'transparent'}; color: ${activeFormTab === 'login' ? 'white' : '#94a3b8'}; border: none; padding: 9px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s;">تسجيل الدخول</button>
+                                <button type="button" id="tabRegisterBtn" style="flex: 1; background: ${activeFormTab === 'register' ? '#3b82f6' : 'transparent'}; color: ${activeFormTab === 'register' ? 'white' : '#94a3b8'}; border: none; padding: 9px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s;">إنشاء حساب</button>
                             </div>
 
                             <div id="stepEmailPassDiv">
@@ -2429,11 +2425,17 @@
                                     <a href="#" id="inlineForgotLink" style="color: #60a5fa; text-decoration: none;">نسيت كلمة المرور؟</a>
                                 </div>
 
-                                <button type="button" id="nativeLoginBtn" style="background: #3b82f6; color: white; border: none; padding: 11px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; width: 100%; margin-bottom: 12px;">${activeFormTab === 'login' ? 'تسجيل الدخول' : 'تسجيل الدخول'}</button>
+                                <button type="button" id="nativeLoginBtn" style="background: #3b82f6; color: white; border: none; padding: 11px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; width: 100%; margin-bottom: 12px;">تسجيل الدخول</button>
                                 
                                 <div style="text-align: center; color: #94a3b8; font-size: 11px; margin: 10px 0;">أو</div>
                                 
-                                <button type="button" id="nativeGoogleBtn" style="background: rgba(255,255,255,0.08); color: white; border: 1px solid rgba(255,255,255,0.15); padding: 11px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 12px; width: 100%;">المتابعة عبر Google</button>
+                                <button type="button" id="nativeGoogleBtn" style="background: rgba(255,255,255,0.08); color: white; border: 1px solid rgba(255,255,255,0.15); padding: 11px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 12px; width: 100%; margin-bottom: 16px;">المتابعة عبر Google</button>
+
+                                <!-- الروابط السفلية كما ظهرت في الصورة الثانية -->
+                                <div style="text-align: center; font-size: 11px; display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
+                                    <a href="#" id="switchTabFooterLink" style="color: #94a3b8; text-decoration: none;">ليس لديك حساب؟ أنشئ حساباً</a>
+                                    <a href="#" id="inlineForgotLinkBottom" style="color: #60a5fa; text-decoration: none;">نسيت كلمة المرور؟</a>
+                                </div>
                             </div>
 
                             <div id="stepOtpVerifyDiv" style="display: none; text-align: center;">
@@ -2447,19 +2449,35 @@
                 `;
 
                         setTimeout(() => {
-                            document.getElementById('tabRegisterBtn').onclick = () => {
-                                activeFormTab = 'register';
-                                updateApp();
-                            };
                             document.getElementById('tabLoginBtn').onclick = () => {
                                 activeFormTab = 'login';
                                 updateApp();
                             };
+                            document.getElementById('tabRegisterBtn').onclick = () => {
+                                activeFormTab = 'register';
+                                updateApp();
+                            };
+
+                            const switchFooter = document.getElementById('switchTabFooterLink');
+                            if (switchFooter) {
+                                switchFooter.onclick = (e) => {
+                                    e.preventDefault();
+                                    activeFormTab = activeFormTab === 'login' ? 'register' : 'login';
+                                    updateApp();
+                                };
+                            }
 
                             document.getElementById('inlineForgotLink').onclick = function (e) {
                                 e.preventDefault();
                                 openForgotModal();
                             };
+                            const inlineForgotBottom = document.getElementById('inlineForgotLinkBottom');
+                            if (inlineForgotBottom) {
+                                inlineForgotBottom.onclick = function (e) {
+                                    e.preventDefault();
+                                    openForgotModal();
+                                };
+                            }
 
                             function triggerOtpFlow(emailToUse) {
                                 if (!emailToUse || !emailToUse.includes('@')) {
@@ -2524,7 +2542,7 @@
                     } else {
                         let userApiKey = localStorage.getItem('user_api_key') || 'nexus_key_demo';
                         containerWrapper.innerHTML = `
-                    <div id="nativeSecureProfileCard" style="max-width: 580px; margin: 0 auto; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(59, 130, 246, 0.4); padding: 35px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); text-align: center; direction: rtl;">
+                    <div id="nativeSecureProfileCard" style="max-width: 580px; margin: 0 auto; background: rgba(15, 23, 42, 0.98); border: 1px solid rgba(59, 130, 246, 0.4); padding: 35px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); text-align: center; direction: rtl;">
                         <div style="font-size: 45px; margin-bottom: 10px;">👤</div>
                         <h3 style="margin: 0 0 8px 0; font-size: 20px; color: #fff; font-weight: bold;">أهلاً بك في فترتك التجريبية (NexusAI)</h3>
                         <p style="color: #60a5fa; font-size: 13px; margin-bottom: 20px; direction: ltr; font-weight: bold;">${userEmail}</p>
@@ -2574,7 +2592,6 @@
                 }
             }
 
-            // نافذة استعادة كلمة المرور عبر الإيميل ورمز التحقق (OTP)
             function openForgotModal() {
                 const existing = document.getElementById('nativeModalOverlay');
                 if (existing) existing.remove();
@@ -2659,7 +2676,6 @@
             setInterval(updateApp, 400);
             window.addEventListener('DOMContentLoaded', updateApp);
 
-            // توجيه روابط باقات الدفع الثلاث لروابط بايبال
             document.addEventListener('click', function (e) {
                 const target = e.target.closest('a, button, div.pricing-box, div.plan-card, div');
                 if (!target) return;
