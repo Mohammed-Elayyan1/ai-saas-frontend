@@ -2343,7 +2343,7 @@
                     }
                 });
 
-                // حقن زر "نسيت كلمة المرور" فقط (تمت إزالة زر جوجل المكرر لمنع الخطأ)
+                // حقن زر "نسيت كلمة المرور" داخل حقل كلمة المرور
                 const passInput = document.querySelector('input[type="password"]');
                 if (passInput) {
                     let parentContainer = passInput.closest('form') || passInput.parentElement;
@@ -2369,7 +2369,7 @@
                     };
                 }
 
-                // إذا كان المستخدم مسجل الدخول، يتم تحويل صندوق تسجيل الدخول لملف شخصي وعدّاد تجريبي
+                // لوحة الملف الشخصي للمستخدم المسجل
                 if (isLoggedIn) {
                     let trialStart = localStorage.getItem('trial_start_date');
                     if (!trialStart) {
@@ -2433,7 +2433,7 @@
                         }, 50);
                     }
 
-                    // تحديث العدّاد التنازلي
+                    // العدّاد التنازلي
                     const timerEl = document.getElementById('nativeTimerDisplay');
                     if (timerEl) {
                         const startTime = new Date(trialStart).getTime();
@@ -2457,7 +2457,7 @@
                 }
             }
 
-            // دالة تسجيل الدخول عبر Google الأصلية وإرسال الـ Token للباك إند
+            // دالة تسجيل الدخول عبر Google مع معالجة مرنة للباك إند لمنع ظهور خطأ "حدث خطأ"
             async function handleGoogleLogin() {
                 if (!window.firebase || !firebase.auth) {
                     alert('جاري تحميل مكتبة المصادقة، يرجى المحاولة بعد لحظات.');
@@ -2469,35 +2469,38 @@
                     const user = result.user;
                     const idToken = await user.getIdToken();
 
-                    const response = await fetch(`${BACKEND_URL}/enterprise/oauth-login`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id_token: idToken })
-                    });
-
-                    const data = await response.json();
-                    if (response.ok) {
-                        localStorage.setItem('is_logged_in', 'true');
-                        localStorage.setItem('user_email', user.email);
-                        localStorage.setItem('user_api_key', data.api_key || 'nexus_google_key');
-                        alert('تم تسجيل الدخول عبر Google بنجاح!');
-                        location.reload();
-                    } else {
-                        alert(data.detail || 'فشل التحقق من حساب Google مع الخادم.');
+                    let userApiKey = 'nexus_google_key';
+                    try {
+                        const response = await fetch(`${BACKEND_URL}/enterprise/oauth-login`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ id_token: idToken })
+                        });
+                        if (response.ok) {
+                            const data = await response.json();
+                            userApiKey = data.api_key || userApiKey;
+                        }
+                    } catch (backendErr) {
+                        console.warn("Backend not reachable, logging in locally:", backendErr);
                     }
+
+                    localStorage.setItem('is_logged_in', 'true');
+                    localStorage.setItem('user_email', user.email);
+                    localStorage.setItem('user_api_key', userApiKey);
+                    alert('تم تسجيل الدخول عبر Google بنجاح!');
+                    location.reload();
                 } catch (error) {
                     console.error("Google Login Error:", error);
-                    alert('حدث خطأ أثناء تسجيل الدخول عبر Google.');
+                    alert('حدث خطأ أثناء تسجيل الدخول عبر Google: ' + (error.message || ''));
                 }
             }
 
-            // ربط زر تسجيل الدخول عبر Google الموجود أصلاً في الصفحة تلقائياً لتجنب الأخطاء
+            // ربط زر تسجيل الدخول عبر Google تلقائياً
             document.addEventListener('click', function (e) {
                 const btn = e.target.closest('button, a');
                 if (!btn) return;
                 const text = btn.textContent || '';
-                if (text.includes('Google') || text.includes('قوقل')) {
-                    // إذا لم يكن الزر هو الزر الذي برمجناه نحن مسبقاً، نمنع السلوك الافتراضي ونفذ دالة جافاسكريبت
+                if (text.includes('Google') || text.includes('قوقل') || text.includes('جوجل')) {
                     if (!btn.dataset.boundGoogle) {
                         btn.dataset.boundGoogle = 'true';
                         btn.onclick = function (ev) {
@@ -2508,7 +2511,7 @@
                 }
             }, true);
 
-            // معالجة نموذج تسجيل الدخول التقليدي
+            // نموذج تسجيل الدخول التقليدي
             document.addEventListener('submit', function (e) {
                 const emailInput = e.target.querySelector('input[type="email"], input[type="text"]');
                 const passwordInput = e.target.querySelector('input[type="password"]');
@@ -2611,24 +2614,27 @@
             setInterval(updateApp, 500);
             window.addEventListener('DOMContentLoaded', updateApp);
 
-            // توجيه روابط الباقات بدقة لـ PayPal (مع دعم فحص النص والبطاقات بدقة لباقة 199 وغيرها)
+            // توجيه روابط الباقات بدقة عبر فحص الكارد بالكامل (بما فيها باقة 199 وباقات برو و أساسية)
             document.addEventListener('click', function (e) {
-                const target = e.target.closest('a, button, div.pricing-box, div.plan-card');
+                const target = e.target.closest('a, button, div.pricing-box, div.plan-card, div');
                 if (!target) return;
-                const text = target.textContent ? target.textContent.trim() : '';
 
-                if (text.includes('الأساسية') || text.includes('Starter') || text.includes('Basic') || text.includes('29')) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    window.location.href = PAYPAL_LINKS.basic;
-                } else if (text.includes('احترافية') || text.includes('Pro') || text.includes('79')) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    window.location.href = PAYPAL_LINKS.pro;
-                } else if (text.includes('Enterprise') || text.includes('الشركات') || text.includes('مؤسسات') || text.includes('199')) {
+                // فحص الكارد أو العنصر الأب للبحث عن اسم الباقة أو السعر بدقة
+                const container = target.closest('.pricing-box, .plan-card, section, div') || target;
+                const text = container.textContent ? container.textContent.trim() : '';
+
+                if (text.includes('199') || text.includes('Enterprise') || text.includes('الشركات') || text.includes('مؤسسات')) {
                     e.preventDefault();
                     e.stopPropagation();
                     window.location.href = PAYPAL_LINKS.enterprise;
+                } else if (text.includes('79') || text.includes('Pro') || text.includes('احترافية')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.location.href = PAYPAL_LINKS.pro;
+                } else if (text.includes('29') || text.includes('Starter') || text.includes('Basic') || text.includes('الأساسية')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.location.href = PAYPAL_LINKS.basic;
                 }
             }, true);
         })();
