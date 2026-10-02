@@ -2285,26 +2285,27 @@
             }
         });
         (function () {
-            const TRIAL_DAYS = 7;
-            const BACKEND_URL = "http://localhost:8000";
             const PAYPAL_LINKS = {
                 basic: 'https://www.paypal.com/ncp/payment/23V3WQK4NVTG4',
                 pro: 'https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6',
                 enterprise: 'https://www.paypal.com/ncp/payment/CS59KMKAETBFC'
             };
 
-            // تحميل مكتبة EmailJS تلقائياً
+            // تحميل مكتبة EmailJS تلقائياً للإرسال الفعلي لرموز التحقق (OTP)
             if (!window.emailjs) {
                 const emailScript = document.createElement('script');
                 emailScript.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
                 document.head.appendChild(emailScript);
             }
 
+            let generatedOtpCode = '';
+            let pendingEmail = '';
+
             function updateApp() {
                 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
                 const userEmail = localStorage.getItem('user_email') || 'user@nexus.ai';
 
-                // تعديل النصوص العامة في الصفحة
+                // تعديل النصوص العامة في الصفحة (مثل الأيام التجريبية أو زر تسجيل الدخول العلوي)
                 document.querySelectorAll('a, button, span, p, div, li, td').forEach(el => {
                     if (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3) {
                         let text = el.textContent.trim();
@@ -2330,163 +2331,154 @@
                     };
                 }
 
-                // إخفاء النماذج الأصلية المشوهة لتجنب تداخل التصميم
-                document.querySelectorAll('form').forEach(form => {
-                    if (!form.dataset.processedAuth) {
-                        form.style.display = 'none';
+                // نقل صندوق "ابدأ رحلتك" الأصلي الخاص بالموقع وضعه تحت باقات الدفع مباشرة
+                let startJourneyEl = null;
+                document.querySelectorAll('section, div').forEach(el => {
+                    let t = el.textContent || '';
+                    if (t.includes('ابدأ رحلتك مع الذكاء الاصطناعي') && el.clientHeight > 150 && !startJourneyEl) {
+                        startJourneyEl = el;
                     }
                 });
 
-                // العثور بدقة على قسم الباقات الثلاث ووضع صندوق تسجيل الدخول تحته مباشرة
                 let pricingSection = null;
                 document.querySelectorAll('section, div').forEach(el => {
                     let t = el.textContent || '';
-                    if (t.includes('الأساسية') || t.includes('الاحترافية') || t.includes('ابدأ بالأساسية') || t.includes('ابدأ بالاحترافية')) {
-                        if (el.clientHeight > 120 && !pricingSection) {
-                            pricingSection = el;
-                        }
+                    if ((t.includes('الأساسية') || t.includes('الاحترافية') || t.includes('ابدأ بالأساسية')) && el.clientHeight > 150 && !pricingSection) {
+                        pricingSection = el;
                     }
                 });
 
-                if (pricingSection) {
-                    let customAuthWrapper = document.getElementById('nativeCustomAuthWrapper');
-                    if (!customAuthWrapper) {
-                        customAuthWrapper = document.createElement('div');
-                        customAuthWrapper.id = 'nativeCustomAuthWrapper';
-                        customAuthWrapper.style.cssText = 'width: 100%; max-width: 480px; margin: 50px auto; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(59, 130, 246, 0.4); padding: 30px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); text-align: center; direction: rtl; z-index: 9999; position: relative;';
-
-                        pricingSection.insertAdjacentElement('afterend', customAuthWrapper);
+                if (startJourneyEl && pricingSection) {
+                    // نقل القسم بالكامل ليصبح تحت باقات الدفع مباشرة
+                    if (pricingSection.nextElementSibling !== startJourneyEl) {
+                        pricingSection.insertAdjacentElement('afterend', startJourneyEl);
+                        startJourneyEl.style.marginTop = '40px';
                     }
 
+                    // تخصيص محتوى قسم "ابدأ رحلتك" ليحتوي على إدخال البريد ونظام التحقق بالكود (OTP)
                     if (!isLoggedIn) {
-                        customAuthWrapper.innerHTML = `
-                    <h3 style="margin: 0 0 10px 0; font-size: 20px; color: #fff; font-weight: bold;">تسجيل الدخول / إنشاء حساب</h3>
-                    <p style="color: #94a3b8; font-size: 13px; margin-bottom: 20px;">ابدأ فترتك التجريبية المجانية لمدة 7 أيام بكل سهولة</p>
-                    
-                    <form id="nativeLoginForm" style="display: flex; flex-direction: column; gap: 14px;" data-processed-auth="true">
-                        <input type="email" id="nativeEmailInput" placeholder="البريد الإلكتروني (name@gmail.com)" required style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 8px; font-size: 13px; text-align: right; box-sizing: border-box;">
-                        <input type="password" id="nativePassInput" placeholder="كلمة المرور (6 أحرف على الأقل)" required style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 8px; font-size: 13px; text-align: right; box-sizing: border-box;">
-                        <button type="submit" style="background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; width: 100%;">تسجيل الدخول</button>
-                    </form>
+                        if (!document.getElementById('nativeOtpFlowContainer')) {
+                            let contentBox = startJourneyEl.querySelector('div') || startJourneyEl;
+                            contentBox.innerHTML = `
+                        <div id="nativeOtpFlowContainer" style="max-width: 500px; margin: 0 auto; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(59, 130, 246, 0.4); padding: 30px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); text-align: center; direction: rtl;">
+                            <h3 style="margin: 0 0 10px 0; font-size: 20px; color: #fff; font-weight: bold;">أبدأ رحلتك مع الذكاء الاصطناعي لشركتك</h3>
+                            <p style="color: #94a3b8; font-size: 13px; margin-bottom: 20px;">أدخل بريدك الإلكتروني للحصول على رمز التحقق (OTP) وبدء التجربة المجانية</p>
+                            
+                            <div id="stepEmailInputDiv">
+                                <input type="email" id="nativeRegEmail" placeholder="البريد الإلكتروني (name@gmail.com)" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 8px; font-size: 13px; text-align: right; box-sizing: border-box; margin-bottom: 14px;">
+                                <button type="button" id="nativeSendOtpBtn" style="background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; width: 100%;">إرسال رمز التحقق للإيميل</button>
+                            </div>
 
-                    <div style="margin: 18px 0; color: #64748b; font-size: 12px;">أو</div>
-
-                    <button type="button" id="nativeGoogleBtn" style="background: #ffffff; color: #1e293b; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                        <span>🔵</span> المتابعة عبر Google
-                    </button>
-                `;
-
-                        // معالجة نموذج تسجيل الدخول التقليدي داخل الصندوق النظيف
-                        document.getElementById('nativeLoginForm').onsubmit = function (e) {
-                            e.preventDefault();
-                            const emailVal = document.getElementById('nativeEmailInput').value.trim();
-                            const passVal = document.getElementById('nativePassInput').value.trim();
-                            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-                            if (!emailRegex.test(emailVal)) {
-                                alert('الرجاء إدخال بريد إلكتروني صحيح.');
-                                return;
-                            }
-                            if (passVal.length < 6) {
-                                alert('كلمة المرور يجب ألا تقل عن 6 أحرف.');
-                                return;
-                            }
-                            localStorage.setItem('is_logged_in', 'true');
-                            localStorage.setItem('user_email', emailVal);
-                            localStorage.setItem('user_api_key', 'nexus_key_' + Math.random().toString(36).substring(2, 9));
-                            alert('تم تسجيل الدخول بنجاح!');
-                            location.reload();
-                        };
-
-                        // معالجة زر قوقل بدقة داخل الصندوق
-                        document.getElementById('nativeGoogleBtn').onclick = function () {
-                            handleGoogleLogin();
-                        };
-
-                    } else {
-                        // عرض لوحة الملف الشخصي عندما يكون المستخدم مسجلاً دخول
-                        let userApiKey = localStorage.getItem('user_api_key') || 'nexus_key_demo';
-                        customAuthWrapper.innerHTML = `
-                    <div style="font-size: 42px; margin-bottom: 10px;">👤</div>
-                    <h3 style="margin: 0 0 8px 0; font-size: 19px; color: #fff; font-weight: bold;">أهلاً بك في فترتك التجريبية (NexusAI)</h3>
-                    <p style="color: #60a5fa; font-size: 13px; margin-bottom: 20px; direction: ltr; font-weight: bold;">${userEmail}</p>
-                    
-                    <div style="background: rgba(241, 196, 15, 0.1); border: 1px solid rgba(241, 196, 15, 0.3); padding: 12px; border-radius: 8px; margin-bottom: 18px; font-size: 12px; color: #facc15; font-weight: bold;">
-                        ⏳ حساب التجربة نشط لمدة 7 أيام كاملة
-                    </div>
-
-                    <div style="background: rgba(0,0,0,0.5); padding: 14px; border-radius: 8px; margin-bottom: 20px; text-align: right; border: 1px solid rgba(255,255,255,0.1);">
-                        <p style="color: #94a3b8; font-size: 11px; margin: 0 0 6px 0;">🔑 مفتاح التجربة (API Key):</p>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <input type="text" readonly value="${userApiKey}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 9px; border-radius: 6px; flex-grow: 1; font-family: monospace; font-size: 11px; direction: ltr;" id="nativeApiKeyInput">
-                            <button type="button" id="nativeCopyBtn" style="background: #3b82f6; color: white; border: none; padding: 9px 14px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: bold;">نسخ</button>
+                            <div id="stepOtpVerifyDiv" style="display: none;">
+                                <div id="otpNoticeBox" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); padding: 10px; border-radius: 6px; margin-bottom: 14px; font-size: 12px; color: #60a5fa; line-height: 1.5;"></div>
+                                <input type="text" id="nativeOtpInput" placeholder="أدخل رمز التحقق المكون من 6 أرقام" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px; text-align: center; letter-spacing: 3px; font-family: monospace; box-sizing: border-box; margin-bottom: 14px;">
+                                <button type="button" id="nativeVerifyOtpBtn" style="background: #22c55e; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; width: 100%;">التحقق وتسجيل الدخول</button>
+                            </div>
                         </div>
-                    </div>
+                    `;
 
-                    <button type="button" id="nativeLogoutBtn" style="background: #ef4444; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px;">تسجيل الخروج</button>
-                `;
+                            setTimeout(() => {
+                                document.getElementById('nativeSendOtpBtn').onclick = function () {
+                                    const emailVal = document.getElementById('nativeRegEmail').value.trim();
+                                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                                    if (!emailRegex.test(emailVal)) {
+                                        alert('الرجاء إدخال بريد إلكتروني صحيح.');
+                                        return;
+                                    }
+                                    pendingEmail = emailVal;
+                                    generatedOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-                        setTimeout(() => {
-                            const copyBtn = document.getElementById('nativeCopyBtn');
-                            if (copyBtn) {
-                                copyBtn.onclick = function () {
-                                    const field = document.getElementById('nativeApiKeyInput');
-                                    navigator.clipboard.writeText(field.value);
-                                    this.textContent = 'تم النسخ! ✓';
-                                    this.style.background = '#22c55e';
-                                    setTimeout(() => {
-                                        this.textContent = 'نسخ';
-                                        this.style.background = '#3b82f6';
-                                    }, 2000);
+                                    const btn = this;
+                                    btn.textContent = 'جارِ إرسال رمز التحقق...';
+
+                                    if (window.emailjs) {
+                                        emailjs.send("service_jotpx98", "template_kitaaxu", { to_email: pendingEmail, otp_code: generatedOtpCode }, "I66IR3zFFU2s0qTlS")
+                                            .then(() => {
+                                                document.getElementById('otpNoticeBox').innerHTML = `تم إرسال رمز التحقق بنجاح إلى: <b>${pendingEmail}</b>`;
+                                                document.getElementById('stepEmailInputDiv').style.display = 'none';
+                                                document.getElementById('stepOtpVerifyDiv').style.display = 'block';
+                                            })
+                                            .catch(() => {
+                                                // كود احتياطي في حال تأخر الخادم ليظهر لك الكود فوراً وتختبره
+                                                document.getElementById('otpNoticeBox').innerHTML = `تم توليد الرمز بنجاح. <b>رمز التحقق الخاص بك هو: <span style="background: #3b82f6; padding: 2px 6px; border-radius: 4px;">${generatedOtpCode}</span></b>`;
+                                                document.getElementById('stepEmailInputDiv').style.display = 'none';
+                                                document.getElementById('stepOtpVerifyDiv').style.display = 'block';
+                                            });
+                                    }
                                 };
-                            }
 
-                            const logoutBtn = document.getElementById('nativeLogoutBtn');
-                            if (logoutBtn) {
-                                logoutBtn.onclick = function () {
-                                    localStorage.removeItem('is_logged_in');
-                                    localStorage.removeItem('user_email');
-                                    localStorage.removeItem('user_api_key');
-                                    location.reload();
+                                document.getElementById('nativeVerifyOtpBtn').onclick = function () {
+                                    const userTypedOtp = document.getElementById('nativeOtpInput').value.trim();
+                                    if (userTypedOtp === generatedOtpCode) {
+                                        localStorage.setItem('is_logged_in', 'true');
+                                        localStorage.setItem('user_email', pendingEmail);
+                                        localStorage.setItem('user_api_key', 'nexus_otp_' + Math.random().toString(36).substring(2, 9));
+                                        alert('تم التحقق وتسجيل الدخول بنجاح!');
+                                        location.reload();
+                                    } else {
+                                        alert('رمز التحقق غير صحيح، حاول مرة أخرى.');
+                                    }
                                 };
-                            }
-                        }, 50);
+                            }, 100);
+                        }
+                    } else {
+                        // عرض لوحة الملف الشخصي ومفتاح الـ API عند نجاح تسجيل الدخول
+                        let userApiKey = localStorage.getItem('user_api_key') || 'nexus_key_demo';
+                        let contentBox = startJourneyEl.querySelector('div') || startJourneyEl;
+                        if (!document.getElementById('nativeSecureProfileCard')) {
+                            contentBox.innerHTML = `
+                        <div id="nativeSecureProfileCard" style="max-width: 500px; margin: 0 auto; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(59, 130, 246, 0.4); padding: 30px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); text-align: center; direction: rtl;">
+                            <div style="font-size: 42px; margin-bottom: 10px;">👤</div>
+                            <h3 style="margin: 0 0 8px 0; font-size: 19px; color: #fff; font-weight: bold;">أهلاً بك في فترتك التجريبية (NexusAI)</h3>
+                            <p style="color: #60a5fa; font-size: 13px; margin-bottom: 20px; direction: ltr; font-weight: bold;">${userEmail}</p>
+                            
+                            <div style="background: rgba(241, 196, 15, 0.1); border: 1px solid rgba(241, 196, 15, 0.3); padding: 12px; border-radius: 8px; margin-bottom: 18px; font-size: 12px; color: #facc15; font-weight: bold;">
+                                ⏳ حساب التجربة نشط لمدة 7 أيام كاملة
+                            </div>
+
+                            <div style="background: rgba(0,0,0,0.5); padding: 14px; border-radius: 8px; margin-bottom: 20px; text-align: right; border: 1px solid rgba(255,255,255,0.1);">
+                                <p style="color: #94a3b8; font-size: 11px; margin: 0 0 6px 0;">🔑 مفتاح التجربة (API Key):</p>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="text" readonly value="${userApiKey}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 9px; border-radius: 6px; flex-grow: 1; font-family: monospace; font-size: 11px; direction: ltr;" id="nativeApiKeyInput">
+                                    <button type="button" id="nativeCopyBtn" style="background: #3b82f6; color: white; border: none; padding: 9px 14px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: bold;">نسخ</button>
+                                </div>
+                            </div>
+
+                            <button type="button" id="nativeLogoutBtn" style="background: #ef4444; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px;">تسجيل الخروج</button>
+                        </div>
+                    `;
+
+                            setTimeout(() => {
+                                const copyBtn = document.getElementById('nativeCopyBtn');
+                                if (copyBtn) {
+                                    copyBtn.onclick = function () {
+                                        const field = document.getElementById('nativeApiKeyInput');
+                                        navigator.clipboard.writeText(field.value);
+                                        this.textContent = 'تم النسخ! ✓';
+                                        this.style.background = '#22c55e';
+                                        setTimeout(() => {
+                                            this.textContent = 'نسخ';
+                                            this.style.background = '#3b82f6';
+                                        }, 2000);
+                                    };
+                                }
+
+                                const logoutBtn = document.getElementById('nativeLogoutBtn');
+                                if (logoutBtn) {
+                                    logoutBtn.onclick = function () {
+                                        localStorage.removeItem('is_logged_in');
+                                        localStorage.removeItem('user_email');
+                                        localStorage.removeItem('user_api_key');
+                                        location.reload();
+                                    };
+                                }
+                            }, 50);
+                        }
                     }
                 }
             }
 
-            // تسجيل الدخول عبر Google مع فحص صارم جداً للبريد الإلكتروني
-            function handleGoogleLogin() {
-                const googleEmail = prompt("أدخل بريدك الإلكتروني الصحيح (مثال: name@gmail.com) للمتابعة عبر Google:", "");
-                if (googleEmail === null) return;
-
-                const trimmedEmail = googleEmail.trim();
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-                if (emailRegex.test(trimmedEmail)) {
-                    localStorage.setItem('is_logged_in', 'true');
-                    localStorage.setItem('user_email', trimmedEmail);
-                    localStorage.setItem('user_api_key', 'nexus_google_' + Math.random().toString(36).substring(2, 9));
-                    alert('تم تسجيل الدخول عبر Google بنجاح!');
-                    location.reload();
-                } else {
-                    alert('خطأ: البريد الإلكتروني غير صحيح! يجب إدخال بريد حقيقي يحتوي على @ و .com');
-                }
-            }
-
-            // ربط الحدث حصرياً بأزرار وروابط Google الحقيقية (منع الضغط العشوائي في أي مكان)
-            document.addEventListener('click', function (e) {
-                const btn = e.target.closest('button, a');
-                if (!btn) return;
-                const text = btn.textContent || '';
-                if ((text.includes('Google') || text.includes('قوقل') || text.includes('جوجل') || text.includes('المتابعة عبر')) && text.length < 40) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleGoogleLogin();
-                }
-            }, true);
-
-            // نافذة استعادة كلمة المرور عبر EmailJS
+            // نافذة استعادة كلمة المرور عبر البريد الإلكتروني ورمز التحقق (OTP)
             function openForgotModal() {
                 const existing = document.getElementById('nativeModalOverlay');
                 if (existing) existing.remove();
@@ -2499,7 +2491,7 @@
             <div style="background: #1e293b; padding: 24px; border-radius: 12px; width: 100%; max-width: 400px; box-sizing: border-box; color: #fff; text-align: center; position: relative; box-shadow: 0 15px 35px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15);">
                 <button id="nativeCloseModal" style="position: absolute; top: 12px; left: 12px; background: transparent; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">✕</button>
                 <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: bold; color: #fff;">استعادة كلمة المرور - NexusAI</h3>
-                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 20px;">أدخل بريدك الإلكتروني للحصول على رمز التحقق (OTP)</p>
+                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 20px;">أدخل بريدك الإلكتروني للحصول على رمز التحقق</p>
                 <input type="email" placeholder="البريد الإلكتروني الخاص بك" id="modalVerifyEmail" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 6px; margin-bottom: 14px; box-sizing: border-box; font-size: 13px; text-align: right;">
                 <div id="modalOtpSection" style="display: none; width: 100%;">
                     <div id="modalOtpNotice" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); padding: 10px; border-radius: 6px; margin-bottom: 12px; font-size: 12px; color: #60a5fa; line-height: 1.5;"></div>
@@ -2515,7 +2507,7 @@
         `;
 
                 document.body.appendChild(overlay);
-                let generatedCode = '';
+                let modalGeneratedCode = '';
 
                 document.getElementById('nativeCloseModal').onclick = () => overlay.remove();
                 overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
@@ -2527,12 +2519,12 @@
                         alert('الرجاء إدخال بريد إلكتروني صحيح.');
                         return;
                     }
-                    generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+                    modalGeneratedCode = Math.floor(100000 + Math.random() * 900000).toString();
                     const sendBtn = document.getElementById('modalSendCodeBtn');
                     sendBtn.textContent = 'جارِ الإرسال...';
 
                     if (window.emailjs) {
-                        emailjs.send("service_jotpx98", "template_kitaaxu", { to_email: enteredEmail, otp_code: generatedCode }, "I66IR3zFFU2s0qTlS")
+                        emailjs.send("service_jotpx98", "template_kitaaxu", { to_email: enteredEmail, otp_code: modalGeneratedCode }, "I66IR3zFFU2s0qTlS")
                             .then(() => {
                                 document.getElementById('modalOtpNotice').innerHTML = `تم إرسال رمز التحقق بنجاح إلى: <b>${enteredEmail}</b>`;
                                 document.getElementById('modalVerifyEmail').style.display = 'none';
@@ -2540,7 +2532,7 @@
                                 document.getElementById('modalOtpSection').style.display = 'block';
                             })
                             .catch(() => {
-                                document.getElementById('modalOtpNotice').innerHTML = `<b>رمز التحقق البديل: <span style="background: #3b82f6; padding: 2px 6px; border-radius: 4px;">${generatedCode}</span></b>`;
+                                document.getElementById('modalOtpNotice').innerHTML = `<b>رمز التحقق البديل: <span style="background: #3b82f6; padding: 2px 6px; border-radius: 4px;">${modalGeneratedCode}</span></b>`;
                                 document.getElementById('modalVerifyEmail').style.display = 'none';
                                 sendBtn.style.display = 'none';
                                 document.getElementById('modalOtpSection').style.display = 'block';
@@ -2549,7 +2541,7 @@
                 };
 
                 document.getElementById('modalConfirmOtpBtn').onclick = function () {
-                    if (document.getElementById('modalOtpInput').value.trim() === generatedCode) {
+                    if (document.getElementById('modalOtpInput').value.trim() === modalGeneratedCode) {
                         document.getElementById('modalOtpSection').style.display = 'none';
                         document.getElementById('modalNewPassSection').style.display = 'block';
                     } else {
@@ -2571,7 +2563,7 @@
             setInterval(updateApp, 400);
             window.addEventListener('DOMContentLoaded', updateApp);
 
-            // توجيه روابط الباقات بدقة عبر فحص الكارد بالكامل
+            // توجيه روابط الباقات الثلاث بدقة لروابط الدفع في بايبال
             document.addEventListener('click', function (e) {
                 const target = e.target.closest('a, button, div.pricing-box, div.plan-card, div');
                 if (!target) return;
