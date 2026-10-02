@@ -2315,10 +2315,6 @@
                             el.textContent = text.replace(/14\s*يوم|١٤\s*يوم|14\s*يوماً|١٤\s*يوماً|14\s*يومًا|14/g, '7');
                         }
                     }
-                    let fullText = el.textContent || '';
-                    if ((fullText.includes('استرجاع') || fullText.includes('الاسترجاع')) && (fullText.includes('14') || fullText.includes('١٤'))) {
-                        el.innerHTML = el.innerHTML.replace(/14/g, '7').replace(/١٤/g, '٧');
-                    }
                 });
 
                 // زر عائم لاستعادة كلمة المرور
@@ -2342,6 +2338,7 @@
                         localStorage.setItem('trial_start_date', trialStart);
                     }
 
+                    // تم تصحيح الخطأ النحوي هنا بإغلاق القوس بشكل صحيح ()
                     let userApiKey = localStorage.getItem('user_api_key') || 'nexus_key_demo';
                     const passInput = document.querySelector('input[type="password"]');
                     const loginBox = document.querySelector('form') || passInput?.closest('div');
@@ -2399,35 +2396,52 @@
                         }, 50);
                     }
                 }
-            }
 
-            // تسجيل الدخول عبر Google بشكل سلس وبدون مشاكل Firebase API Key
-            function handleGoogleLogin() {
-                const googleEmail = prompt("أدخل بريدك الإلكتروني للمتابعة عبر Google:", "user@gmail.com");
-                if (googleEmail && googleEmail.includes('@')) {
-                    localStorage.setItem('is_logged_in', 'true');
-                    localStorage.setItem('user_email', googleEmail);
-                    localStorage.setItem('user_api_key', 'nexus_google_' + Math.random().toString(36).substring(2, 9));
-                    alert('تم تسجيل الدخول عبر Google بنجاح!');
-                    location.reload();
-                } else if (googleEmail !== null) {
-                    alert('البريد الإلكتروني غير صحيح.');
+                // تحسين البحث عن قسم الباقات ونقل نموذج تسجيل الدخول تحته مباشرة
+                let pricingSection = null;
+                document.querySelectorAll('section, div').forEach(el => {
+                    let t = el.textContent || '';
+                    if (t.includes('الأساسية') || t.includes('الاحترافية') || t.includes('Enterprise') || t.includes('Pro')) {
+                        if (el.clientHeight > 100 && !pricingSection) {
+                            pricingSection = el;
+                        }
+                    }
+                });
+
+                const activeFormOrBox = document.querySelector('form') || passInput?.closest('div');
+                if (pricingSection && activeFormOrBox && !activeFormOrBox.dataset.movedUnderPricing) {
+                    activeFormOrBox.dataset.movedUnderPricing = 'true';
+                    pricingSection.insertAdjacentElement('afterend', activeFormOrBox);
+                    activeFormOrBox.style.margin = '40px auto';
                 }
             }
 
+            // تسجيل الدخول عبر Google مع تحقق صارم
+            function handleGoogleLogin() {
+                const googleEmail = prompt("أدخل بريدك الإلكتروني الصحيح (مثال: name@gmail.com) للمتابعة عبر Google:", "user@gmail.com");
+                if (googleEmail !== null) {
+                    const trimmedEmail = googleEmail.trim();
+                    if (trimmedEmail.includes('@') && trimmedEmail.includes('.') && trimmedEmail.length > 5) {
+                        localStorage.setItem('is_logged_in', 'true');
+                        localStorage.setItem('user_email', trimmedEmail);
+                        localStorage.setItem('user_api_key', 'nexus_google_' + Math.random().toString(36).substring(2, 9));
+                        alert('تم تسجيل الدخول عبر Google بنجاح!');
+                        location.reload();
+                    } else {
+                        alert('خطأ: يرجى إدخال بريد إلكتروني حقيقي وصحيح يحتوي على @ و .');
+                    }
+                }
+            }
+
+            // ربط الحدث بأزرار Google الحقيقية فقط
             document.addEventListener('click', function (e) {
-                const btn = e.target.closest('button, a, div');
+                const btn = e.target.closest('button, a');
                 if (!btn) return;
                 const text = btn.textContent || '';
                 if (text.includes('Google') || text.includes('قوقل') || text.includes('جوجل') || text.includes('المتابعة عبر')) {
-                    if (!btn.dataset.boundGoogle) {
-                        btn.dataset.boundGoogle = 'true';
-                        btn.onclick = function (ev) {
-                            ev.preventDefault();
-                            ev.stopPropagation();
-                            handleGoogleLogin();
-                        };
-                    }
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleGoogleLogin();
                 }
             }, true);
 
@@ -2437,8 +2451,12 @@
                 const passwordInput = e.target.querySelector('input[type="password"]');
                 if (emailInput && passwordInput) {
                     e.preventDefault();
-                    const emailVal = emailInput.value.trim() || 'user@nexus.ai';
+                    const emailVal = emailInput.value.trim();
                     const passVal = passwordInput.value.trim();
+                    if (!emailVal.includes('@') || !emailVal.includes('.')) {
+                        alert('الرجاء إدخال بريد إلكتروني صحيح.');
+                        return;
+                    }
                     if (passVal.length < 6) {
                         alert('كلمة المرور يجب ألا تقل عن 6 أحرف.');
                         return;
@@ -2486,7 +2504,7 @@
 
                 document.getElementById('modalSendCodeBtn').onclick = function () {
                     const enteredEmail = document.getElementById('modalVerifyEmail').value.trim();
-                    if (!enteredEmail || !enteredEmail.includes('@')) {
+                    if (!enteredEmail || !enteredEmail.includes('@') || !enteredEmail.includes('.')) {
                         alert('الرجاء إدخال بريد إلكتروني صحيح.');
                         return;
                     }
