@@ -2455,9 +2455,18 @@
                         setInterval(updateCountdown, 1000);
                     }
                 }
+
+                // نقل قائمة تسجيل الدخول / النموذج لتصبح تحت قسم أو كاردات الباقات الثلاث مباشرة
+                const pricingSection = document.querySelector('.pricing, #pricing, [class*="pricing"], [class*="plan"], [id*="pricing"]');
+                const activeLoginForm = document.querySelector('form') || passInput?.closest('div');
+                if (pricingSection && activeLoginForm && !activeLoginForm.dataset.movedUnderPricing) {
+                    activeLoginForm.dataset.movedUnderPricing = 'true';
+                    pricingSection.insertAdjacentElement('afterend', activeLoginForm);
+                    activeLoginForm.style.margin = '40px auto';
+                }
             }
 
-            // دالة تسجيل الدخول عبر Google مع معالجة مرنة للباك إند لمنع ظهور خطأ "حدث خطأ"
+            // دالة تسجيل الدخول عبر Google مع معالجة دقيقة لخطأ فيربيس
             async function handleGoogleLogin() {
                 if (!window.firebase || !firebase.auth) {
                     alert('جاري تحميل مكتبة المصادقة، يرجى المحاولة بعد لحظات.');
@@ -2490,8 +2499,14 @@
                     alert('تم تسجيل الدخول عبر Google بنجاح!');
                     location.reload();
                 } catch (error) {
-                    console.error("Google Login Error:", error);
-                    alert('حدث خطأ أثناء تسجيل الدخول عبر Google: ' + (error.message || ''));
+                    console.error("Firebase Google Login Error:", error);
+                    let errorMsg = error.message || '';
+                    if (error.code === 'auth/unauthorized-domain') {
+                        errorMsg = 'النطاق الحالي غير مضاف في قائمة النطاقات المصرح بها (Authorized Domains) في إعدادات مشروع Firebase الخاص بك.';
+                    } else if (error.code === 'auth/popup-closed-by-user') {
+                        errorMsg = 'تم إغلاق نافذة تسجيل الدخول قبل إتمام العملية.';
+                    }
+                    alert('حدث خطأ أثناء تسجيل الدخول عبر Google: ' + errorMsg);
                 }
             }
 
@@ -2614,12 +2629,11 @@
             setInterval(updateApp, 500);
             window.addEventListener('DOMContentLoaded', updateApp);
 
-            // توجيه روابط الباقات بدقة عبر فحص الكارد بالكامل (بما فيها باقة 199 وباقات برو و أساسية)
+            // توجيه روابط الباقات بدقة عبر فحص الكارد بالكامل
             document.addEventListener('click', function (e) {
                 const target = e.target.closest('a, button, div.pricing-box, div.plan-card, div');
                 if (!target) return;
 
-                // فحص الكارد أو العنصر الأب للبحث عن اسم الباقة أو السعر بدقة
                 const container = target.closest('.pricing-box, .plan-card, section, div') || target;
                 const text = container.textContent ? container.textContent.trim() : '';
 
