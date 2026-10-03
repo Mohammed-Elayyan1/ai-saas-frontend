@@ -1615,7 +1615,7 @@
             </div>
         </section>
 
-        <section>
+        <section id="pay">
             <div class="wrap">
                 <div class="section-head center">
                     <span class="kicker" data-i18n="pay.kicker"></span>
@@ -2122,7 +2122,7 @@
                     document.querySelectorAll('#paypalLinkRow .amount-chip').forEach(c => {
                         c.classList.toggle('active', c.dataset.plan === plan);
                     });
-                    document.getElementById('auth').scrollIntoView({ behavior: 'smooth' });
+                    document.getElementById('pay').scrollIntoView({ behavior: 'smooth' });
                 });
             });
         }
@@ -2305,7 +2305,9 @@
             if (email) localStorage.setItem('nexus_email', email);
             saveSession(data);
             showLoggedInUI(data);
-            showApiKey(data.api_key);
+            // المفتاح يظهر هنا داخل بطاقة الحساب (accountApiKeyInput) فقط —
+            // لا ننتقل لصندوق آخر بأسفل الصفحة.
+            document.getElementById('accountPanel').scrollIntoView({ behavior: 'smooth', block: 'center' });
             showToast(lang === 'ar' ? `أهلًا بك، ${data.company}!` : `Welcome, ${data.company}!`);
         }
 
