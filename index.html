@@ -1505,6 +1505,96 @@
             </div>
         </section>
 
+        <section id="auth">
+            <div class="wrap">
+                <div class="auth-section">
+                    <div class="auth-grid">
+                        <div class="auth-copy">
+                            <span class="eyebrow"><span class="dot"></span> <span
+                                    data-i18n="auth.eyebrow"></span></span>
+                            <h2 data-i18n="auth.title"></h2>
+                            <p data-i18n="auth.sub"></p>
+                            <ul id="authList"></ul>
+                        </div>
+
+                        <div class="auth-card">
+                            <div id="accountPanel" style="display:none; text-align:center;">
+                                <div style="font-size:38px; margin-bottom:8px;">👤</div>
+                                <h3 id="accountName" style="margin:0 0 6px 0; color:var(--text-0);"></h3>
+                                <p id="accountEmail"
+                                    style="color:var(--text-1); font-size:13px; margin-bottom:16px; direction:ltr;">
+                                </p>
+                                <div id="trialBanner"
+                                    style="display:none; background:rgba(240,182,76,0.12); border:1px solid rgba(240,182,76,0.35); padding:10px; border-radius:8px; margin-bottom:16px; font-size:13px; color:var(--gold);">
+                                </div>
+                                <div
+                                    style="background:rgba(0,0,0,0.25); padding:12px; border-radius:8px; margin-bottom:18px; text-align:right; border:1px solid var(--border);">
+                                    <p style="color:var(--text-2); font-size:11px; margin:0 0 6px 0;">🔑 مفتاح API
+                                        الخاص بكم:</p>
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                        <input type="text" readonly id="accountApiKeyInput"
+                                            style="background:rgba(255,255,255,0.05); border:1px solid var(--border); color:var(--text-0); padding:8px; border-radius:4px; flex-grow:1; font-family:monospace; font-size:11px; direction:ltr;">
+                                        <button type="button" class="btn btn-ghost btn-sm"
+                                            id="accountCopyBtn">نسخ</button>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-ghost btn-block" id="accountLogoutBtn">تسجيل
+                                    الخروج</button>
+                            </div>
+
+                            <div id="authFormWrapper">
+                                <div class="auth-tabs">
+                                    <button class="active" id="tabLogin" type="button"
+                                        data-i18n="auth.tabLogin"></button>
+                                    <button id="tabSignup" type="button" data-i18n="auth.tabSignup"></button>
+                                </div>
+
+                                <form id="authForm" method="post" action="#" autocomplete="on">
+                                    <div class="field" id="nameField" style="display:none;">
+                                        <label for="companyName" data-i18n="auth.companyLabel"></label>
+                                        <input id="companyName" name="organization" type="text"
+                                            autocomplete="organization">
+                                    </div>
+
+                                    <div class="field">
+                                        <label for="email" data-i18n="auth.emailLabel"></label>
+                                        <input id="email" name="email" type="email" placeholder="name@company.com"
+                                            autocomplete="email" required>
+                                    </div>
+
+                                    <div class="field">
+                                        <label for="password" data-i18n="auth.passwordLabel"></label>
+                                        <input id="password" name="password" type="password" placeholder="••••••••"
+                                            autocomplete="current-password" required minlength="6">
+                                    </div>
+
+                                    <div class="field-row">
+                                        <a href="#" id="forgotPasswordLink" style="color: var(--violet-2);"
+                                            data-i18n="auth.forgot"></a>
+                                        <label>
+                                            <input type="checkbox" checked style="accent-color: var(--violet);">
+                                            <span data-i18n="auth.remember"></span>
+                                        </label>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary btn-block" id="authSubmit"
+                                        data-i18n="auth.submitLogin"></button>
+
+                                    <div class="divider"><span data-i18n="auth.or"></span></div>
+
+                                    <button type="button" class="btn btn-ghost btn-block" id="googleBtn"
+                                        data-i18n="auth.google"></button>
+
+                                    <div class="switch-mode" id="switchModeText"></div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
         <section style="background:var(--bg-1);">
             <div class="wrap">
                 <div class="section-head center">
@@ -1522,67 +1612,6 @@
                     <h2 class="section-title" data-i18n="testi.title"></h2>
                 </div>
                 <div class="testi-grid" id="testiGrid"></div>
-            </div>
-        </section>
-
-        <section id="auth">
-            <div class="wrap">
-                <div class="auth-section">
-                    <div class="auth-grid">
-                        <div class="auth-copy">
-                            <span class="eyebrow"><span class="dot"></span> <span
-                                    data-i18n="auth.eyebrow"></span></span>
-                            <h2 data-i18n="auth.title"></h2>
-                            <p data-i18n="auth.sub"></p>
-                            <ul id="authList"></ul>
-                        </div>
-
-                        <div class="auth-card">
-                            <div class="auth-tabs">
-                                <button class="active" id="tabLogin" type="button" data-i18n="auth.tabLogin"></button>
-                                <button id="tabSignup" type="button" data-i18n="auth.tabSignup"></button>
-                            </div>
-
-                            <form id="authForm" method="post" action="#" autocomplete="on">
-                                <div class="field" id="nameField" style="display:none;">
-                                    <label for="companyName" data-i18n="auth.companyLabel"></label>
-                                    <input id="companyName" name="organization" type="text" autocomplete="organization">
-                                </div>
-
-                                <div class="field">
-                                    <label for="email" data-i18n="auth.emailLabel"></label>
-                                    <input id="email" name="email" type="email" placeholder="name@company.com"
-                                        autocomplete="email" required>
-                                </div>
-
-                                <div class="field">
-                                    <label for="password" data-i18n="auth.passwordLabel"></label>
-                                    <input id="password" name="password" type="password" placeholder="••••••••"
-                                        autocomplete="current-password" required minlength="6">
-                                </div>
-
-                                <div class="field-row">
-                                    <a href="#" id="forgotPasswordLink" style="color: var(--violet-2);"
-                                        data-i18n="auth.forgot"></a>
-                                    <label>
-                                        <input type="checkbox" checked style="accent-color: var(--violet);">
-                                        <span data-i18n="auth.remember"></span>
-                                    </label>
-                                </div>
-
-                                <button type="submit" class="btn btn-primary btn-block" id="authSubmit"
-                                    data-i18n="auth.submitLogin"></button>
-
-                                <div class="divider"><span data-i18n="auth.or"></span></div>
-
-                                <button type="button" class="btn btn-ghost btn-block" id="googleBtn"
-                                    data-i18n="auth.google"></button>
-
-                                <div class="switch-mode" id="switchModeText"></div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
             </div>
         </section>
 
@@ -1720,6 +1749,40 @@
 
     <div class="toast" id="toast"></div>
 
+    <div id="resetModalOverlay"
+        style="display:none; position:fixed; inset:0; background:rgba(5,3,15,0.72); z-index:9999; align-items:center; justify-content:center; padding:20px;">
+        <div
+            style="background:var(--bg-1); border:1px solid var(--border); border-radius:var(--radius-md); padding:28px; width:100%; max-width:380px; box-shadow:var(--shadow-glow); position:relative;">
+            <button type="button" id="resetModalClose"
+                style="position:absolute; top:12px; left:12px; background:transparent; color:var(--text-2); font-size:18px;">✕</button>
+
+            <div id="resetStepEmail">
+                <h3 style="margin-bottom:8px; color:var(--text-0);">استعادة كلمة السر</h3>
+                <p style="color:var(--text-2); font-size:13px; margin-bottom:16px;">أدخل بريدك الإلكتروني، وسنرسل لك رمز
+                    إعادة التعيين.</p>
+                <div class="field">
+                    <input type="email" id="resetEmailInput" placeholder="name@company.com" required>
+                </div>
+                <button type="button" class="btn btn-primary btn-block" id="resetSendCodeBtn">إرسال الرمز</button>
+            </div>
+
+            <div id="resetStepToken" style="display:none;">
+                <h3 style="margin-bottom:8px; color:var(--text-0);">أدخل الرمز وكلمة السر الجديدة</h3>
+                <p style="color:var(--text-2); font-size:13px; margin-bottom:16px;">تفقّد بريدك الإلكتروني، وألصق الرمز
+                    هنا مع كلمة سرك الجديدة.</p>
+                <div class="field">
+                    <input type="text" id="resetTokenInput" placeholder="رمز إعادة التعيين"
+                        style="direction:ltr; text-align:center; font-family:monospace;" required>
+                </div>
+                <div class="field">
+                    <input type="password" id="resetNewPasswordInput" placeholder="كلمة السر الجديدة (6 أحرف فأكثر)"
+                        minlength="6" required>
+                </div>
+                <button type="button" class="btn btn-primary btn-block" id="resetConfirmBtn">تغيير كلمة السر</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ---------------- CONFIG: EDIT THIS ----------------
         // بعد نشر main.py على سيرفر حقيقي، غيّر هذا الرابط ليطابق رابط الخادم الفعلي
@@ -1732,17 +1795,6 @@
             pro: "https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6",
             enterprise: "https://www.paypal.com/ncp/payment/CS59KMKAETBFC",
         };
-
-        // ربط أزرار الباقات بروابط الدفع مباشرة
-        document.querySelectorAll('.plan-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const plan = e.target.getAttribute('data-plan'); // تأكد أن الزر يحتوي على attribute مثل data-plan="enterprise"
-                if (PAYPAL_LINKS[plan]) {
-                    window.location.href = PAYPAL_LINKS[plan]; // الانتقال لرابط PayPal
-                }
-            });
-        });
-        // -----------------------------------------------------
 
         const T = {
             ar: {
@@ -1786,15 +1838,15 @@
                     monthly: "شهري", yearly: "سنوي", save: "وفّر 20%",
                     plans: [
                         {
-                            name: "الباقة الأساسية", desc: "مثالية للشركات الناشئة وفرق العمل الصغيرة", m: 29, y: 23, badge: null, cta: "ابدأ بالأساسية", btnClass: "btn-ghost",
+                            key: "basic", name: "الباقة الأساسية", desc: "مثالية للشركات الناشئة وفرق العمل الصغيرة", m: 29, y: 23, badge: null, cta: "ابدأ بالأساسية", btnClass: "btn-ghost",
                             feats: ["مساعد ذكي مخصص لشركة واحدة", "رفع ملف بيانات واحد", "حتى 500 استفسار شهريًا", "استجابة سريعة", "دعم عبر البريد الإلكتروني"]
                         },
                         {
-                            name: "الباقة الاحترافية", desc: "للشركات المتوسطة التي تحتاج مرونة أكبر", m: 79, y: 63, badge: "الأكثر طلبًا", cta: "ابدأ بالاحترافية", btnClass: "btn-primary",
+                            key: "pro", name: "الباقة الاحترافية", desc: "للشركات المتوسطة التي تحتاج مرونة أكبر", m: 79, y: 63, badge: "الأكثر طلبًا", cta: "ابدأ بالاحترافية", btnClass: "btn-primary",
                             feats: ["مساعد ذكي متطور جدًا", "ملفات بيانات متعددة", "استفسارات غير محدودة", "أولوية قصوى في المعالجة", "تقارير أداء أسبوعية", "دعم فني عبر الدردشة المباشرة"]
                         },
                         {
-                            name: "باقة المؤسسات", desc: "للشركات الكبرى ذات الاحتياجات الخاصة", m: 199, y: 159, badge: null, cta: "تواصل مع المبيعات", btnClass: "btn-ghost",
+                            key: "enterprise", name: "باقة المؤسسات", desc: "للشركات الكبرى ذات الاحتياجات الخاصة", m: 199, y: 159, badge: null, cta: "تواصل مع المبيعات", btnClass: "btn-ghost",
                             feats: ["ذكاء اصطناعي غير محدود", "ربط بأنظمة الشركة الحالية (API/Webhooks)", "عدد مستخدمين غير محدود", "مدير حساب مخصص", "اتفاقية مستوى خدمة (SLA)", "دعم فني خاص 24/7"]
                         }
                     ],
@@ -1905,15 +1957,15 @@
                     monthly: "Monthly", yearly: "Yearly", save: "Save 20%",
                     plans: [
                         {
-                            name: "Basic", desc: "Perfect for startups and small teams", m: 29, y: 23, badge: null, cta: "Start with Basic", btnClass: "btn-ghost",
+                            key: "basic", name: "Basic", desc: "Perfect for startups and small teams", m: 29, y: 23, badge: null, cta: "Start with Basic", btnClass: "btn-ghost",
                             feats: ["Dedicated AI assistant for one company", "1 data file upload", "Up to 500 queries / month", "Fast response times", "Email support"]
                         },
                         {
-                            name: "Pro", desc: "For growing companies that need more flexibility", m: 79, y: 63, badge: "Most popular", cta: "Start with Pro", btnClass: "btn-primary",
+                            key: "pro", name: "Pro", desc: "For growing companies that need more flexibility", m: 79, y: 63, badge: "Most popular", cta: "Start with Pro", btnClass: "btn-primary",
                             feats: ["Highly advanced AI assistant", "Multiple data files", "Unlimited queries", "Top-priority processing", "Weekly performance reports", "Live chat support"]
                         },
                         {
-                            name: "Enterprise", desc: "For large companies with custom needs", m: 199, y: 159, badge: null, cta: "Talk to sales", btnClass: "btn-ghost",
+                            key: "enterprise", name: "Enterprise", desc: "For large companies with custom needs", m: 199, y: 159, badge: null, cta: "Talk to sales", btnClass: "btn-ghost",
                             feats: ["Unlimited AI usage", "Integrate with your existing systems (API/Webhooks)", "Unlimited team members", "Dedicated account manager", "Service-level agreement (SLA)", "24/7 priority support"]
                         }
                     ],
@@ -2014,8 +2066,9 @@
         <div class="plan-desc">${p.desc}</div>
         <div class="plan-price"><span class="amount" data-monthly="${p.m}" data-yearly="${p.y}">$${p.m}</span><span class="period">${dict.pricing.perMonth}</span></div>
         <ul class="plan-list">${p.feats.map(f => `<li><span class="check">✔</span> ${f}</li>`).join('')}</ul>
-        <a href="#auth" class="btn ${p.btnClass} btn-block">${p.cta}</a>
+        <button type="button" class="btn ${p.btnClass} btn-block plan-cta" data-plan="${p.key}">${p.cta}</button>
       </div>`).join('');
+            bindPricingButtons();
 
             // Trust
             document.getElementById('trustGrid').innerHTML = dict.trust.items.map(t => `
@@ -2056,6 +2109,20 @@
                         item.classList.add('open');
                         a.style.maxHeight = a.scrollHeight + 'px';
                     }
+                });
+            });
+        }
+
+        let selectedPaypalPlan = 'basic';
+        function bindPricingButtons() {
+            document.querySelectorAll('.plan-cta').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const plan = btn.dataset.plan;
+                    selectedPaypalPlan = plan;
+                    document.querySelectorAll('#paypalLinkRow .amount-chip').forEach(c => {
+                        c.classList.toggle('active', c.dataset.plan === plan);
+                    });
+                    document.getElementById('auth').scrollIntoView({ behavior: 'smooth' });
                 });
             });
         }
@@ -2169,43 +2236,159 @@
             bindBillingAmounts(currentDict());
         });
 
+        // --- حساب حقيقي: تخزين الجلسة محليًا + عدّاد تجربة حقيقي من السيرفر ---
+        const SESSION_KEYS = ['nexus_api_key', 'nexus_company', 'nexus_plan', 'nexus_trial_ends_at', 'nexus_is_trial'];
+        let trialCountdownTimer = null;
+
+        function saveSession(data) {
+            localStorage.setItem('nexus_api_key', data.api_key);
+            localStorage.setItem('nexus_company', data.company || '');
+            localStorage.setItem('nexus_plan', data.plan || '');
+            localStorage.setItem('nexus_trial_ends_at', data.trial_ends_at || '');
+            localStorage.setItem('nexus_is_trial', data.is_trial ? '1' : '0');
+        }
+
+        function clearSession() {
+            SESSION_KEYS.forEach(k => localStorage.removeItem(k));
+            clearInterval(trialCountdownTimer);
+        }
+
+        function startTrialCountdown(trialEndsAtIso) {
+            clearInterval(trialCountdownTimer);
+            const banner = document.getElementById('trialBanner');
+            if (!trialEndsAtIso) { banner.style.display = 'none'; return; }
+            banner.style.display = 'block';
+            const endTime = new Date(trialEndsAtIso).getTime();
+            const tick = () => {
+                const diff = endTime - Date.now();
+                if (diff <= 0) {
+                    banner.textContent = lang === 'ar'
+                        ? '⏳ انتهت فترتك التجريبية — يرجى الاشتراك بأحد الباقات للاستمرار.'
+                        : '⏳ Your free trial has ended — please subscribe to continue.';
+                    clearInterval(trialCountdownTimer);
+                    return;
+                }
+                const d = Math.floor(diff / 86400000);
+                const h = Math.floor((diff % 86400000) / 3600000);
+                const m = Math.floor((diff % 3600000) / 60000);
+                const sec = Math.floor((diff % 60000) / 1000);
+                banner.textContent = lang === 'ar'
+                    ? `⏳ باقي على نهاية التجربة: ${d} يوم ${h} س ${m} د ${sec} ث`
+                    : `⏳ Trial ends in: ${d}d ${h}h ${m}m ${sec}s`;
+            };
+            tick();
+            trialCountdownTimer = setInterval(tick, 1000);
+        }
+
+        function showLoggedInUI(data) {
+            document.getElementById('authFormWrapper').style.display = 'none';
+            document.getElementById('accountPanel').style.display = 'block';
+            document.getElementById('accountName').textContent = data.company || '';
+            document.getElementById('accountEmail').textContent = localStorage.getItem('nexus_email') || '';
+            document.getElementById('accountApiKeyInput').value = data.api_key || localStorage.getItem('nexus_api_key') || '';
+            if (data.is_trial) startTrialCountdown(data.trial_ends_at);
+            else document.getElementById('trialBanner').style.display = 'none';
+
+            document.getElementById('navLoginBtn').style.display = 'none';
+            document.getElementById('navLogoutBtn').style.display = 'inline-flex';
+        }
+
+        function showLoggedOutUI() {
+            document.getElementById('authFormWrapper').style.display = 'block';
+            document.getElementById('accountPanel').style.display = 'none';
+            document.getElementById('navLoginBtn').style.display = 'inline-flex';
+            document.getElementById('navLogoutBtn').style.display = 'none';
+            clearInterval(trialCountdownTimer);
+        }
+
+        async function handleAuthSuccess(data, email) {
+            if (email) localStorage.setItem('nexus_email', email);
+            saveSession(data);
+            showLoggedInUI(data);
+            showApiKey(data.api_key);
+            showToast(lang === 'ar' ? `أهلًا بك، ${data.company}!` : `Welcome, ${data.company}!`);
+        }
+
+        async function restoreSession() {
+            const apiKey = localStorage.getItem('nexus_api_key');
+            if (!apiKey) { showLoggedOutUI(); return; }
+            try {
+                const res = await fetch(`${API_BASE_URL}/enterprise/me`, {
+                    headers: { 'x-api-key': apiKey }
+                });
+                if (!res.ok) { clearSession(); showLoggedOutUI(); return; }
+                const data = await res.json();
+                showLoggedInUI({
+                    company: data.company,
+                    api_key: apiKey,
+                    is_trial: data.is_trial,
+                    trial_ends_at: data.trial_ends_at,
+                });
+            } catch (err) {
+                // لا يمكن التحقق الآن (مثلاً لا اتصال) — نُبقي الجلسة كما هي محليًا
+                showLoggedInUI({
+                    company: localStorage.getItem('nexus_company'),
+                    api_key: apiKey,
+                    is_trial: localStorage.getItem('nexus_is_trial') === '1',
+                    trial_ends_at: localStorage.getItem('nexus_trial_ends_at'),
+                });
+            }
+        }
+
+        document.getElementById('accountLogoutBtn').addEventListener('click', async () => {
+            clearSession();
+            try { if (window.AuthAPI) await window.AuthAPI.logoutGoogle(); } catch (err) { /* لا مشكلة */ }
+            showLoggedOutUI();
+            showToast(lang === 'ar' ? 'تم تسجيل الخروج' : 'Logged out');
+        });
+
+        document.getElementById('navLogoutBtn').addEventListener('click', () => {
+            document.getElementById('accountLogoutBtn').click();
+        });
+
         // Auth tabs
         document.getElementById('tabLogin').addEventListener('click', () => { authMode = 'login'; setAuthMode('login', currentDict()); });
         document.getElementById('tabSignup').addEventListener('click', () => { authMode = 'signup'; setAuthMode('signup', currentDict()); });
-        document.getElementById('authForm').addEventListener('submit', async () => {
+
+        document.getElementById('authForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
             const dict = currentDict();
-
-            if (authMode === 'login') {
-                // No real account/password system exists yet — say so honestly instead of pretending to log in.
-                showToast(dict.auth.loginNotAvailable);
-                return;
-            }
-
-            // Signup: this actually saves the company + email to the backend and issues
-            // a real free-trial API key immediately (no payment involved, so instant issuance is fine).
-            const name = document.getElementById('companyName').value.trim();
             const email = document.getElementById('email').value.trim();
-            if (!name || !email) {
-                showToast(lang === 'ar' ? 'يرجى تعبئة اسم الشركة والبريد الإلكتروني' : 'Please fill in company name and email');
-                return;
-            }
-
+            const password = document.getElementById('password').value;
             const btn = document.getElementById('authSubmit');
             const originalText = btn.textContent;
             btn.textContent = '...'; btn.disabled = true;
+
             try {
-                const body = new URLSearchParams({ name, email });
-                const res = await fetch(`${API_BASE_URL}/enterprise/register-trial`, { method: 'POST', body });
-                let data = null;
-                try { data = await res.json(); } catch (parseErr) { data = null; }
-
-                if (!res.ok) {
-                    showToast(data && data.detail ? data.detail : dict.auth.signupNetworkError);
-                    return;
-                }
-
-                if (data && data.api_key) {
-                    showApiKey(data.api_key);
+                if (authMode === 'login') {
+                    const res = await fetch(`${API_BASE_URL}/enterprise/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password }),
+                    });
+                    const data = await res.json().catch(() => null);
+                    if (!res.ok) {
+                        showToast(data && data.detail ? data.detail : dict.auth.signupNetworkError);
+                        return;
+                    }
+                    await handleAuthSuccess(data, email);
+                } else {
+                    const name = document.getElementById('companyName').value.trim();
+                    if (!name) {
+                        showToast(lang === 'ar' ? 'يرجى تعبئة اسم الشركة' : 'Please fill in the company name');
+                        return;
+                    }
+                    const res = await fetch(`${API_BASE_URL}/enterprise/signup`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, email, password }),
+                    });
+                    const data = await res.json().catch(() => null);
+                    if (!res.ok) {
+                        showToast(data && data.detail ? data.detail : dict.auth.signupNetworkError);
+                        return;
+                    }
+                    await handleAuthSuccess({ ...data, is_trial: true }, email);
                 }
                 document.getElementById('authForm').reset();
             } catch (err) {
@@ -2215,8 +2398,37 @@
             }
         });
 
-        document.getElementById('googleBtn').addEventListener('click', () => {
-            showToast(currentDict().auth.googleComingSoon);
+        document.getElementById('googleBtn').addEventListener('click', async () => {
+            if (!window.AuthAPI || !window.AuthAPI.loginWithGoogle) {
+                showToast(lang === 'ar'
+                    ? 'جارِ تحميل تسجيل الدخول عبر Google، حاول بعد لحظة.'
+                    : 'Google sign-in is still loading, try again in a moment.');
+                return;
+            }
+            const btn = document.getElementById('googleBtn');
+            const originalText = btn.textContent;
+            btn.textContent = '...'; btn.disabled = true;
+            try {
+                const user = await window.AuthAPI.loginWithGoogle();
+                const idToken = await user.getIdToken();
+                const res = await fetch(`${API_BASE_URL}/enterprise/oauth-login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id_token: idToken }),
+                });
+                const data = await res.json().catch(() => null);
+                if (!res.ok) {
+                    showToast(data && data.detail ? data.detail : currentDict().auth.signupNetworkError);
+                    return;
+                }
+                await handleAuthSuccess(data, user.email);
+            } catch (err) {
+                showToast(lang === 'ar'
+                    ? 'تعذّر تسجيل الدخول عبر Google. حاول مرة أخرى.'
+                    : 'Google sign-in failed. Please try again.');
+            } finally {
+                btn.textContent = originalText; btn.disabled = false;
+            }
         });
 
         // Payment
@@ -2229,7 +2441,6 @@
                 selectedPaypalPlan = a.dataset.plan;
             });
         });
-        let selectedPaypalPlan = 'basic';
 
         function showApiKey(key) {
             document.getElementById('apiKeyValue').textContent = key;
@@ -2284,364 +2495,91 @@
                 btn.textContent = originalText; btn.disabled = false;
             }
         });
-        (function () {
-            const TRIAL_DAYS = 7;
-            const BACKEND_URL = "http://localhost:8000"; // عدّلها إلى رابط السيرفر الحقيقي عند الرفع
-            const PAYPAL_LINKS = {
-                basic: 'https://www.paypal.com/ncp/payment/23V3WQK4NVTG4',
-                pro: 'https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6',
-                enterprise: 'https://www.paypal.com/ncp/payment/CS59KMKAETBFC'
-            };
+        // --- استعادة كلمة السر (حقيقية: رمز عشوائي من السيرفر، صالح 30 دقيقة) ---
+        function openResetModal() {
+            document.getElementById('resetModalOverlay').style.display = 'flex';
+            document.getElementById('resetStepEmail').style.display = 'block';
+            document.getElementById('resetStepToken').style.display = 'none';
+            document.getElementById('resetEmailInput').value = document.getElementById('email').value || '';
+        }
+        function closeResetModal() {
+            document.getElementById('resetModalOverlay').style.display = 'none';
+        }
 
-            // تحميل مكتبة EmailJS ومكتبات Firebase تلقائياً إذا لم تكن موجودة
-            if (!window.emailjs) {
-                const emailScript = document.createElement('script');
-                emailScript.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
-                document.head.appendChild(emailScript);
-            }
+        document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            openResetModal();
+        });
+        document.getElementById('resetModalClose').addEventListener('click', closeResetModal);
+        document.getElementById('resetModalOverlay').addEventListener('click', (e) => {
+            if (e.target.id === 'resetModalOverlay') closeResetModal();
+        });
 
-            if (!window.firebase) {
-                const fbApp = document.createElement('script');
-                fbApp.src = 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js';
-                document.head.appendChild(fbApp);
-
-                const fbAuth = document.createElement('script');
-                fbAuth.src = 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js';
-                fbAuth.onload = function () {
-                    if (!firebase.apps.length) {
-                        firebase.initializeApp({
-                            apiKey: "YOUR_FIREBASE_API_KEY",
-                            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-                            projectId: "YOUR_PROJECT_ID"
-                        });
-                    }
-                };
-                document.head.appendChild(fbAuth);
-            }
-
-            function updateApp() {
-                const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
-                const userEmail = localStorage.getItem('user_email') || 'user@nexus.ai';
-
-                // تعديل النصوص العامة في الصفحة (مرة واحدة عند التحميل)
-                document.querySelectorAll('a, button, span, p, div, li, td').forEach(el => {
-                    if (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3) {
-                        let text = el.textContent.trim();
-                        if (text === 'تسجيل الدخول' || text === 'تسجيل دخول') {
-                            el.textContent = isLoggedIn ? `👤 ${userEmail}` : 'تسجيل الدخول';
-                        }
-                        if (text.includes('14') || text.includes('١٤')) {
-                            el.textContent = text.replace(/14\s*يوم|١٤\s*يوم|14\s*يوماً|١٤\s*يوماً|14\s*يومًا|14/g, '7');
-                        }
-                    }
-                    let fullText = el.textContent || '';
-                    if ((fullText.includes('استرجاع') || fullText.includes('الاسترجاع')) && (fullText.includes('14') || fullText.includes('١٤'))) {
-                        el.innerHTML = el.innerHTML.replace(/14/g, '7').replace(/١٤/g, '٧');
-                    }
+        document.getElementById('resetSendCodeBtn').addEventListener('click', async () => {
+            const email = document.getElementById('resetEmailInput').value.trim();
+            if (!email) { showToast(lang === 'ar' ? 'أدخل بريدك الإلكتروني' : 'Enter your email'); return; }
+            const btn = document.getElementById('resetSendCodeBtn');
+            const original = btn.textContent;
+            btn.textContent = '...'; btn.disabled = true;
+            try {
+                const res = await fetch(`${API_BASE_URL}/enterprise/forgot-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email }),
                 });
-
-                // حقن زر "نسيت كلمة المرور" بجانب حقل كلمة السر
-                const passInput = document.querySelector('input[type="password"]');
-                if (passInput) {
-                    let parentContainer = passInput.closest('form') || passInput.parentElement;
-                    if (parentContainer && !parentContainer.dataset.forgotInjected) {
-                        parentContainer.dataset.forgotInjected = 'true';
-                        const forgotDiv = document.createElement('div');
-                        forgotDiv.style.cssText = 'text-align: center; margin-top: 12px; width: 100%; z-index: 99; position: relative;';
-                        forgotDiv.innerHTML = `<span class="native-forgot-trigger" style="color: #60a5fa; font-size: 13px; text-decoration: underline; cursor: pointer; font-weight: bold; display: inline-block;">نسيت كلمة المرور؟</span>`;
-                        forgotDiv.onclick = (e) => { e.preventDefault(); openForgotModal(); };
-                        parentContainer.appendChild(forgotDiv);
-                    }
-
-                    // حقن زر "تسجيل الدخول عبر Google" داخل نموذج الدخول تلقائياً
-                    if (parentContainer && !parentContainer.dataset.googleInjected) {
-                        parentContainer.dataset.googleInjected = 'true';
-                        const googleBtn = document.createElement('button');
-                        googleBtn.type = 'button';
-                        googleBtn.id = 'nativeGoogleLoginBtn';
-                        googleBtn.style.cssText = 'width: 100%; background: #ffffff; color: #333333; border: 1px solid #cbd5e1; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 13px; box-sizing: border-box;';
-                        googleBtn.innerHTML = `
-                    <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.19v3.15C3.17 21.32 7.23 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.6H1.19C.43 8.13 0 9.87 0 11.7s.43 3.57 1.19 5.1l4.08-2.56z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.17 2.68 1.19 6.6l4.08 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
-                    المتابعة باستخدام Google
-                `;
-                        parentContainer.appendChild(googleBtn);
-                        googleBtn.onclick = handleGoogleLogin;
-                    }
+                const data = await res.json().catch(() => null);
+                showToast(data && data.message ? data.message : (lang === 'ar' ? 'تم إرسال الطلب.' : 'Request sent.'));
+                if (res.ok) {
+                    document.getElementById('resetStepEmail').style.display = 'none';
+                    document.getElementById('resetStepToken').style.display = 'block';
                 }
-
-                // زر عائم لاستعادة كلمة المرور
-                if (!document.getElementById('nativeFloatingForgotBtn')) {
-                    const floatBtn = document.createElement('div');
-                    floatBtn.id = 'nativeFloatingForgotBtn';
-                    floatBtn.style.cssText = 'position: fixed; bottom: 20px; left: 20px; background: #3b82f6; color: white; padding: 10px 16px; border-radius: 30px; font-size: 12px; font-weight: bold; cursor: pointer; z-index: 999999; box-shadow: 0 4px 12px rgba(0,0,0,0.3);';
-                    floatBtn.innerHTML = '🔑 هل نسيت كلمة المرور؟';
-                    document.body.appendChild(floatBtn);
-                    floatBtn.onclick = function (e) {
-                        e.preventDefault();
-                        openForgotModal();
-                    };
-                }
-
-                // إذا كان المستخدم مسجل الدخول، يتم تحويل صندوق تسجيل الدخول لملف شخصي وعدّاد تجريبي
-                if (isLoggedIn) {
-                    let trialStart = localStorage.getItem('trial_start_date');
-                    if (!trialStart) {
-                        trialStart = new Date().toISOString();
-                        localStorage.setItem('trial_start_date', trialStart);
-                    }
-
-                    let userApiKey = localStorage.getItem('user_api_key') || 'nexus_key_demo';
-                    const loginBox = document.querySelector('form') || passInput?.closest('div');
-
-                    if (loginBox && loginBox.dataset.currentState !== 'logged_in') {
-                        loginBox.dataset.currentState = 'logged_in';
-                        loginBox.innerHTML = `
-                    <div style="width: 100%; max-width: 400px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; text-align: center; box-sizing: border-box; padding: 20px;">
-                        <div style="font-size: 38px; margin-bottom: 8px;">👤</div>
-                        <h3 style="margin: 0 0 6px 0; font-size: 18px; color: #fff; font-weight: bold;">أهلاً بك في فترتك التجريبية (NexusAI)</h3>
-                        <p style="color: #60a5fa; font-size: 13px; margin-bottom: 16px; direction: ltr; font-weight: bold;">${userEmail}</p>
-                        
-                        <div style="background: rgba(241, 196, 15, 0.1); border: 1px solid rgba(241, 196, 15, 0.3); padding: 10px; border-radius: 8px; margin-bottom: 16px; font-size: 12px; color: #facc15; width: 100%; box-sizing: border-box;" id="nativeTimerDisplay">
-                            ⏳ جارِ حساب الوقت المتبقي...
-                        </div>
-
-                        <div style="background: rgba(0,0,0,0.45); padding: 12px; border-radius: 8px; margin-bottom: 18px; text-align: right; border: 1px solid rgba(255,255,255,0.1); width: 100%; box-sizing: border-box;">
-                            <p style="color: #94a3b8; font-size: 11px; margin: 0 0 6px 0; text-align: right;">🔑 مفتاح التجربة (API Key):</p>
-                            <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
-                                <input type="text" readonly value="${userApiKey}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px; border-radius: 4px; flex-grow: 1; font-family: monospace; font-size: 11px; direction: ltr; box-sizing: border-box;" id="nativeApiKeyInput">
-                                <button type="button" id="nativeCopyBtn" style="background: #3b82f6; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; white-space: nowrap;">نسخ</button>
-                            </div>
-                        </div>
-
-                        <button type="button" id="nativeLogoutBtn" style="background: #ef4444; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px; box-sizing: border-box;">تسجيل الخروج</button>
-                    </div>
-                `;
-
-                        setTimeout(() => {
-                            const copyBtn = document.getElementById('nativeCopyBtn');
-                            if (copyBtn) {
-                                copyBtn.onclick = function () {
-                                    const field = document.getElementById('nativeApiKeyInput');
-                                    if (field) {
-                                        navigator.clipboard.writeText(field.value);
-                                        copyBtn.textContent = 'تم النسخ! ✓';
-                                        copyBtn.style.background = '#22c55e';
-                                        setTimeout(() => {
-                                            copyBtn.textContent = 'نسخ';
-                                            copyBtn.style.background = '#3b82f6';
-                                        }, 2000);
-                                    }
-                                };
-                            }
-
-                            const logoutBtn = document.getElementById('nativeLogoutBtn');
-                            if (logoutBtn) {
-                                logoutBtn.onclick = function () {
-                                    localStorage.removeItem('is_logged_in');
-                                    localStorage.removeItem('user_email');
-                                    localStorage.removeItem('user_api_key');
-                                    location.reload();
-                                };
-                            }
-                        }, 50);
-                    }
-                }
+            } catch (err) {
+                showToast(lang === 'ar' ? 'تعذّر الاتصال بالخادم.' : 'Could not reach the server.');
+            } finally {
+                btn.textContent = original; btn.disabled = false;
             }
+        });
 
-            // دالة لتحديث العداد التنازلي بشكل خفيف ومنفصل كل ثانية (دون التسبب ببطء الصفحة)
-            function startTimerLoop() {
-                const timerEl = document.getElementById('nativeTimerDisplay');
-                if (!timerEl) return;
-
-                const trialStart = localStorage.getItem('trial_start_date');
-                if (!trialStart) return;
-
-                const startTime = new Date(trialStart).getTime();
-                const durationMs = TRIAL_DAYS * 24 * 60 * 60 * 1000;
-
-                const updateCountdown = () => {
-                    const now = new Date().getTime();
-                    const timeLeft = durationMs - (now - startTime);
-                    if (timeLeft > 0) {
-                        const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                        const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                        const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-                        timerEl.innerHTML = `⏳ الوقت المتبقي للفترة التجريبية: ${days} أيام ${hours} س ${minutes} د ${seconds} ث`;
-                    } else {
-                        timerEl.innerHTML = `⏳ انتهت فترتك التجريبية`;
-                    }
-                };
-                updateCountdown();
-                setInterval(updateCountdown, 1000);
+        document.getElementById('resetConfirmBtn').addEventListener('click', async () => {
+            const token = document.getElementById('resetTokenInput').value.trim();
+            const new_password = document.getElementById('resetNewPasswordInput').value;
+            if (!token || new_password.length < 6) {
+                showToast(lang === 'ar' ? 'أدخل الرمز وكلمة سر لا تقل عن 6 أحرف' : 'Enter the code and a password of 6+ characters');
+                return;
             }
-
-            // دالة تسجيل الدخول عبر Google وإرسال الـ Token للباك إند
-            async function handleGoogleLogin() {
-                if (!window.firebase || !firebase.auth) {
-                    alert('جاري تحميل مكتبة المصادقة، يرجى المحاولة بعد لحظات.');
+            const btn = document.getElementById('resetConfirmBtn');
+            const original = btn.textContent;
+            btn.textContent = '...'; btn.disabled = true;
+            try {
+                const res = await fetch(`${API_BASE_URL}/enterprise/reset-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token, new_password }),
+                });
+                const data = await res.json().catch(() => null);
+                if (!res.ok) {
+                    showToast(data && data.detail ? data.detail : (lang === 'ar' ? 'تعذّر تغيير كلمة السر.' : 'Could not reset password.'));
                     return;
                 }
-                try {
-                    const provider = new firebase.auth.GoogleAuthProvider();
-                    const result = await firebase.auth().signInWithPopup(provider);
-                    const user = result.user;
-                    const idToken = await user.getIdToken();
-
-                    const response = await fetch(`${BACKEND_URL}/enterprise/oauth-login`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id_token: idToken })
-                    });
-
-                    const data = await response.json();
-                    if (response.ok) {
-                        localStorage.setItem('is_logged_in', 'true');
-                        localStorage.setItem('user_email', user.email);
-                        localStorage.setItem('user_api_key', data.api_key || 'nexus_google_key');
-                        alert('تم تسجيل الدخول عبر Google بنجاح!');
-                        location.reload();
-                    } else {
-                        alert(data.detail || 'فشل التحقق من حساب Google مع الخادم.');
-                    }
-                } catch (error) {
-                    console.error("Google Login Error:", error);
-                    alert('حدث خطأ أثناء تسجيل الدخول عبر Google.');
-                }
+                showToast(data.message);
+                closeResetModal();
+                authMode = 'login';
+                setAuthMode('login', currentDict());
+                document.getElementById('resetTokenInput').value = '';
+                document.getElementById('resetNewPasswordInput').value = '';
+            } catch (err) {
+                showToast(lang === 'ar' ? 'تعذّر الاتصال بالخادم.' : 'Could not reach the server.');
+            } finally {
+                btn.textContent = original; btn.disabled = false;
             }
+        });
 
-            // معالجة نموذج تسجيل الدخول التقليدي
-            document.addEventListener('submit', function (e) {
-                const emailInput = e.target.querySelector('input[type="email"], input[type="text"]');
-                const passwordInput = e.target.querySelector('input[type="password"]');
-                if (emailInput && passwordInput) {
-                    e.preventDefault();
-                    const emailVal = emailInput.value.trim() || 'user@nexus.ai';
-                    const passVal = passwordInput.value.trim();
-                    if (passVal.length < 6) {
-                        alert('كلمة المرور يجب ألا تقل عن 6 أحرف.');
-                        return;
-                    }
-                    localStorage.setItem('is_logged_in', 'true');
-                    localStorage.setItem('user_email', emailVal);
-                    alert('تم تسجيل الدخول بنجاح!');
-                    location.reload();
-                }
-            }, true);
-
-            // نافذة استعادة كلمة المرور عبر EmailJS
-            function openForgotModal() {
-                const existing = document.getElementById('nativeModalOverlay');
-                if (existing) existing.remove();
-
-                const overlay = document.createElement('div');
-                overlay.id = 'nativeModalOverlay';
-                overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 99999999; display: flex; justify-content: center; align-items: center; direction: rtl;';
-
-                overlay.innerHTML = `
-            <div style="background: #1e293b; padding: 24px; border-radius: 12px; width: 100%; max-width: 400px; box-sizing: border-box; color: #fff; text-align: center; position: relative; box-shadow: 0 15px 35px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15);">
-                <button id="nativeCloseModal" style="position: absolute; top: 12px; left: 12px; background: transparent; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">✕</button>
-                <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: bold; color: #fff;">استعادة كلمة المرور - NexusAI</h3>
-                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 20px;">أدخل بريدك الإلكتروني للحصول على رمز التحقق (OTP)</p>
-                <input type="email" placeholder="البريد الإلكتروني الخاص بك" id="modalVerifyEmail" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 6px; margin-bottom: 14px; box-sizing: border-box; font-size: 13px; text-align: right;">
-                <div id="modalOtpSection" style="display: none; width: 100%;">
-                    <div id="modalOtpNotice" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); padding: 10px; border-radius: 6px; margin-bottom: 12px; font-size: 12px; color: #60a5fa; line-height: 1.5;"></div>
-                    <input type="text" placeholder="رمز التحقق (6 أرقام)" id="modalOtpInput" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 6px; margin-bottom: 12px; box-sizing: border-box; font-size: 14px; text-align: center; letter-spacing: 3px; font-family: monospace;">
-                    <button type="button" id="modalConfirmOtpBtn" style="background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px; margin-bottom: 10px;">تحقق من الرمز</button>
-                </div>
-                <div id="modalNewPassSection" style="display: none; width: 100%;">
-                    <input type="password" placeholder="كلمة المرور الجديدة (6 أحرف على الأقل)" id="modalNewPassInput" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 6px; margin-bottom: 12px; box-sizing: border-box; font-size: 13px; text-align: right;">
-                    <button type="button" id="modalSavePassBtn" style="background: #22c55e; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px; margin-bottom: 10px;">حفظ كلمة المرور الجديدة</button>
-                </div>
-                <button type="button" id="modalSendCodeBtn" style="background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px; margin-bottom: 10px;">إرسال رسالة التحقق للإيميل</button>
-            </div>
-        `;
-
-                document.body.appendChild(overlay);
-                let generatedCode = '';
-
-                document.getElementById('nativeCloseModal').onclick = () => overlay.remove();
-                overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
-
-                document.getElementById('modalSendCodeBtn').onclick = function () {
-                    const enteredEmail = document.getElementById('modalVerifyEmail').value.trim();
-                    if (!enteredEmail || !enteredEmail.includes('@')) {
-                        alert('الرجاء إدخال بريد إلكتروني صحيح.');
-                        return;
-                    }
-                    generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
-                    const sendBtn = document.getElementById('modalSendCodeBtn');
-                    sendBtn.textContent = 'جارِ الإرسال...';
-
-                    if (window.emailjs) {
-                        emailjs.send("service_jotpx98", "template_kitaaxu", { to_email: enteredEmail, otp_code: generatedCode }, "I66IR3zFFU2s0qTlS")
-                            .then(() => {
-                                document.getElementById('modalOtpNotice').innerHTML = `تم إرسال رمز التحقق بنجاح إلى: <b>${enteredEmail}</b>`;
-                                document.getElementById('modalVerifyEmail').style.display = 'none';
-                                sendBtn.style.display = 'none';
-                                document.getElementById('modalOtpSection').style.display = 'block';
-                            })
-                            .catch(() => {
-                                document.getElementById('modalOtpNotice').innerHTML = `<b>رمز التحقق البديل: <span style="background: #3b82f6; padding: 2px 6px; border-radius: 4px;">${generatedCode}</span></b>`;
-                                document.getElementById('modalVerifyEmail').style.display = 'none';
-                                sendBtn.style.display = 'none';
-                                document.getElementById('modalOtpSection').style.display = 'block';
-                            });
-                    }
-                };
-
-                document.getElementById('modalConfirmOtpBtn').onclick = function () {
-                    if (document.getElementById('modalOtpInput').value.trim() === generatedCode) {
-                        document.getElementById('modalOtpSection').style.display = 'none';
-                        document.getElementById('modalNewPassSection').style.display = 'block';
-                    } else {
-                        alert('رمز التحقق غير صحيح.');
-                    }
-                };
-
-                document.getElementById('modalSavePassBtn').onclick = function () {
-                    const newPass = document.getElementById('modalNewPassInput').value;
-                    if (!newPass || newPass.length < 6) {
-                        alert('كلمة المرور قصيرة جداً.');
-                        return;
-                    }
-                    alert('تم تغيير كلمة المرور بنجاح!');
-                    overlay.remove();
-                };
-            }
-
-            // التشغيل عند اكتمال تحميل الصفحة وتفعيل المراقبة الخفيفة للعداد
-            window.addEventListener('DOMContentLoaded', () => {
-                updateApp();
-                startTimerLoop();
-            });
-
-            // توجيه روابط الباقات لـ PayPal
-            document.addEventListener('click', function (e) {
-                const target = e.target.closest('a, button');
-                if (!target) return;
-                const text = target.textContent ? target.textContent.trim() : '';
-
-                if (text.includes('الأساسية') || text.includes('Starter') || text.includes('Basic') || text.includes('29')) {
-                    e.preventDefault();
-                    window.location.href = PAYPAL_LINKS.basic;
-                } else if (text.includes('احترافية') || text.includes('Pro') || text.includes('79')) {
-                    e.preventDefault();
-                    window.location.href = PAYPAL_LINKS.pro;
-                } else if (text.includes('Enterprise') || text.includes('الشركات') || text.includes('مؤسسات') || text.includes('199')) {
-                    e.preventDefault();
-                    window.location.href = PAYPAL_LINKS.enterprise;
-                }
-            }, true);
-        })();
         // Init
         setLanguage('ar');
+        restoreSession();
     </script>
     <script type="module" src="firebase-config.js"></script>
     <script type="module" src="auth.js"></script>
-    <button class="plan-btn" data-plan="basic">Basic $29</button>
-    <button class="plan-btn" data-plan="pro">Pro $79</button>
-    <button class="plan-btn" data-plan="enterprise">Enterprise $199</button>
 </body>
 
 </html>

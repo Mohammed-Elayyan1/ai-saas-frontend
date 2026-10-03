@@ -1,88 +1,40 @@
-// auth.js - وحدة المصادقة لمنصة NexusAI
+// auth.js - تسجيل الدخول عبر Google (حقيقي) لمنصة NexusAI
+//
+// يعتمد على window.auth المُعرّف في firebase-config.js (يجب تحميله أولاً).
+// البريد وكلمة السر العاديين يمرّان عبر السيرفر الخاص بك (main.py)
+// مباشرة من index.html، وليس من هذا الملف.
 
 import {
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
     GoogleAuthProvider,
     signInWithPopup,
-    signOut
+    signOut,
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-// الحصول على كائن المصادقة المعرّف مسبقاً
-const auth = window.auth;
-
-/**
- * تسجيل حساب جديد بالبريد الإلكتروني وكلمة المرور
- */
-export function registerWithEmail(email, password) {
-    return createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            console.log("تم إنشاء الحساب بنجاح:", userCredential.user.email);
-            return userCredential.user;
-        })
-        .catch((error) => {
-            console.error("خطأ في إنشاء الحساب:", error.message);
-            throw error;
-        });
+function getAuthInstance() {
+    if (!window.auth) {
+        throw new Error("Firebase auth غير مُهيّأ. تأكد من تحميل firebase-config.js أولاً.");
+    }
+    return window.auth;
 }
 
 /**
- * تسجيل الدخول بالبريد الإلكتروني وكلمة المرور
- */
-export function loginWithEmail(email, password) {
-    return signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            console.log("تم تسجيل الدخول بنجاح:", userCredential.user.email);
-            return userCredential.user;
-        })
-        .catch((error) => {
-            console.error("خطأ في تسجيل الدخول:", error.message);
-            throw error;
-        });
-}
-
-/**
- * تسجيل الدخول عبر حساب Google
+ * يفتح نافذة تسجيل الدخول عبر Google ويرجع المستخدم الحقيقي بعد نجاح الدخول.
+ * المستدعي (index.html) يأخذ user.getIdToken() ويبعته للسيرفر للتحقق منه.
  */
 export function loginWithGoogle() {
     const provider = new GoogleAuthProvider();
-    return signInWithPopup(auth, provider)
-        .then((result) => {
-            console.log("تم تسجيل الدخول عبر جوجل بنجاح:", result.user.email);
-            return result.user;
-        })
-        .catch((error) => {
-            console.error("خطأ في تسجيل الدخول عبر جوجل:", error.message);
-            throw error;
-        });
+    return signInWithPopup(getAuthInstance(), provider).then(
+        (result) => result.user
+    );
 }
 
 /**
- * تسجيل الخروج
+ * تسجيل الخروج من جلسة Google (إضافة لحذف الجلسة من السيرفر بـ index.html).
  */
-export function logoutUser() {
-    return signOut(auth);
+export function logoutGoogle() {
+    if (!window.auth) return Promise.resolve();
+    return signOut(window.auth);
 }
 
-// ربط أزرار الواجهة تلقائياً عند تحميل الصفحة
-document.addEventListener("DOMContentLoaded", () => {
-    const googleBtn = document.getElementById("googleLoginBtn");
-
-    if (googleBtn) {
-        googleBtn.addEventListener("click", (e) => {
-            e.preventDefault();
-            console.ج("تم الضغط على زر جوجل بنجاح!");
-
-            loginWithGoogle()
-                .then((user) => {
-                    alert("تم تسجيل الدخول عبر Google بنجاح: " + user.email);
-                    // يمكنك هنا توجيه المستخدم للوحة التحكم
-                })
-                .catch((error) => {
-                    alert("فشل تسجيل الدخول عبر جوجل: " + error.message);
-                });
-        });
-    } else {
-        console.warn("تنبيه: لم يتم العثور على عنصر يحمل المعرف googleLoginBtn في الصفحة الحالية.");
-    }
-});
+// إتاحة الدوال لاستدعائها من السكربت العادي (غير module) داخل index.html
+window.AuthAPI = { loginWithGoogle, logoutGoogle };

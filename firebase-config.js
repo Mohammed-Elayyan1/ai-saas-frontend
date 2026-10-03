@@ -1,6 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAbnVN9fxCP3JdMqYqolyEi1_14V4Tae7c",
@@ -12,13 +11,9 @@ const firebaseConfig = {
     measurementId: "G-C1JB01NGQ9"
 };
 
-// تهيئة فايربيس
+// تهيئة Firebase (بدون Firestore — غير مستخدم حاليًا بالمنصة)
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
 
-// ربطها بنافذة المتصفح لسهولة الاستخدام في باقي الملفات
+// ربطها بنافذة المتصفح لاستخدامها من auth.js
 window.auth = auth;
-window.db = db;
-
-console.log("Firebase Connected Successfully!");
