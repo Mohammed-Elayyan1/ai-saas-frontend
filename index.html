@@ -1580,6 +1580,10 @@
                                     <button type="submit" class="btn btn-primary btn-block" id="authSubmit"
                                         data-i18n="auth.submitLogin"></button>
 
+                                    <div class="divider"><span data-i18n="auth.or"></span></div>
+
+                                    <button type="button" class="btn btn-ghost btn-block" id="googleBtn"
+                                        data-i18n="auth.google"></button>
 
                                     <div class="switch-mode" id="switchModeText"></div>
                                 </form>
@@ -1632,42 +1636,14 @@
 
                         <div class="amount-row" id="paypalLinkRow">
                             <a class="amount-chip active" href="https://www.paypal.com/ncp/payment/23V3WQK4NVTG4"
-                                data-plan="basic" target="_blank" rel="noopener noreferrer">Starter $29</a>
+                                data-plan="basic" target="_blank" rel="noopener noreferrer">Basic
+                                $29</a>
                             <a class="amount-chip" href="https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6"
                                 data-plan="pro" target="_blank" rel="noopener noreferrer">Pro $79</a>
                             <a class="amount-chip" href="https://www.paypal.com/ncp/payment/CS59KMKAETBFC"
                                 data-plan="enterprise" target="_blank" rel="noopener noreferrer">Enterprise $199</a>
                         </div>
-
-                        <form id="paypalClaimForm" onsubmit="return false;"
-                            style="margin-top:16px; display:flex; flex-direction:column; gap:12px;">
-                            <div class="field" style="margin-bottom:0;">
-                                <label for="ppName" data-i18n="pay.nameLabel"></label>
-                                <input id="ppName" type="text" required>
-                            </div>
-                            <div class="field" style="margin-bottom:0;">
-                                <label for="ppEmail" data-i18n="pay.emailLabel"></label>
-                                <input id="ppEmail" type="email" required placeholder="name@company.com">
-                            </div>
-                            <div class="field" style="margin-bottom:0;">
-                                <label for="ppRef" data-i18n="pay.refLabel"></label>
-                                <input id="ppRef" type="text" placeholder="Transaction ID (optional)">
-                            </div>
-                            <button type="submit" class="btn btn-gold btn-block" id="paypalClaimBtn"
-                                data-i18n="pay.paypalClaimBtn"></button>
-                        </form>
                         <p class="pay-note" data-i18n="pay.paypalNote"></p>
-                    </div>
-                </div>
-
-                <div id="apiKeyResult"
-                    style="display:none; max-width:640px; margin:26px auto 0; background:var(--glass); border:1px solid var(--border); border-radius:var(--radius-md); padding:22px 24px; text-align:center;">
-                    <div style="font-size:0.85rem; color:var(--text-2); margin-bottom:8px;"
-                        data-i18n="pay.keyReadyLabel"></div>
-                    <div style="display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap;">
-                        <code id="apiKeyValue"
-                            style="background:rgba(255,255,255,0.08); padding:8px 14px; border-radius:8px; font-size:0.9rem; word-break:break-all;"></code>
-                        <button class="btn btn-ghost btn-sm" id="copyKeyBtn" data-i18n="pay.copyBtn"></button>
                     </div>
                 </div>
             </div>
@@ -1870,24 +1846,20 @@
                     list: ["✅ إعداد فوري بدون خبرة تقنية", "✅ إلغاء الاشتراك في أي وقت", "✅ دعم عربي كامل"],
                     tabLogin: "تسجيل الدخول", tabSignup: "إنشاء حساب",
                     companyLabel: "اسم الشركة", emailLabel: "البريد الإلكتروني", passwordLabel: "كلمة المرور",
-                    remember: "تذكرني", forgot: "نسيت كلمة المرور؟", or: "او",
+                    remember: "تذكرني", forgot: "نسيت كلمة المرور؟", or: "أو", google: "المتابعة عبر Google (قريبًا)",
                     submitLogin: "تسجيل الدخول", submitSignup: "إنشاء الحساب",
                     haveAccount: "ليس لديك حساب؟", noAccount: "لديك حساب بالفعل؟", signupLink: "أنشئ حسابًا", loginLink: "سجّل الدخول",
                     toastSubmit: "هذا نموذج عرض تصميمي — يجب ربطه بواجهة API الخاصة بالخادم",
 
+                    "googleSuccess": "تم تسجيل الدخول عبر Google بنجاح",
                     "signupNetworkError": "تعذر الاتصال بالخادم، تحقق من اتصالك بالإنترنت وحاول مجدداً"
                 },
                 pay: {
-                    kicker: "طرق الدفع", title: "اشترك عبر PayPal بخطوتين", sub: "ادفع بأمان عبر PayPal، واستلم مفتاح API فورًا لتبدأ الاستخدام مباشرة.",
-                    paypalTitle: "الدفع عبر PayPal", paypalSub: "ادفع أولًا ثم فعّل حسابك فورًا",
-                    paypalDesc: "اضغط على الباقة المناسبة لإتمام الدفع عبر PayPal، ثم عبّئ النموذج أدناه لاستلام مفتاح API فورًا.",
-                    nameLabel: "اسم الشركة", emailLabel: "البريد الإلكتروني", planLabel: "الباقة",
-                    refLabel: "رقم عملية PayPal (اختياري)",
-                    paypalClaimBtn: "استلم مفتاح API الآن",
-                    paypalNote: "⚠️ يتم إصدار المفتاح فورًا لتسريع تجربتك، وتتم مراجعة الدفعة يدويًا من حساب PayPal خلال ساعات العمل. أي حساب غير مؤكَّد قد يُوقف.",
-                    keyReadyLabel: "تم تفعيل حسابكم! هذا مفتاح الـ API الخاص بكم:",
-                    copyBtn: "نسخ",
-                    paypalClaimError: "حدث خطأ أثناء إصدار المفتاح. حاول مرة أخرى."
+                    kicker: "طرق الدفع", title: "اشترك عبر PayPal بخطوة واحدة", sub: "ادفع بأمان عبر PayPal، واستلم مفتاح API فورًا وتلقائيًا بعد تأكيد الدفعة.",
+                    paypalTitle: "الدفع عبر PayPal", paypalSub: "اختر باقتك وادفع — يصلك المفتاح فورًا",
+                    paypalDesc: "اضغط على الباقة المناسبة من قسم الباقات بالأعلى لتنتقل مباشرة لصفحة الدفع على PayPal. بعد إتمام الدفع، يُفعَّل حسابك تلقائيًا ويظهر مفتاح API في بطاقة حسابك أعلى الصفحة (سجّل الدخول بنفس البريد الذي دفعت منه).",
+                    planLabel: "الباقة",
+                    paypalNote: "✅ التفعيل تلقائي بالكامل عند استلام تأكيد الدفع من PayPal — لا حاجة لأي مراجعة يدوية."
                 },
                 faq: {
                     kicker: "الأسئلة الشائعة", title: "كل ما تحتاج معرفته قبل البدء",
@@ -1988,7 +1960,7 @@
                     list: ["✅ Instant setup, no tech skills needed", "✅ Cancel anytime", "✅ Full Arabic & English support"],
                     tabLogin: "Log in", tabSignup: "Sign up",
                     companyLabel: "Company name", emailLabel: "Email", passwordLabel: "Password",
-                    remember: "Remember me", forgot: "Forgot password?", or: "or", google: "Continue with Google",
+                    remember: "Remember me", forgot: "Forgot password?", or: "or", google: "Continue with Google (soon)",
                     submitLogin: "Log in", submitSignup: "Create account",
                     haveAccount: "Don't have an account?", noAccount: "Already have an account?", signupLink: "Sign up", loginLink: "Log in",
                     toastSubmit: "This is a design demo — connect it to your backend API",
@@ -1997,16 +1969,11 @@
                     signupNetworkError: "Could not reach the server. Check your connection and try again."
                 },
                 pay: {
-                    kicker: "Payment methods", title: "Subscribe via PayPal in two steps", sub: "Pay securely through PayPal and get your API key instantly to start using the platform.",
-                    paypalTitle: "Pay with PayPal", paypalSub: "Pay first, then activate instantly",
-                    paypalDesc: "Click the matching plan to pay via PayPal, then fill the form below to get your API key instantly.",
-                    nameLabel: "Company name", emailLabel: "Email", planLabel: "Plan",
-                    refLabel: "PayPal transaction ID (optional)",
-                    paypalClaimBtn: "Get my API key now",
-                    paypalNote: "⚠️ Your key is issued instantly to speed up onboarding, and the payment is manually verified against our PayPal account during business hours. Unverified accounts may be suspended.",
-                    keyReadyLabel: "Your account is active! Here's your API key:",
-                    copyBtn: "Copy",
-                    paypalClaimError: "Something went wrong issuing your key. Please try again."
+                    kicker: "Payment methods", title: "Subscribe via PayPal in one step", sub: "Pay securely through PayPal and get your API key automatically the moment your payment is confirmed.",
+                    paypalTitle: "Pay with PayPal", paypalSub: "Pick your plan and pay — your key arrives instantly",
+                    paypalDesc: "Click the matching plan in the pricing section above to go straight to its PayPal payment page. Once payment completes, your account activates automatically and your API key appears in your account card near the top of the page (log in with the same email you paid with).",
+                    planLabel: "Plan",
+                    paypalNote: "✅ Fully automatic activation as soon as PayPal confirms your payment — no manual review needed."
                 },
                 faq: {
                     kicker: "FAQ", title: "Everything you need to know before you start",
@@ -2116,6 +2083,9 @@
                     document.querySelectorAll('#paypalLinkRow .amount-chip').forEach(c => {
                         c.classList.toggle('active', c.dataset.plan === plan);
                     });
+                    // يفتح رابط الدفع الحقيقي على PayPal لهذه الباقة في تبويب جديد فورًا
+                    const link = PAYPAL_LINKS[plan];
+                    if (link) window.open(link, '_blank', 'noopener,noreferrer');
                     document.getElementById('pay').scrollIntoView({ behavior: 'smooth' });
                 });
             });
@@ -2231,7 +2201,7 @@
         });
 
         // --- حساب حقيقي: تخزين الجلسة محليًا + عدّاد تجربة حقيقي من السيرفر ---
-        const SESSION_KEYS = ['nexus_api_key', 'nexus_company', 'nexus_plan', 'nexus_trial_ends_at', 'nexus_is_trial'];
+        const SESSION_KEYS = ['nexus_api_key', 'nexus_company', 'nexus_plan', 'nexus_trial_ends_at', 'nexus_is_trial', 'nexus_paid_until', 'nexus_is_paid'];
         let trialCountdownTimer = null;
 
         function saveSession(data) {
@@ -2240,6 +2210,8 @@
             localStorage.setItem('nexus_plan', data.plan || '');
             localStorage.setItem('nexus_trial_ends_at', data.trial_ends_at || '');
             localStorage.setItem('nexus_is_trial', data.is_trial ? '1' : '0');
+            localStorage.setItem('nexus_paid_until', data.paid_until || '');
+            localStorage.setItem('nexus_is_paid', data.is_paid ? '1' : '0');
         }
 
         function clearSession() {
@@ -2274,6 +2246,33 @@
             trialCountdownTimer = setInterval(tick, 1000);
         }
 
+        function startPaidCountdown(paidUntilIso) {
+            clearInterval(trialCountdownTimer);
+            const banner = document.getElementById('trialBanner');
+            if (!paidUntilIso) { banner.style.display = 'none'; return; }
+            banner.style.display = 'block';
+            const endTime = new Date(paidUntilIso).getTime();
+            const tick = () => {
+                const diff = endTime - Date.now();
+                if (diff <= 0) {
+                    banner.textContent = lang === 'ar'
+                        ? '⏳ حان وقت تجديد الاشتراك — يرجى إعادة الدفع للاستمرار.'
+                        : '⏳ Your subscription needs renewal — please pay again to continue.';
+                    clearInterval(trialCountdownTimer);
+                    return;
+                }
+                const d = Math.floor(diff / 86400000);
+                const h = Math.floor((diff % 86400000) / 3600000);
+                const m = Math.floor((diff % 3600000) / 60000);
+                const sec = Math.floor((diff % 60000) / 1000);
+                banner.textContent = lang === 'ar'
+                    ? `✅ اشتراكك فعّال — يتجدد بعد: ${d} يوم ${h} س ${m} د ${sec} ث`
+                    : `✅ Subscription active — renews in: ${d}d ${h}h ${m}m ${sec}s`;
+            };
+            tick();
+            trialCountdownTimer = setInterval(tick, 1000);
+        }
+
         function showLoggedInUI(data) {
             document.getElementById('authFormWrapper').style.display = 'none';
             document.getElementById('accountPanel').style.display = 'block';
@@ -2281,6 +2280,7 @@
             document.getElementById('accountEmail').textContent = localStorage.getItem('nexus_email') || '';
             document.getElementById('accountApiKeyInput').value = data.api_key || localStorage.getItem('nexus_api_key') || '';
             if (data.is_trial) startTrialCountdown(data.trial_ends_at);
+            else if (data.is_paid) startPaidCountdown(data.paid_until);
             else document.getElementById('trialBanner').style.display = 'none';
 
             document.getElementById('navLoginBtn').style.display = 'none';
@@ -2314,12 +2314,16 @@
                 });
                 if (!res.ok) { clearSession(); showLoggedOutUI(); return; }
                 const data = await res.json();
-                showLoggedInUI({
+                const merged = {
                     company: data.company,
                     api_key: apiKey,
                     is_trial: data.is_trial,
                     trial_ends_at: data.trial_ends_at,
-                });
+                    is_paid: data.is_paid,
+                    paid_until: data.paid_until,
+                };
+                saveSession(merged);
+                showLoggedInUI(merged);
             } catch (err) {
                 // لا يمكن التحقق الآن (مثلاً لا اتصال) — نُبقي الجلسة كما هي محليًا
                 showLoggedInUI({
@@ -2327,6 +2331,8 @@
                     api_key: apiKey,
                     is_trial: localStorage.getItem('nexus_is_trial') === '1',
                     trial_ends_at: localStorage.getItem('nexus_trial_ends_at'),
+                    is_paid: localStorage.getItem('nexus_is_paid') === '1',
+                    paid_until: localStorage.getItem('nexus_paid_until'),
                 });
             }
         }
@@ -2394,37 +2400,11 @@
             }
         });
 
-        document.getElementById('googleBtn').addEventListener('click', async () => {
-            if (!window.AuthAPI || !window.AuthAPI.loginWithGoogle) {
-                showToast(lang === 'ar'
-                    ? 'جارِ تحميل تسجيل الدخول عبر Google، حاول بعد لحظة.'
-                    : 'Google sign-in is still loading, try again in a moment.');
-                return;
-            }
-            const btn = document.getElementById('googleBtn');
-            const originalText = btn.textContent;
-            btn.textContent = '...'; btn.disabled = true;
-            try {
-                const user = await window.AuthAPI.loginWithGoogle();
-                const idToken = await user.getIdToken();
-                const res = await fetch(`${API_BASE_URL}/enterprise/oauth-login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id_token: idToken }),
-                });
-                const data = await res.json().catch(() => null);
-                if (!res.ok) {
-                    showToast(data && data.detail ? data.detail : currentDict().auth.signupNetworkError);
-                    return;
-                }
-                await handleAuthSuccess(data, user.email);
-            } catch (err) {
-                showToast(lang === 'ar'
-                    ? 'تعذّر تسجيل الدخول عبر Google. حاول مرة أخرى.'
-                    : 'Google sign-in failed. Please try again.');
-            } finally {
-                btn.textContent = originalText; btn.disabled = false;
-            }
+        // تسجيل الدخول عبر Google: سيتوفر قريبًا (معطّل مؤقتًا بدل أن يفشل بصمت)
+        document.getElementById('googleBtn').addEventListener('click', () => {
+            showToast(lang === 'ar'
+                ? 'تسجيل الدخول عبر Google سيتوفر قريبًا.'
+                : 'Sign in with Google will be available soon.');
         });
 
         // Payment
@@ -2438,59 +2418,6 @@
             });
         });
 
-        function showApiKey(key) {
-            document.getElementById('apiKeyValue').textContent = key;
-            document.getElementById('apiKeyResult').style.display = 'block';
-            document.getElementById('apiKeyResult').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-
-        document.getElementById('copyKeyBtn').addEventListener('click', () => {
-            navigator.clipboard.writeText(document.getElementById('apiKeyValue').textContent);
-            showToast(lang === 'ar' ? 'تم النسخ' : 'Copied');
-        });
-
-        // --- Real PayPal claim: sends the request to your backend for manual review.
-        //     No API key is issued instantly — the backend returns {status:"pending", message}.
-        document.getElementById('paypalClaimForm').addEventListener('submit', async () => {
-            const name = document.getElementById('ppName').value.trim();
-            const email = document.getElementById('ppEmail').value.trim();
-            const paypal_reference = document.getElementById('ppRef').value.trim();
-            if (!name || !email) {
-                showToast(lang === 'ar' ? 'يرجى تعبئة اسم الشركة والبريد الإلكتروني' : 'Please fill in company name and email');
-                return;
-            }
-
-            const btn = document.getElementById('paypalClaimBtn');
-            const originalText = btn.textContent;
-            btn.textContent = '...'; btn.disabled = true;
-            try {
-                const res = await fetch(`${API_BASE_URL}/enterprise/paypal/claim`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, email, plan: selectedPaypalPlan, paypal_reference })
-                });
-                let data = null;
-                try { data = await res.json(); } catch (parseErr) { data = null; }
-
-                if (!res.ok) {
-                    const detail = data && data.detail ? data.detail : currentDict().pay.paypalClaimError;
-                    showToast(detail);
-                    return;
-                }
-
-                // Backend intentionally does NOT return an api_key here (pending-approval flow).
-                // Show its confirmation message instead of trying to display a key.
-                showToast(data && data.message ? data.message : currentDict().pay.paypalClaimError);
-                document.getElementById('paypalClaimForm').reset();
-            } catch (err) {
-                // Network error (backend unreachable, CORS, wrong API_BASE_URL, etc.)
-                showToast(lang === 'ar'
-                    ? 'تعذّر الاتصال بالخادم. تحقق من اتصالك بالإنترنت وحاول مجددًا.'
-                    : 'Could not reach the server. Check your connection and try again.');
-            } finally {
-                btn.textContent = originalText; btn.disabled = false;
-            }
-        });
         // --- استعادة كلمة السر (حقيقية: رمز عشوائي من السيرفر، صالح 30 دقيقة) ---
         function openResetModal() {
             document.getElementById('resetModalOverlay').style.display = 'flex';
