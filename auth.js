@@ -38,3 +38,14 @@ export function logoutGoogle() {
 
 // إتاحة الدوال لاستدعائها من السكربت العادي (غير module) داخل index.html
 window.AuthAPI = { loginWithGoogle, logoutGoogle };
+
+document.getElementById("googleBtn")?.addEventListener("click", async () => {
+    try {
+        const user = await loginWithGoogle();
+        if (user) {
+            window.location.href = '/dashboard'; // صفحة التوجيه بعد النجاح
+        }
+    } catch (error) {
+        console.log("خطأ في تسجيل الدخول عبر قوقل:", error);
+    }
+});
