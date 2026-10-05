@@ -7,6 +7,7 @@
 import {
     GoogleAuthProvider,
     signInWithRedirect,
+    getRedirectResult,
     signOut,
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
@@ -18,34 +19,43 @@ function getAuthInstance() {
 }
 
 /**
- * يفتح نافذة تسجيل الدخول عبر Google ويرجع المستخدم الحقيقي بعد نجاح الدخول.
- * المستدعي (index.html) يأخذ user.getIdToken() ويبعته للسيرفر للتحقق منه.
+ * يبدأ عملية تسجيل الدخول عبر Google باستخدام إعادة التوجيه (Redirect).
  */
 export function loginWithGoogle() {
+    const auth = getAuthInstance();
     const provider = new GoogleAuthProvider();
-    return signInWithPopup(getAuthInstance(), provider).then(
-        (result) => result.user
-    );
+    return signInWithRedirect(auth, provider);
 }
 
 /**
- * تسجيل الخروج من جلسة Google (إضافة لحذف الجلسة من السيرفر بـ index.html).
+ * تسجيل الخروج من جلسة Google.
  */
 export function logoutGoogle() {
     if (!window.auth) return Promise.resolve();
     return signOut(window.auth);
 }
 
-// إتاحة الدوال لاستدعائها من السكربت العادي (غير module) داخل index.html
-window.AuthAPI = { loginWithGoogle, logoutGoogle };
-
-document.getElementById("googleBtn")?.addEventListener("click", async () => {
+// معالجة النتيجة فور عودة المستخدم من جوجل وتحميل الصفحة
+document.addEventListener("DOMContentLoaded", async () => {
     try {
-        const user = await loginWithGoogle();
-        if (user) {
-            window.location.href = '/dashboard'; // صفحة التوجيه بعد النجاح
+        const auth = getAuthInstance();
+        const result = await getRedirectResult(auth);
+        if (result && result.user) {
+            const user = result.user;
+            const token = await user.getIdToken();
+            console.log("تم تسجيل الدخول بنجاح، الـ Token:", token);
+
+            // التوجيه لصفحة الـ dashboard بعد نجاح الدخول
+            window.location.href = '/dashboard';
         }
     } catch (error) {
         console.log("خطأ في تسجيل الدخول عبر قوقل:", error);
     }
+});
+
+// إتاحة الدوال لاستدعائها من السكربت العادي (غير module) داخل index.html
+window.AuthAPI = { loginWithGoogle, logoutGoogle };
+
+document.getElementById("googleBtn")?.addEventListener("click", () => {
+    loginWithGoogle();
 });
