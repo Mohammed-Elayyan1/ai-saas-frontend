@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAbnVN9fxCP3JdMqYqolyEi1_14V4Tae7c",
+    apiKey: "AIzaSyAbnVN9fxCP3JdMqyqolyEi1_14V4TaE7c",
     authDomain: "nexusai-app-4061f.firebaseapp.com",
     projectId: "nexusai-app-4061f",
     storageBucket: "nexusai-app-4061f.firebasestorage.app",
