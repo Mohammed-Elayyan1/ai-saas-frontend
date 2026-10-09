@@ -1493,7 +1493,6 @@
                     <p class="section-sub" data-i18n="pricing.sub"></p>
                 </div>
 
-
                 <div class="pricing-grid" id="pricingGrid"></div>
             </div>
         </section>
@@ -1531,6 +1530,48 @@
                                             id="accountCopyBtn">نسخ</button>
                                     </div>
                                 </div>
+                                <div
+                                    style="background:rgba(0,0,0,0.25); padding:12px; border-radius:8px; margin-bottom:18px; text-align:right; border:1px solid var(--border);">
+                                    <p style="color:var(--text-2); font-size:11px; margin:0 0 6px 0;">🔌 كود تضمين
+                                        المساعد بموقعكم (انسخه وألصقه قبل &lt;/body&gt;):</p>
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                        <input type="text" readonly id="accountEmbedCodeInput"
+                                            style="background:rgba(255,255,255,0.05); border:1px solid var(--border); color:var(--text-0); padding:8px; border-radius:4px; flex-grow:1; font-family:monospace; font-size:10px; direction:ltr;">
+                                        <button type="button" class="btn btn-ghost btn-sm"
+                                            id="accountEmbedCopyBtn">نسخ</button>
+                                    </div>
+                                </div>
+
+                                <div
+                                    style="background:rgba(0,0,0,0.25); padding:12px; border-radius:8px; margin-bottom:18px; text-align:right; border:1px solid var(--border);">
+                                    <p style="color:var(--text-2); font-size:11px; margin:0 0 8px 0;">📁 ملفاتكم
+                                        (<span id="accountFilesCount">0</span>/<span id="accountFilesMax">—</span>)</p>
+                                    <ul id="accountFilesList"
+                                        style="list-style:none; margin:0 0 10px 0; padding:0; font-size:12px; color:var(--text-1);">
+                                    </ul>
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                        <input type="file" id="accountFileInput"
+                                            style="flex-grow:1; font-size:11px; color:var(--text-1);">
+                                        <button type="button" class="btn btn-ghost btn-sm"
+                                            id="accountFileUploadBtn">رفع</button>
+                                    </div>
+                                </div>
+
+                                <div
+                                    style="background:rgba(0,0,0,0.25); padding:12px; border-radius:8px; margin-bottom:18px; text-align:right; border:1px solid var(--border);">
+                                    <p style="color:var(--text-2); font-size:11px; margin:0 0 8px 0;">🧪 جرّب المساعد
+                                        الآن:</p>
+                                    <div id="accountAskAnswer"
+                                        style="display:none; background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:6px; padding:8px; margin-bottom:8px; font-size:12px; color:var(--text-0); white-space:pre-wrap;">
+                                    </div>
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                        <input type="text" id="accountAskInput" placeholder="اكتب سؤالًا تجريبيًا..."
+                                            style="background:rgba(255,255,255,0.05); border:1px solid var(--border); color:var(--text-0); padding:8px; border-radius:4px; flex-grow:1; font-size:12px;">
+                                        <button type="button" class="btn btn-primary btn-sm"
+                                            id="accountAskBtn">اسأل</button>
+                                    </div>
+                                </div>
+
                                 <button type="button" class="btn btn-ghost btn-block" id="accountLogoutBtn">تسجيل
                                     الخروج</button>
                             </div>
@@ -1799,19 +1840,19 @@
                 },
                 pricing: {
                     kicker: "الأسعار", title: "باقات تناسب كل حجم شركة", sub: "ابدأ صغيرًا وارتقِ بباقتك في أي وقت. لا رسوم خفية.",
-                    monthly: "شهري",
+                    monthly: "شهري", yearly: "سنوي", save: "وفّر 20%",
                     plans: [
                         {
                             key: "basic", name: "الباقة الأساسية", desc: "مثالية للشركات الناشئة وفرق العمل الصغيرة", m: 29, y: 23, badge: null, cta: "ابدأ بالأساسية", btnClass: "btn-ghost",
-                            feats: ["مساعد ذكي مخصص لشركة واحدة", "رفع ملف بيانات واحد", "حتى 500 استفسار شهريًا", "استجابة سريعة", "دعم عبر البريد الإلكتروني"]
+                            feats: ["مساعد ذكي مخصص لشركة واحدة", "رفع ملف بيانات واحد", "حتى 500 استفسار شهريًا", "دعم عبر البريد الإلكتروني"]
                         },
                         {
                             key: "pro", name: "الباقة الاحترافية", desc: "للشركات المتوسطة التي تحتاج مرونة أكبر", m: 79, y: 63, badge: "الأكثر طلبًا", cta: "ابدأ بالاحترافية", btnClass: "btn-primary",
-                            feats: ["مساعد ذكي متطور جدًا", "ملفات بيانات متعددة", "استفسارات غير محدودة", "أولوية قصوى في المعالجة", "تقارير أداء أسبوعية", "دعم فني عبر الدردشة المباشرة"]
+                            feats: ["مساعد ذكي مخصص لشركتكم", "حتى 10 ملفات بيانات", "استفسارات غير محدودة شهريًا", "دعم عبر البريد الإلكتروني"]
                         },
                         {
                             key: "enterprise", name: "باقة المؤسسات", desc: "للشركات الكبرى ذات الاحتياجات الخاصة", m: 199, y: 159, badge: null, cta: "تواصل مع المبيعات", btnClass: "btn-ghost",
-                            feats: ["ذكاء اصطناعي غير محدود", "ربط بأنظمة الشركة الحالية (API/Webhooks)", "عدد مستخدمين غير محدود", "مدير حساب مخصص", "اتفاقية مستوى خدمة (SLA)", "دعم فني خاص 24/7"]
+                            feats: ["استفسارات غير محدودة", "عدد غير محدود من ملفات البيانات", "تكامل مخصص مع أنظمتكم عند الطلب (API/Webhooks)", "تواصل مباشر معنا لتخصيص الباقة حسب احتياجاتكم"]
                         }
                     ],
                     perMonth: "/ شهريًا", perMonthYearly: "/ شهريًا (فوترة سنوية)"
@@ -1914,15 +1955,15 @@
                     plans: [
                         {
                             key: "basic", name: "Basic", desc: "Perfect for startups and small teams", m: 29, y: 23, badge: null, cta: "Start with Basic", btnClass: "btn-ghost",
-                            feats: ["Dedicated AI assistant for one company", "1 data file upload", "Up to 500 queries / month", "Fast response times", "Email support"]
+                            feats: ["Dedicated AI assistant for one company", "1 data file upload", "Up to 500 queries / month", "Email support"]
                         },
                         {
                             key: "pro", name: "Pro", desc: "For growing companies that need more flexibility", m: 79, y: 63, badge: "Most popular", cta: "Start with Pro", btnClass: "btn-primary",
-                            feats: ["Highly advanced AI assistant", "Multiple data files", "Unlimited queries", "Top-priority processing", "Weekly performance reports", "Live chat support"]
+                            feats: ["Dedicated AI assistant for your company", "Up to 10 data files", "Unlimited monthly queries", "Email support"]
                         },
                         {
                             key: "enterprise", name: "Enterprise", desc: "For large companies with custom needs", m: 199, y: 159, badge: null, cta: "Talk to sales", btnClass: "btn-ghost",
-                            feats: ["Unlimited AI usage", "Integrate with your existing systems (API/Webhooks)", "Unlimited team members", "Dedicated account manager", "Service-level agreement (SLA)", "24/7 priority support"]
+                            feats: ["Unlimited queries", "Unlimited number of data files", "Custom integration with your systems on request (API/Webhooks)", "Talk to us directly to tailor the plan to your needs"]
                         }
                     ],
                     perMonth: "/ month", perMonthYearly: "/ month (billed yearly)"
@@ -2012,7 +2053,7 @@
         ${p.badge ? `<span class="plan-badge">${p.badge}</span>` : ''}
         <div class="plan-name">${p.name}</div>
         <div class="plan-desc">${p.desc}</div>
-        <div class="plan-price"><span class="amount" data-monthly="${p.m}" data-yearly="${p.y}">$${p.m}</span><span class="period">${dict.pricing.perMonth}</span></div>
+        <div class="plan-price"><span class="amount">$${p.m}</span><span class="period">${dict.pricing.perMonth}</span></div>
         <ul class="plan-list">${p.feats.map(f => `<li><span class="check">✔</span> ${f}</li>`).join('')}</ul>
         <button type="button" class="btn ${p.btnClass} btn-block plan-cta" data-plan="${p.key}">${p.cta}</button>
       </div>`).join('');
@@ -2047,7 +2088,6 @@
         <div class="faq-a"><p>${f.a}</p></div>
       </div>`).join('');
             bindFaq();
-            bindBillingAmounts(dict);
         }
 
         function bindFaq() {
@@ -2085,16 +2125,6 @@
             });
         }
 
-        let yearly = false;
-        function bindBillingAmounts(dict) {
-            document.querySelectorAll('.plan-price .amount').forEach(el => {
-                const val = yearly ? el.dataset.yearly : el.dataset.monthly;
-                el.textContent = '$' + val;
-            });
-            document.querySelectorAll('.plan-price .period').forEach(el => {
-                el.textContent = yearly ? dict.pricing.perMonthYearly : dict.pricing.perMonth;
-            });
-        }
 
         function applyStatic(dict) {
             document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -2187,12 +2217,6 @@
             loop();
         }
 
-        // Billing switch
-        document.getElementById('billingSwitch').addEventListener('click', () => {
-            yearly = !yearly;
-            document.getElementById('billingSwitch').classList.toggle('on', yearly);
-            bindBillingAmounts(currentDict());
-        });
 
         // --- حساب حقيقي: تخزين الجلسة محليًا + عدّاد تجربة حقيقي من السيرفر ---
         const SESSION_KEYS = ['nexus_api_key', 'nexus_company', 'nexus_plan', 'nexus_trial_ends_at', 'nexus_is_trial', 'nexus_paid_until', 'nexus_is_paid'];
@@ -2279,6 +2303,9 @@
 
             document.getElementById('navLoginBtn').style.display = 'none';
             document.getElementById('navLogoutBtn').style.display = 'inline-flex';
+
+            fillEmbedCode();
+            loadAccountFiles();
         }
 
         function showLoggedOutUI() {
@@ -2330,6 +2357,116 @@
                 });
             }
         }
+
+        // ---------------------------------------------------------------
+        // لوحة التحكم الفعلية: كود التضمين، إدارة الملفات، تجربة المساعد
+        // ---------------------------------------------------------------
+        function currentApiKey() {
+            return localStorage.getItem('nexus_api_key') || '';
+        }
+
+        function fillEmbedCode() {
+            const key = currentApiKey();
+            const code = `<script src="${API_BASE_URL}/widget.js" data-api-key="${key}"><\/script>`;
+            document.getElementById('accountEmbedCodeInput').value = code;
+        }
+
+        async function loadAccountFiles() {
+            const key = currentApiKey();
+            if (!key) return;
+            try {
+                const res = await fetch(`${API_BASE_URL}/enterprise/files`, {
+                    headers: { 'x-api-key': key }
+                });
+                if (!res.ok) return;
+                const data = await res.json();
+                document.getElementById('accountFilesCount').textContent = data.files_count;
+                document.getElementById('accountFilesMax').textContent = data.max_files === null ? (lang === 'ar' ? 'غير محدود' : 'unlimited') : data.max_files;
+                const list = document.getElementById('accountFilesList');
+                list.innerHTML = '';
+                data.files.forEach(f => {
+                    const li = document.createElement('li');
+                    li.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid var(--border);';
+                    const nameSpan = document.createElement('span');
+                    nameSpan.textContent = f.name;
+                    const delBtn = document.createElement('button');
+                    delBtn.type = 'button';
+                    delBtn.textContent = '✕';
+                    delBtn.style.cssText = 'background:none; border:none; color:var(--text-2); cursor:pointer; font-size:12px;';
+                    delBtn.addEventListener('click', async () => {
+                        await fetch(`${API_BASE_URL}/enterprise/files/${encodeURIComponent(f.name)}`, {
+                            method: 'DELETE',
+                            headers: { 'x-api-key': key }
+                        });
+                        loadAccountFiles();
+                    });
+                    li.appendChild(nameSpan);
+                    li.appendChild(delBtn);
+                    list.appendChild(li);
+                });
+            } catch (err) { /* تجاهل أخطاء الشبكة هنا بصمت */ }
+        }
+
+        document.getElementById('accountEmbedCopyBtn').addEventListener('click', () => {
+            const input = document.getElementById('accountEmbedCodeInput');
+            input.select();
+            navigator.clipboard?.writeText(input.value).catch(() => document.execCommand('copy'));
+            showToast(lang === 'ar' ? 'تم نسخ كود التضمين' : 'Embed code copied');
+        });
+
+        document.getElementById('accountCopyBtn').addEventListener('click', () => {
+            const input = document.getElementById('accountApiKeyInput');
+            input.select();
+            navigator.clipboard?.writeText(input.value).catch(() => document.execCommand('copy'));
+            showToast(lang === 'ar' ? 'تم نسخ المفتاح' : 'API key copied');
+        });
+
+        document.getElementById('accountFileUploadBtn').addEventListener('click', async () => {
+            const key = currentApiKey();
+            const fileInput = document.getElementById('accountFileInput');
+            const file = fileInput.files[0];
+            if (!key || !file) return;
+            const formData = new FormData();
+            formData.append('file', file);
+            try {
+                const res = await fetch(`${API_BASE_URL}/enterprise/upload`, {
+                    method: 'POST',
+                    headers: { 'x-api-key': key },
+                    body: formData
+                });
+                const data = await res.json().catch(() => null);
+                if (!res.ok) {
+                    showToast((data && data.detail) || (lang === 'ar' ? 'تعذر رفع الملف' : 'Upload failed'));
+                    return;
+                }
+                fileInput.value = '';
+                loadAccountFiles();
+                showToast(lang === 'ar' ? 'تم رفع الملف' : 'File uploaded');
+            } catch (err) {
+                showToast(lang === 'ar' ? 'تعذر رفع الملف' : 'Upload failed');
+            }
+        });
+
+        document.getElementById('accountAskBtn').addEventListener('click', async () => {
+            const key = currentApiKey();
+            const input = document.getElementById('accountAskInput');
+            const question = input.value.trim();
+            if (!key || !question) return;
+            const answerBox = document.getElementById('accountAskAnswer');
+            answerBox.style.display = 'block';
+            answerBox.textContent = lang === 'ar' ? '...جاري التفكير' : 'Thinking...';
+            try {
+                const res = await fetch(`${API_BASE_URL}/enterprise/ask`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-api-key': key },
+                    body: JSON.stringify({ question })
+                });
+                const data = await res.json().catch(() => null);
+                answerBox.textContent = (res.ok && data && data.answer) ? data.answer : ((data && data.detail) || (lang === 'ar' ? 'حدث خطأ' : 'Something went wrong'));
+            } catch (err) {
+                answerBox.textContent = lang === 'ar' ? 'حدث خطأ' : 'Something went wrong';
+            }
+        });
 
         document.getElementById('accountLogoutBtn').addEventListener('click', async () => {
             clearSession();
