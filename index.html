@@ -1454,12 +1454,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="stat-badge">
-                        <div>
-                            <div class="num">+2,400</div>
-                            <div class="lbl" data-i18n="hero.statLabel"></div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </section>
@@ -1570,6 +1564,14 @@
                                         <button type="button" class="btn btn-primary btn-sm"
                                             id="accountAskBtn">اسأل</button>
                                     </div>
+                                </div>
+
+                                <div id="refundBox"
+                                    style="display:none; background:rgba(0,0,0,0.25); padding:12px; border-radius:8px; margin-bottom:18px; text-align:right; border:1px solid var(--border);">
+                                    <p id="refundInfoText"
+                                        style="color:var(--text-2); font-size:11px; margin:0 0 8px 0;"></p>
+                                    <button type="button" class="btn btn-ghost btn-sm btn-block"
+                                        id="requestRefundBtn">طلب استرجاع الأموال</button>
                                 </div>
 
                                 <button type="button" class="btn btn-ghost btn-block" id="accountLogoutBtn">تسجيل
@@ -1739,8 +1741,8 @@
                 <div>
                     <h5 data-i18n="footer.legal"></h5>
                     <ul>
-                        <li><a href="#" data-i18n="footer.privacy"></a></li>
-                        <li><a href="#" data-i18n="footer.terms"></a></li>
+                        <li><a href="#" id="footerPrivacyLink" data-i18n="footer.privacy"></a></li>
+                        <li><a href="#" id="footerTermsLink" data-i18n="footer.terms"></a></li>
                         <li><a href="#faq" data-i18n="nav.faq"></a></li>
                     </ul>
                 </div>
@@ -1788,6 +1790,18 @@
         </div>
     </div>
 
+    <div id="legalModalOverlay"
+        style="display:none; position:fixed; inset:0; background:rgba(5,3,15,0.72); z-index:9999; align-items:center; justify-content:center; padding:20px;">
+        <div
+            style="background:var(--bg-1); border:1px solid var(--border); border-radius:var(--radius-md); padding:28px; width:100%; max-width:640px; max-height:80vh; overflow-y:auto; box-shadow:var(--shadow-glow); position:relative;">
+            <button type="button" id="legalModalClose"
+                style="position:absolute; top:12px; left:12px; background:transparent; color:var(--text-2); font-size:18px;">✕</button>
+            <h3 id="legalModalTitle" style="margin-bottom:12px; color:var(--text-0);"></h3>
+            <div id="legalModalBody"
+                style="color:var(--text-1); font-size:13px; line-height:1.9; white-space:pre-wrap;"></div>
+        </div>
+    </div>
+
     <script>
         // ---------------- CONFIG: EDIT THIS ----------------
         // بعد نشر main.py على سيرفر حقيقي، غيّر هذا الرابط ليطابق رابط الخادم الفعلي
@@ -1799,6 +1813,134 @@
             basic: "https://www.paypal.com/ncp/payment/23V3WQK4NVTG4",
             pro: "https://www.paypal.com/ncp/payment/Z59KCWS6MZAC6",
             enterprise: "https://www.paypal.com/ncp/payment/CS59KMKAETBFC",
+        };
+
+        // نص سياسة الخصوصية وشروط الاستخدام — يعكس فعليًا ما يفعله النظام
+        // (لا وعود غير مطبّقة). هذا نص تأسيسي؛ يُنصح بمراجعة قانونية قبل
+        // الاعتماد عليه بشكل رسمي كامل.
+        const LEGAL_TEXT = {
+            ar: {
+                privacyTitle: "سياسة الخصوصية",
+                privacy: `آخر تحديث: 2026
+
+1) البيانات التي نجمعها
+- بيانات الحساب: اسم الشركة، البريد الإلكتروني، وكلمة سر مخزّنة بصيغة مجزّأة (hash) لا نص صريح أبدًا.
+- محتوى الملفات التي ترفعونها لتدريب مساعدكم الذكي.
+- سجل الأسئلة التي يطرحها عملاؤكم على المساعد والردود الناتجة.
+- عنوان IP الخاص بالطلبات، لأغراض الحماية من إساءة الاستخدام وتطبيق حدود الاستخدام.
+- بيانات الدفع: نحن لا نخزّن أرقام بطاقاتكم؛ المعالجة تتم بالكامل عبر PayPal.
+
+2) كيف نستخدم بياناتكم
+- لتشغيل المساعد الذكي: محتوى ملفاتكم وأسئلة عملائكم تُرسل لمزوّد ذكاء اصطناعي خارجي (Google Gemini أو Anthropic Claude، حسب الإعداد المفعّل) لتوليد الردود.
+- لتفعيل اشتراككم فور تأكيد الدفع، وإرسال مفتاح API ورسائل متعلقة بالحساب عبر البريد الإلكتروني.
+- لتطبيق حدود الباقة (عدد الملفات، عدد الاستفسارات الشهرية) ومنع إساءة الاستخدام عبر تقييد معدل الطلبات.
+
+3) أطراف ثالثة نشارك معها بيانات
+- PayPal: لمعالجة الدفعات والاشتراكات.
+- Google (Gemini API) أو Anthropic: لتوليد ردود المساعد الذكي بناءً على أسئلتكم وملفاتكم.
+- Firebase: لتسجيل الدخول عبر حساب جوجل (إن استخدمتموه).
+- Sentry: لتتبع الأعطاء التقنية فقط في الخادم، دون إرسال بيانات شخصية تعريفية.
+- مزوّدو الاستضافة وقاعدة البيانات (Railway وNeon) لتشغيل الخدمة وتخزين بياناتكم.
+
+4) الاحتفاظ بالبيانات وحذفها
+نحتفظ ببيانات حسابكم وملفاتكم طالما الحساب نشط. يمكنكم طلب حذف حسابكم وكل بياناته المرتبطة في أي وقت بالتواصل معنا عبر البريد الإلكتروني المذكور أدناه.
+
+5) أمان البيانات
+الاتصال بالخادم مشفّر عبر HTTPS/TLS. كلمات السر مخزّنة بصيغة مجزّأة فقط. الوصول لبيانات حسابكم (ملفاتكم، سجل استفساراتكم) يتطلب مفتاح API الخاص بكم فقط.
+
+6) حقوقكم
+يحق لكم الوصول لبياناتكم، تصحيحها، أو طلب حذفها بالكامل، بالتواصل معنا.
+
+7) التواصل
+لأي استفسار يخص الخصوصية، راسلونا عبر البريد الإلكتروني المذكور في صفحة "تواصل معنا".`,
+                termsTitle: "شروط الاستخدام",
+                terms: `آخر تحديث: 2026
+
+1) قبول الشروط
+باستخدامكم هذه المنصّة، فإنكم توافقون على هذه الشروط بالكامل.
+
+2) الاشتراكات والدفع
+الأسعار المعلنة بصفحة الباقات هي المبلغ الفعلي المُحصَّل شهريًا عبر PayPal. يُفعَّل حسابكم ويصدر مفتاح API الخاص بكم تلقائيًا فور تأكيد PayPal لنجاح الدفعة.
+
+3) ضمان استرجاع الأموال
+نوفر استرجاعًا كاملاً لآخر دفعة خلال 14 يومًا من تاريخها، لمرة واحدة فقط لكل حساب. يمكنكم تقديم الطلب مباشرة من لوحة التحكم بعد تسجيل الدخول، وسيُسترجع المبلغ فعليًا عبر PayPal ويُلغى تفعيل الحساب فور تنفيذ الاسترجاع.
+
+4) حدود الاستخدام
+كل باقة محكومة بعدد ملفات وعدد استفسارات شهرية كما هو موضّح بصفحة الأسعار. تجاوز هذه الحدود يتطلب الترقية لباقة أعلى.
+
+5) مسؤوليتكم عن المحتوى
+أنتم مسؤولون بالكامل عن محتوى الملفات التي ترفعونها وعن صحة المعلومات التي يعتمد عليها المساعد في الرد على عملائكم. يمنع رفع محتوى مخالف للقانون أو ينتهك حقوق طرف ثالث.
+
+6) حدود مسؤوليتنا
+تُقدَّم الخدمة "كما هي". لا نضمن دقة ردود الذكاء الاصطناعي بنسبة 100%، وننصح بمراجعة الردود المتعلقة بقرارات حساسة قبل الاعتماد عليها الكامل مع عملائكم.
+
+7) تعليق الخدمة
+يحق لنا تعليق أو إلغاء أي حساب يُساء استخدامه أو ينتهك هذه الشروط، مع إشعاركم عبر البريد الإلكتروني المسجَّل.
+
+8) التواصل
+لأي استفسار يخص هذه الشروط، راسلونا عبر البريد الإلكتروني المذكور في صفحة "تواصل معنا".`
+            },
+            en: {
+                privacyTitle: "Privacy Policy",
+                privacy: `Last updated: 2026
+
+1) Data we collect
+- Account data: company name, email, and a password stored only as a one-way hash, never in plain text.
+- The content of files you upload to train your AI assistant.
+- A log of the questions your customers ask the assistant and the resulting answers.
+- The IP address of requests, used to prevent abuse and enforce rate limits.
+- Payment data: we never store your card numbers; payment processing is handled entirely by PayPal.
+
+2) How we use your data
+- To run the AI assistant: your uploaded file content and your customers' questions are sent to a third-party AI provider (Google Gemini or Anthropic Claude, depending on configuration) to generate answers.
+- To activate your subscription as soon as payment is confirmed, and to send your API key and account-related emails.
+- To enforce your plan's limits (file count, monthly queries) and prevent abuse via rate limiting.
+
+3) Third parties we share data with
+- PayPal: to process payments and subscriptions.
+- Google (Gemini API) or Anthropic: to generate the assistant's answers from your questions and files.
+- Firebase: for Google sign-in, if you use it.
+- Sentry: for technical error monitoring on our server only, with no personally identifying data sent.
+- Our hosting and database providers (Railway and Neon), to run the service and store your data.
+
+4) Data retention and deletion
+We retain your account and file data for as long as your account is active. You may request full deletion of your account and all associated data at any time by contacting us at the email below.
+
+5) Data security
+Traffic to our server is encrypted via HTTPS/TLS. Passwords are stored only as hashes. Access to your account's data (files, query history) requires your own API key.
+
+6) Your rights
+You may request access to, correction of, or full deletion of your data by contacting us.
+
+7) Contact
+For any privacy-related question, reach us via the email listed on the "Contact us" page.`,
+                termsTitle: "Terms of Service",
+                terms: `Last updated: 2026
+
+1) Acceptance of terms
+By using this platform, you agree to these terms in full.
+
+2) Subscriptions and payment
+The prices shown on the pricing page are the actual amount charged monthly via PayPal. Your account is activated and your API key issued automatically as soon as PayPal confirms a successful payment.
+
+3) Money-back guarantee
+We offer a full refund of your most recent payment within 14 days of that payment, once per account. You can request it directly from your dashboard after logging in; the refund is actually issued via PayPal and your account is deactivated once the refund completes.
+
+4) Usage limits
+Each plan is bound by the file count and monthly query limits shown on the pricing page. Exceeding them requires upgrading to a higher plan.
+
+5) Your responsibility for content
+You are fully responsible for the content of the files you upload and for the accuracy of the information the assistant relies on when answering your customers. Uploading unlawful content or content that infringes a third party's rights is prohibited.
+
+6) Limits of our liability
+The service is provided "as is". We do not guarantee the AI's answers are 100% accurate, and we recommend reviewing answers involving sensitive decisions before fully relying on them with your customers.
+
+7) Suspension of service
+We may suspend or terminate any account that is abused or violates these terms, and will notify you at your registered email.
+
+8) Contact
+For any question about these terms, reach us via the email listed on the "Contact us" page.`
+            }
         };
 
         const T = {
@@ -1815,7 +1957,6 @@
                     sideChats: "💬 المحادثات", sideFiles: "📁 الملفات", sideReports: "📊 التقارير", sideSettings: "⚙️ الإعدادات",
                     userMsg: "ما هي سياسة الاسترجاع لدينا؟",
                     inputPlaceholder: "اسأل أي شيء عن شركتك…",
-                    statLabel: "استفسار تمت معالجته اليوم",
                     typing: "بالتأكيد! سياسة الاسترجاع لديكم تسمح باسترجاع الأموال خلال 14 يومًا من تاريخ الشراء، بحسب الملف الذي تم رفعه."
                 },
                 features: {
@@ -1926,7 +2067,6 @@
                     sideChats: "💬 Chats", sideFiles: "📁 Files", sideReports: "📊 Reports", sideSettings: "⚙️ Settings",
                     userMsg: "What's our refund policy?",
                     inputPlaceholder: "Ask anything about your company…",
-                    statLabel: "queries handled today",
                     typing: "Sure! Your refund policy allows a full refund within 14 days of purchase, based on the uploaded policy document."
                 },
                 features: {
@@ -2306,6 +2446,7 @@
 
             fillEmbedCode();
             loadAccountFiles();
+            loadRefundStatus();
         }
 
         function showLoggedOutUI() {
@@ -2406,6 +2547,62 @@
                 });
             } catch (err) { /* تجاهل أخطاء الشبكة هنا بصمت */ }
         }
+
+        async function loadRefundStatus() {
+            const key = currentApiKey();
+            const box = document.getElementById('refundBox');
+            const info = document.getElementById('refundInfoText');
+            const btn = document.getElementById('requestRefundBtn');
+            if (!key) { box.style.display = 'none'; return; }
+            try {
+                const res = await fetch(`${API_BASE_URL}/enterprise/me`, {
+                    headers: { 'x-api-key': key }
+                });
+                if (!res.ok) { box.style.display = 'none'; return; }
+                const data = await res.json();
+                if (data.refunded) {
+                    box.style.display = 'block';
+                    info.textContent = lang === 'ar' ? 'تم استرجاع آخر دفعة على هذا الحساب.' : 'Your last payment has already been refunded.';
+                    btn.style.display = 'none';
+                } else if (data.refund_eligible) {
+                    box.style.display = 'block';
+                    info.textContent = lang === 'ar'
+                        ? 'ضمن مهلة استرجاع الأموال (14 يومًا من الدفع). يمكنكم طلب استرجاع كامل المبلغ.'
+                        : 'You are within the 14-day money-back window. You can request a full refund.';
+                    btn.style.display = 'block';
+                } else {
+                    box.style.display = 'none';
+                }
+            } catch (err) { box.style.display = 'none'; }
+        }
+
+        document.getElementById('requestRefundBtn').addEventListener('click', async () => {
+            const key = currentApiKey();
+            if (!key) return;
+            const confirmMsg = lang === 'ar'
+                ? 'سيتم استرجاع كامل مبلغ آخر دفعة وإلغاء تفعيل حسابكم فورًا. هل أنتم متأكدون؟'
+                : 'This will refund your last payment in full and deactivate your account immediately. Are you sure?';
+            if (!confirm(confirmMsg)) return;
+            const btn = document.getElementById('requestRefundBtn');
+            btn.disabled = true;
+            try {
+                const res = await fetch(`${API_BASE_URL}/enterprise/request-refund`, {
+                    method: 'POST',
+                    headers: { 'x-api-key': key }
+                });
+                const data = await res.json().catch(() => null);
+                if (!res.ok) {
+                    showToast((data && data.detail) || (lang === 'ar' ? 'تعذر تنفيذ الاسترجاع' : 'Refund failed'));
+                    btn.disabled = false;
+                    return;
+                }
+                showToast((data && data.message) || (lang === 'ar' ? 'تم الاسترجاع بنجاح' : 'Refund successful'));
+                loadRefundStatus();
+            } catch (err) {
+                showToast(lang === 'ar' ? 'تعذر الاتصال بالسيرفر' : 'Could not reach the server');
+                btn.disabled = false;
+            }
+        });
 
         document.getElementById('accountEmbedCopyBtn').addEventListener('click', () => {
             const input = document.getElementById('accountEmbedCodeInput');
@@ -2599,6 +2796,22 @@
         document.getElementById('resetModalClose').addEventListener('click', closeResetModal);
         document.getElementById('resetModalOverlay').addEventListener('click', (e) => {
             if (e.target.id === 'resetModalOverlay') closeResetModal();
+        });
+
+        function openLegalModal(which) {
+            const t = LEGAL_TEXT[lang] || LEGAL_TEXT.ar;
+            document.getElementById('legalModalTitle').textContent = which === 'terms' ? t.termsTitle : t.privacyTitle;
+            document.getElementById('legalModalBody').textContent = which === 'terms' ? t.terms : t.privacy;
+            document.getElementById('legalModalOverlay').style.display = 'flex';
+        }
+        function closeLegalModal() {
+            document.getElementById('legalModalOverlay').style.display = 'none';
+        }
+        document.getElementById('footerPrivacyLink').addEventListener('click', (e) => { e.preventDefault(); openLegalModal('privacy'); });
+        document.getElementById('footerTermsLink').addEventListener('click', (e) => { e.preventDefault(); openLegalModal('terms'); });
+        document.getElementById('legalModalClose').addEventListener('click', closeLegalModal);
+        document.getElementById('legalModalOverlay').addEventListener('click', (e) => {
+            if (e.target.id === 'legalModalOverlay') closeLegalModal();
         });
 
         document.getElementById('resetSendCodeBtn').addEventListener('click', async () => {
