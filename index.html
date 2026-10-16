@@ -289,6 +289,34 @@
             }
         }
 
+        /* على الموبايل: نصغّر شريط التنقل حتى لا يتجاوز عرض الشاشة (كان زر الدعوة يخرج عن الصفحة) */
+        @media (max-width:520px) {
+            .nav-inner {
+                padding: 10px 10px;
+                gap: 6px;
+            }
+
+            .brand {
+                font-size: 1rem;
+                gap: 6px;
+            }
+
+            .nav-cta {
+                gap: 5px;
+            }
+
+            .nav-cta .btn {
+                padding-inline: 10px;
+                font-size: 0.76rem;
+                white-space: nowrap;
+            }
+
+            .nav-cta .icon-btn {
+                width: 32px;
+                height: 32px;
+            }
+        }
+
         .hero {
             padding: 76px 0 40px;
         }
@@ -987,8 +1015,17 @@
 
         @media (max-width:860px) {
             .auth-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: minmax(0, 1fr);
             }
+        }
+
+        /* يمنع محتوى بطاقة الحساب (حقول المفتاح الطويلة) من توسيع الصفحة أفقيًا على الموبايل */
+        .auth-grid>* {
+            min-width: 0;
+        }
+
+        .auth-card input {
+            min-width: 0;
         }
 
         .auth-copy h2 {
@@ -1598,6 +1635,9 @@
                                         id="requestRefundBtn">طلب استرجاع الأموال</button>
                                 </div>
 
+                                <a href="#results" class="btn btn-primary btn-block" style="margin-bottom:10px;">📊
+                                    لوحة النتائج: الزبائن والأسئلة والمحادثات</a>
+
                                 <button type="button" class="btn btn-ghost btn-block" id="accountLogoutBtn">تسجيل
                                     الخروج</button>
                             </div>
@@ -1654,6 +1694,515 @@
             </div>
         </section>
 
+
+        <section id="results" style="display:none; background:var(--bg-1);" dir="rtl">
+            <style>
+                #results .rs-head {
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: flex-end;
+                    justify-content: space-between;
+                    gap: 14px;
+                    margin-bottom: 22px;
+                }
+
+                #results .rs-head h2 {
+                    margin: 0 0 4px 0;
+                    font-size: clamp(1.4rem, 2.6vw, 2rem);
+                    font-weight: 800;
+                }
+
+                #results .rs-head p {
+                    margin: 0;
+                    color: var(--text-1);
+                    font-size: .95rem;
+                }
+
+                #results .rs-tools {
+                    display: flex;
+                    gap: 8px;
+                    align-items: center;
+                }
+
+                #results select,
+                #results input[type=text],
+                #results input[type=email],
+                #results textarea {
+                    background: var(--glass);
+                    border: 1px solid var(--border);
+                    color: var(--text-0);
+                    padding: 9px 11px;
+                    border-radius: var(--radius-sm);
+                    font-family: inherit;
+                    font-size: .9rem;
+                    width: 100%;
+                }
+
+                #results .rs-tools select {
+                    width: auto;
+                }
+
+                #results textarea {
+                    resize: vertical;
+                }
+
+                #results .rs-stats {
+                    display: grid;
+                    grid-template-columns: repeat(5, 1fr);
+                    gap: 12px;
+                    margin-bottom: 22px;
+                }
+
+                #results .rs-stat {
+                    background: var(--glass);
+                    border: 1px solid var(--border);
+                    border-radius: var(--radius-md);
+                    padding: 16px;
+                }
+
+                #results .rs-stat b {
+                    display: block;
+                    font-size: 1.7rem;
+                    font-weight: 800;
+                    line-height: 1.2;
+                }
+
+                #results .rs-stat span {
+                    color: var(--text-1);
+                    font-size: .82rem;
+                }
+
+                #results .rs-stat.hot b {
+                    color: var(--gold);
+                }
+
+                #results .rs-tabs {
+                    display: flex;
+                    gap: 6px;
+                    flex-wrap: wrap;
+                    margin-bottom: 16px;
+                    border-bottom: 1px solid var(--border);
+                }
+
+                #results .rs-tab {
+                    background: none;
+                    border: none;
+                    color: var(--text-1);
+                    padding: 10px 14px;
+                    cursor: pointer;
+                    font-family: inherit;
+                    font-size: .95rem;
+                    font-weight: 700;
+                    border-bottom: 2px solid transparent;
+                    margin-bottom: -1px;
+                }
+
+                #results .rs-tab.active {
+                    color: var(--text-0);
+                    border-bottom-color: var(--violet);
+                }
+
+                #results .rs-badge {
+                    background: var(--gold);
+                    color: #1a1200;
+                    border-radius: 999px;
+                    font-size: .72rem;
+                    padding: 1px 7px;
+                    margin-inline-start: 6px;
+                    font-weight: 800;
+                }
+
+                #results .rs-card {
+                    background: var(--glass);
+                    border: 1px solid var(--border);
+                    border-radius: var(--radius-md);
+                    padding: 14px 16px;
+                    margin-bottom: 10px;
+                }
+
+                #results .rs-row {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 10px;
+                    align-items: center;
+                    justify-content: space-between;
+                }
+
+                #results .rs-name {
+                    font-weight: 800;
+                }
+
+                #results .rs-meta {
+                    color: var(--text-2);
+                    font-size: .8rem;
+                }
+
+                #results .rs-ask {
+                    color: var(--text-1);
+                    font-size: .86rem;
+                    margin-top: 6px;
+                }
+
+                #results .rs-actions {
+                    display: flex;
+                    gap: 6px;
+                    flex-wrap: wrap;
+                    align-items: center;
+                    margin-top: 10px;
+                }
+
+                #results .rs-chip {
+                    display: inline-block;
+                    background: var(--glass-strong);
+                    border: 1px solid var(--border);
+                    border-radius: 999px;
+                    padding: 5px 11px;
+                    font-size: .82rem;
+                    color: var(--text-0);
+                    text-decoration: none;
+                    cursor: pointer;
+                }
+
+                #results .rs-chip:hover {
+                    border-color: var(--violet);
+                }
+
+                #results .rs-del {
+                    background: none;
+                    border: none;
+                    color: var(--text-2);
+                    cursor: pointer;
+                    font-size: .82rem;
+                    font-family: inherit;
+                }
+
+                #results .rs-empty {
+                    text-align: center;
+                    color: var(--text-1);
+                    padding: 36px 16px;
+                    border: 1px dashed var(--border);
+                    border-radius: var(--radius-md);
+                    line-height: 1.9;
+                }
+
+                #results .rs-bubble {
+                    padding: 8px 12px;
+                    border-radius: 12px;
+                    margin: 6px 0;
+                    font-size: .88rem;
+                    white-space: pre-wrap;
+                    line-height: 1.7;
+                }
+
+                #results .rs-bubble.q {
+                    background: rgba(139, 107, 255, .18);
+                }
+
+                #results .rs-bubble.a {
+                    background: var(--glass-strong);
+                }
+
+                #results details>summary {
+                    cursor: pointer;
+                    list-style: none;
+                }
+
+                #results .rs-form label {
+                    display: block;
+                    font-size: .85rem;
+                    color: var(--text-1);
+                    margin: 14px 0 6px;
+                    font-weight: 700;
+                }
+
+                #results .rs-hint {
+                    font-size: .78rem;
+                    color: var(--text-2);
+                    margin-top: 4px;
+                }
+
+                #results .rs-note {
+                    font-size: .78rem;
+                    color: var(--text-2);
+                    margin-top: 14px;
+                }
+
+                @media (max-width: 860px) {
+                    #results .rs-stats {
+                        grid-template-columns: repeat(2, 1fr);
+                    }
+                }
+            </style>
+            <div class="wrap">
+                <div class="rs-head">
+                    <div>
+                        <span class="kicker">📊 لوحة النتائج</span>
+                        <h2>ماذا حقّق لك مساعدك الذكي؟</h2>
+                        <p>الزبائن الذين تركوا أرقامهم، وأسئلة لم يعرف البوت جوابها، وكل المحادثات — في مكان واحد.</p>
+                    </div>
+                    <div class="rs-tools">
+                        <select id="rsDays" aria-label="الفترة">
+                            <option value="7">آخر 7 أيام</option>
+                            <option value="30" selected>آخر 30 يومًا</option>
+                            <option value="90">آخر 90 يومًا</option>
+                        </select>
+                        <button type="button" class="btn btn-ghost btn-sm" id="rsRefresh">تحديث</button>
+                    </div>
+                </div>
+
+                <div id="rsError" class="rs-empty" style="display:none;"></div>
+                <div class="rs-stats" id="rsStats"></div>
+
+                <div class="rs-tabs" id="rsTabs">
+                    <button type="button" class="rs-tab active" data-tab="leads">الزبائن <span
+                            id="rsBadgeLeads"></span></button>
+                    <button type="button" class="rs-tab" data-tab="unanswered">أسئلة بلا جواب <span
+                            id="rsBadgeUnanswered"></span></button>
+                    <button type="button" class="rs-tab" data-tab="convos">المحادثات</button>
+                    <button type="button" class="rs-tab" data-tab="settings">إعدادات المساعد</button>
+                </div>
+                <div id="rsPanel"></div>
+            </div>
+            <script>
+                (function () {
+                    const $ = (id) => document.getElementById(id);
+                    const sec = $('results');
+                    let tab = 'leads';
+                    let data = null;
+                    let settings = null;
+
+                    const STATUS_LABELS = { new: 'جديد', contacted: 'تم التواصل', won: 'تم البيع ✅', lost: 'لم يُكمل' };
+
+                    // كل نص قادم من الزوار يُعرض عبر textContent فقط (لا innerHTML) لمنع أي حقن.
+                    function h(tag, attrs, ...kids) {
+                        const e = document.createElement(tag);
+                        if (attrs) for (const [k, v] of Object.entries(attrs)) {
+                            if (v === false || v == null) continue;
+                            if (k === 'class') e.className = v;
+                            else if (k === 'text') e.textContent = v;
+                            else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+                            else e.setAttribute(k, v);
+                        }
+                        for (const kid of kids.flat()) {
+                            if (kid == null || kid === false) continue;
+                            e.appendChild(typeof kid === 'string' ? document.createTextNode(kid) : kid);
+                        }
+                        return e;
+                    }
+
+                    function api(path, opts = {}) {
+                        return fetch(`${API_BASE_URL}${path}`, {
+                            ...opts,
+                            headers: { 'Content-Type': 'application/json', 'x-api-key': currentApiKey(), ...(opts.headers || {}) },
+                        });
+                    }
+
+                    function fmtDate(iso) {
+                        try { return new Date(iso).toLocaleString('ar-JO', { dateStyle: 'medium', timeStyle: 'short' }); }
+                        catch (e) { return iso || ''; }
+                    }
+
+                    function fmtMinutes(m) {
+                        if (!m) return '0';
+                        return m < 60 ? `${m} دقيقة` : `${(m / 60).toFixed(1)} ساعة`;
+                    }
+
+                    function renderStats() {
+                        const s = data.stats;
+                        const cards = [
+                            { n: s.leads, l: 'زبائن محتملون', hot: s.leads > 0 },
+                            { n: s.answered, l: 'سؤال أجاب عنه البوت بنفسه' },
+                            { n: s.answer_rate == null ? '—' : s.answer_rate + '%', l: 'نسبة الأسئلة المجاب عنها' },
+                            { n: s.conversations, l: 'محادثات' },
+                            { n: fmtMinutes(s.minutes_saved_est), l: 'وقت موفّر (تقدير: دقيقتان لكل سؤال)' },
+                        ];
+                        const box = $('rsStats');
+                        box.replaceChildren(...cards.map(c => h('div', { class: 'rs-stat' + (c.hot ? ' hot' : '') }, h('b', { text: String(c.n) }), h('span', { text: c.l }))));
+                        $('rsBadgeLeads').replaceChildren(...(s.new_leads ? [h('span', { class: 'rs-badge', text: String(s.new_leads) })] : []));
+                        $('rsBadgeUnanswered').replaceChildren(...(data.unanswered.length ? [h('span', { class: 'rs-badge', text: String(data.unanswered.length) })] : []));
+                    }
+
+                    function empty(text) { return h('div', { class: 'rs-empty', text }); }
+
+                    // ---------- الزبائن ----------
+                    function csvCell(v) {
+                        let s = String(v == null ? '' : v).replace(/"/g, '""');
+                        if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; // منع حقن المعادلات في Excel
+                        return `"${s}"`;
+                    }
+                    function exportLeads() {
+                        const rows = [['الاسم', 'الهاتف', 'البريد', 'ملاحظة', 'ما سأل عنه', 'المصدر', 'الحالة', 'التاريخ']];
+                        data.leads.forEach(l => rows.push([l.name, l.phone, l.email, l.message, (l.asked || []).join(' | '), l.source, STATUS_LABELS[l.status] || l.status, l.at]));
+                        const csv = '﻿' + rows.map(r => r.map(csvCell).join(',')).join('\n');
+                        const a = h('a', { href: URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })), download: 'leads.csv' });
+                        document.body.appendChild(a); a.click(); a.remove();
+                    }
+
+                    function leadCard(l) {
+                        const digits = (l.phone || '').replace(/\D/g, '');
+                        const actions = h('div', { class: 'rs-actions' });
+                        if (l.phone) actions.appendChild(h('a', { class: 'rs-chip', href: 'tel:' + l.phone.replace(/[^\d+]/g, ''), text: '📞 اتصال' }));
+                        if (digits && /^(\+|00)/.test(l.phone.trim())) {
+                            actions.appendChild(h('a', { class: 'rs-chip', href: 'https://wa.me/' + digits.replace(/^0+/, ''), target: '_blank', rel: 'noopener', text: '💬 واتساب' }));
+                        }
+                        if (l.email) actions.appendChild(h('a', { class: 'rs-chip', href: 'mailto:' + encodeURIComponent(l.email), text: '✉️ بريد' }));
+
+                        const sel = h('select', { 'aria-label': 'حالة الزبون', style: 'width:auto;' },
+                            ...Object.entries(STATUS_LABELS).map(([v, t]) => h('option', { value: v, text: t, selected: v === l.status ? 'selected' : false })));
+                        sel.addEventListener('change', async () => {
+                            const r = await api(`/enterprise/leads/${encodeURIComponent(l.id)}/status`, { method: 'POST', body: JSON.stringify({ status: sel.value }) });
+                            if (r.ok) { l.status = sel.value; showToast('تم تحديث الحالة'); load(false); }
+                            else showToast('تعذر تحديث الحالة');
+                        });
+                        const del = h('button', {
+                            type: 'button', class: 'rs-del', text: 'حذف', onclick: async () => {
+                                if (!confirm('حذف هذا الزبون نهائيًا؟')) return;
+                                const r = await api(`/enterprise/leads/${encodeURIComponent(l.id)}`, { method: 'DELETE' });
+                                if (r.ok) load(false); else showToast('تعذر الحذف');
+                            }
+                        });
+                        actions.append(sel, del);
+
+                        return h('div', { class: 'rs-card' },
+                            h('div', { class: 'rs-row' },
+                                h('div', null,
+                                    h('span', { class: 'rs-name', text: l.name || 'زبون' }),
+                                    l.status === 'new' ? h('span', { class: 'rs-badge', text: 'جديد' }) : null),
+                                h('span', { class: 'rs-meta', text: fmtDate(l.at) + (l.source === 'link' ? ' · رابط المحادثة' : ' · الموقع') })),
+                            l.phone ? h('div', { class: 'rs-ask', dir: 'ltr', style: 'text-align:right;', text: l.phone }) : null,
+                            l.email ? h('div', { class: 'rs-ask', dir: 'ltr', style: 'text-align:right;', text: l.email }) : null,
+                            l.message ? h('div', { class: 'rs-ask', text: 'ملاحظته: ' + l.message }) : null,
+                            (l.asked && l.asked.length) ? h('div', { class: 'rs-ask', text: 'سأل عن: ' + l.asked.join(' · ') }) : null,
+                            actions);
+                    }
+
+                    function renderLeads() {
+                        if (!data.leads.length) {
+                            return [empty('لا يوجد زبائن بعد. شارك رابط المحادثة (في Bio إنستغرام أو حالة واتساب) أو ضع الويدجت في موقعك، وعندما يُبدي زائر اهتمامًا بالشراء أو الحجز سيطلب منه المساعد ترك رقمه، وستصلك رسالة على بريدك فورًا.')];
+                        }
+                        return [
+                            h('div', { class: 'rs-row', style: 'margin-bottom:12px;' },
+                                h('span', { class: 'rs-meta', text: 'تواصل مع الزبون بأسرع وقت — أول من يرد غالبًا يكسب الزبون.' }),
+                                h('button', { type: 'button', class: 'btn btn-ghost btn-sm', text: 'تصدير CSV', onclick: exportLeads })),
+                            ...data.leads.map(leadCard),
+                        ];
+                    }
+
+                    // ---------- أسئلة بلا جواب ----------
+                    function unansweredCard(u) {
+                        const ta = h('textarea', { rows: '2', maxlength: '1000', placeholder: 'اكتب الجواب الصحيح ليتعلمه المساعد فورًا...' });
+                        const btn = h('button', { type: 'button', class: 'btn btn-primary btn-sm', text: 'علّم المساعد' });
+                        btn.addEventListener('click', async () => {
+                            const answer = ta.value.trim();
+                            if (!answer) { showToast('اكتب الجواب أولًا'); return; }
+                            btn.disabled = true;
+                            const r = await api('/enterprise/teach', { method: 'POST', body: JSON.stringify({ question: u.question, answer }) });
+                            const d = await r.json().catch(() => null);
+                            if (r.ok) { showToast('تعلّم المساعد الجواب ✅'); load(false); }
+                            else { showToast((d && d.detail) || 'تعذر الحفظ'); btn.disabled = false; }
+                        });
+                        return h('div', { class: 'rs-card' },
+                            h('div', { class: 'rs-row' },
+                                h('span', { class: 'rs-name', text: u.question }),
+                                h('span', { class: 'rs-meta', text: `سُئل ${u.count} ${u.count === 1 ? 'مرة' : 'مرات'} · آخر مرة ${fmtDate(u.last_at)}` })),
+                            h('div', { style: 'margin-top:10px;' }, ta),
+                            h('div', { class: 'rs-actions' }, btn));
+                    }
+                    function renderUnanswered() {
+                        if (!data.unanswered.length) {
+                            return [empty('ممتاز! لا توجد أسئلة بلا جواب حاليًا. عندما يسأل زبون شيئًا غير موجود في بياناتك، سيظهر هنا لتكتب جوابه مرة واحدة ويتعلمه المساعد.')];
+                        }
+                        return [h('p', { class: 'rs-meta', style: 'margin:0 0 12px 0;', text: 'هذه أسئلة زبائنك التي لم يجد المساعد جوابها في بياناتك. اكتب الجواب ويُضاف فورًا لمعرفة المساعد.' }), ...data.unanswered.map(unansweredCard)];
+                    }
+
+                    // ---------- المحادثات ----------
+                    function renderConvos() {
+                        if (!data.recent.length) return [empty('لا توجد محادثات في هذه الفترة بعد.')];
+                        return data.recent.map(s => {
+                            const first = s.turns[0] ? s.turns[0].q : '';
+                            const hasUnknown = s.turns.some(t => t.unknown);
+                            return h('details', { class: 'rs-card' },
+                                h('summary', { class: 'rs-row' },
+                                    h('span', { class: 'rs-name', text: first.length > 70 ? first.slice(0, 70) + '…' : first }),
+                                    h('span', { class: 'rs-meta', text: fmtDate(s.last_at) + (s.has_lead ? ' · 🔔 ترك رقمه' : '') + (hasUnknown ? ' · ❓ سؤال بلا جواب' : '') })),
+                                ...s.turns.flatMap(t => [h('div', { class: 'rs-bubble q', text: t.q }), h('div', { class: 'rs-bubble a', text: t.a })]));
+                        });
+                    }
+
+                    // ---------- الإعدادات ----------
+                    function renderSettings() {
+                        if (!settings) return [empty('تعذر تحميل الإعدادات.')];
+                        const greeting = h('input', { type: 'text', maxlength: '200', value: settings.greeting || '', placeholder: 'أهلًا بك في ... كيف أقدر أخدمك؟' });
+                        const contact = h('textarea', { rows: '2', maxlength: '300', placeholder: 'مثال: واتساب 0795550123 أو اتصل بنا على ...' });
+                        contact.value = settings.contact_text || '';
+                        const dialect = h('select', null,
+                            ...[['auto', 'تلقائي (حسب لهجة الزبون)'], ['gulf', 'لهجة بيضاء قريبة من الخليجية'], ['levant', 'لهجة بيضاء قريبة من الشامية'], ['msa', 'فصحى مبسطة']]
+                                .map(([v, t]) => h('option', { value: v, text: t, selected: v === settings.dialect ? 'selected' : false })));
+                        const notifyEmail = h('input', { type: 'email', dir: 'ltr', maxlength: '120', value: settings.notify_email || '', placeholder: settings.account_email || 'name@example.com' });
+                        const notify = h('input', { type: 'checkbox' });
+                        notify.checked = settings.notify_leads !== false;
+                        const save = h('button', { type: 'button', class: 'btn btn-primary', text: 'حفظ الإعدادات' });
+                        save.addEventListener('click', async () => {
+                            save.disabled = true;
+                            const r = await api('/enterprise/settings', {
+                                method: 'POST', body: JSON.stringify({
+                                    greeting: greeting.value, contact_text: contact.value, dialect: dialect.value,
+                                    notify_email: notifyEmail.value, notify_leads: notify.checked
+                                })
+                            });
+                            const d = await r.json().catch(() => null);
+                            if (r.ok) { settings = { ...settings, ...d }; showToast('تم حفظ الإعدادات ✅'); }
+                            else showToast((d && d.detail) || 'تعذر الحفظ');
+                            save.disabled = false;
+                        });
+                        return [h('div', { class: 'rs-card rs-form' },
+                            h('label', { text: 'رسالة الترحيب' }), greeting,
+                            h('label', { text: 'وسيلة التواصل التي يعطيها المساعد عندما لا يعرف الجواب' }), contact,
+                            h('div', { class: 'rs-hint', text: 'يكتبها المساعد كما هي (رقم واتساب، هاتف، ساعات الدوام...). اتركها فارغة ليطلب من الزائر ترك رقمه.' }),
+                            h('label', { text: 'لهجة المساعد' }), dialect,
+                            h('label', { text: 'بريد استقبال تنبيهات الزبائن' }), notifyEmail,
+                            h('div', { class: 'rs-hint', text: 'اتركه فارغًا لاستخدام بريد حسابك.' }),
+                            h('label', { style: 'display:flex; gap:8px; align-items:center; cursor:pointer;' }, notify, 'أرسل لي بريدًا فوريًا عند وصول زبون جديد'),
+                            h('div', { style: 'margin-top:18px;' }, save),
+                            h('p', { class: 'rs-note', text: 'ملاحظة: وصول البريد يعتمد على إعدادات الإرسال في السيرفر؛ الزبائن يظهرون هنا دائمًا حتى لو تأخر البريد.' }))];
+                    }
+
+                    function renderPanel() {
+                        if (!data) return;
+                        const builders = { leads: renderLeads, unanswered: renderUnanswered, convos: renderConvos, settings: renderSettings };
+                        $('rsPanel').replaceChildren(...builders[tab]());
+                        document.querySelectorAll('#rsTabs .rs-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+                    }
+
+                    async function load(withSettings = true) {
+                        const err = $('rsError');
+                        try {
+                            const days = $('rsDays').value;
+                            const reqs = [api(`/enterprise/insights?days=${encodeURIComponent(days)}`)];
+                            if (withSettings || !settings) reqs.push(api('/enterprise/settings'));
+                            const [ins, set] = await Promise.all(reqs);
+                            if (!ins.ok) throw new Error('insights');
+                            data = await ins.json();
+                            if (set && set.ok) settings = await set.json();
+                            err.style.display = 'none';
+                            $('rsStats').style.display = '';
+                            renderStats();
+                            renderPanel();
+                        } catch (e) {
+                            err.style.display = 'block';
+                            err.textContent = 'تعذر تحميل النتائج الآن. حدّث الصفحة أو حاول بعد قليل.';
+                        }
+                    }
+
+                    document.querySelectorAll('#rsTabs .rs-tab').forEach(b => b.addEventListener('click', () => { tab = b.dataset.tab; renderPanel(); }));
+                    $('rsRefresh').addEventListener('click', () => load(true));
+                    $('rsDays').addEventListener('change', () => load(false));
+
+                    window.loadResults = function () { sec.style.display = 'block'; load(true); };
+                    window.hideResults = function () { sec.style.display = 'none'; data = null; settings = null; };
+                })();
+            </script>
+        </section>
 
         <section style="background:var(--bg-1);">
             <div class="wrap">
@@ -2473,6 +3022,7 @@ For any question about these terms, reach us via the email listed on the "Contac
             loadAccountFiles();
             loadRefundStatus();
             loadPublicChatLink();
+            if (window.loadResults) window.loadResults();
         }
 
         async function loadPublicChatLink() {
@@ -2496,6 +3046,7 @@ For any question about these terms, reach us via the email listed on the "Contac
             document.getElementById('accountPanel').style.display = 'none';
             document.getElementById('navLoginBtn').style.display = 'inline-flex';
             document.getElementById('navLogoutBtn').style.display = 'none';
+            if (window.hideResults) window.hideResults();
             clearInterval(trialCountdownTimer);
         }
 
@@ -2705,7 +3256,8 @@ For any question about these terms, reach us via the email listed on the "Contac
                 const res = await fetch(`${API_BASE_URL}/enterprise/ask`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'x-api-key': key },
-                    body: JSON.stringify({ question })
+                    // جلسة "test-" = تجربة من لوحة التحكم: لا تُسجَّل ضمن محادثات الزبائن ولا إحصائياتهم
+                    body: JSON.stringify({ question, session_id: 'test-' + Math.random().toString(36).slice(2, 10) })
                 });
                 const data = await res.json().catch(() => null);
                 answerBox.textContent = (res.ok && data && data.answer) ? data.answer : ((data && data.detail) || (lang === 'ar' ? 'حدث خطأ' : 'Something went wrong'));
