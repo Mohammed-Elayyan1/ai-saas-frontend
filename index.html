@@ -1474,6 +1474,8 @@
                     <div class="hero-actions">
                         <a href="#pricing" class="btn btn-primary" data-i18n="hero.ctaPrimary"></a>
                         <a href="#how" class="btn btn-ghost" data-i18n="hero.ctaSecondary"></a>
+                        <a id="demoBtn" class="btn btn-ghost" style="display:none;" target="_blank" rel="noopener">💬
+                            جرّب مساعدًا تجريبيًا</a>
                     </div>
                     <div class="hero-trust">
                         <span data-i18n="hero.trust1"></span>
@@ -1562,10 +1564,18 @@
                                 <div id="trialBanner"
                                     style="display:none; background:rgba(240,182,76,0.12); border:1px solid rgba(240,182,76,0.35); padding:10px; border-radius:8px; margin-bottom:16px; font-size:13px; color:var(--gold);">
                                 </div>
+                                <div id="onboardBox"
+                                    style="display:none; background:rgba(139,107,255,0.10); padding:12px; border-radius:8px; margin-bottom:18px; text-align:right; border:1px solid rgba(139,107,255,0.35);">
+                                    <p style="color:var(--text-0); font-size:13px; font-weight:700; margin:0 0 8px 0;">
+                                        🚀 ابدأ بـ 3 خطوات:</p>
+                                    <ul id="onboardList"
+                                        style="list-style:none; margin:0; padding:0; font-size:13px; color:var(--text-1); line-height:2;">
+                                    </ul>
+                                </div>
                                 <div
                                     style="background:rgba(0,0,0,0.25); padding:12px; border-radius:8px; margin-bottom:18px; text-align:right; border:1px solid var(--border);">
                                     <p style="color:var(--text-2); font-size:11px; margin:0 0 6px 0;">🔑 مفتاح API
-                                        الخاص بكم:</p>
+                                        الخاص بكم (سرّي — لا تضعه بكود موقعك ولا تشاركه):</p>
                                     <div style="display:flex; align-items:center; gap:8px;">
                                         <input type="text" readonly id="accountApiKeyInput"
                                             style="background:rgba(255,255,255,0.05); border:1px solid var(--border); color:var(--text-0); padding:8px; border-radius:4px; flex-grow:1; font-family:monospace; font-size:11px; direction:ltr;">
@@ -1959,6 +1969,7 @@
                     <button type="button" class="rs-tab" data-tab="unanswered">أسئلة بلا جواب <span
                             id="rsBadgeUnanswered"></span></button>
                     <button type="button" class="rs-tab" data-tab="convos">المحادثات</button>
+                    <button type="button" class="rs-tab" data-tab="roi">العائد والإحصائيات</button>
                     <button type="button" class="rs-tab" data-tab="settings">إعدادات المساعد</button>
                 </div>
                 <div id="rsPanel"></div>
@@ -2130,6 +2141,71 @@
                     }
 
                     // ---------- الإعدادات ----------
+                    // نرسل دائمًا كل الحقول (ومنها أرقام العائد) كي لا يمسح حفظ أحد التبويبين إعدادات الآخر
+                    function settingsBody(over) {
+                        const s0 = settings || {};
+                        return Object.assign({
+                            greeting: s0.greeting || '', contact_text: s0.contact_text || '', dialect: s0.dialect || 'auto',
+                            notify_email: s0.notify_email || '', notify_leads: s0.notify_leads !== false,
+                            avg_sale: s0.avg_sale || 0, close_rate: s0.close_rate || 0, currency: s0.currency || '',
+                        }, over || {});
+                    }
+
+                    // ---------- العائد والإحصائيات ----------
+                    function money(v, cur) {
+                        const n = Number(v) || 0;
+                        return n.toLocaleString('ar-JO', { maximumFractionDigits: 2 }) + (cur ? ' ' + cur : '');
+                    }
+                    function renderRoi() {
+                        const r = data.roi || {};
+                        const avg = h('input', { type: 'number', min: '0', step: 'any', dir: 'ltr', value: r.avg_sale || '', placeholder: 'مثال: 40' });
+                        const rate = h('input', { type: 'number', min: '0', max: '100', step: 'any', dir: 'ltr', value: r.close_rate || '', placeholder: 'مثال: 20' });
+                        const cur = h('input', { type: 'text', maxlength: '8', value: r.currency || '', placeholder: 'دينار / $ / ريال' });
+                        const save = h('button', { type: 'button', class: 'btn btn-primary btn-sm', text: 'احسب' });
+                        save.addEventListener('click', async () => {
+                            save.disabled = true;
+                            const res = await api('/enterprise/settings', {
+                                method: 'POST', body: JSON.stringify(settingsBody({
+                                    avg_sale: parseFloat(avg.value) || 0, close_rate: parseFloat(rate.value) || 0, currency: cur.value
+                                }))
+                            });
+                            const d = await res.json().catch(() => null);
+                            if (res.ok) { settings = { ...settings, ...d }; showToast('تم الحفظ ✅'); load(false); }
+                            else { showToast((d && d.detail) || 'تعذر الحفظ'); save.disabled = false; }
+                        });
+
+                        const out = [];
+                        out.push(h('div', { class: 'rs-card rs-form' },
+                            h('b', { text: '💰 كم قد تساوي هذه الزبائن بالنسبة لك؟' }),
+                            h('div', { class: 'rs-hint', text: 'أدخل أرقامك أنت — المنصة لا تعرف مبيعاتك الفعلية ولا تعدك بنتيجة. نحسب فقط من بياناتك.' }),
+                            h('label', { text: 'متوسط قيمة البيعة الواحدة' }), avg,
+                            h('label', { text: 'من كل 100 زبون مهتم، كم تقدّر أنك تبيع لهم؟ (%)' }), rate,
+                            h('label', { text: 'العملة (اختياري)' }), cur,
+                            h('div', { style: 'margin-top:14px;' }, save)));
+
+                        if (r.configured) {
+                            out.push(h('div', { class: 'rs-stats', style: 'grid-template-columns:repeat(3,1fr); margin-top:6px;' },
+                                h('div', { class: 'rs-stat hot' }, h('b', { text: money(r.won_value, r.currency) }),
+                                    h('span', { text: `مبيعات مؤكدة: ${r.won_leads} زبون علّمتَهم «تم البيع» × متوسط البيعة` })),
+                                h('div', { class: 'rs-stat' }, h('b', { text: String(r.open_leads) }),
+                                    h('span', { text: 'زبائن ما زالوا بانتظار تواصلك' })),
+                                h('div', { class: 'rs-stat' }, h('b', { text: r.close_rate > 0 ? '≈ ' + money(r.pipeline_value, r.currency) : '—' }),
+                                    h('span', { text: r.close_rate > 0 ? `قيمة محتملة (تقدير): ${r.open_leads} × ${r.close_rate}% × متوسط البيعة` : 'أدخل نسبة البيع المتوقعة لتظهر القيمة المحتملة' }))));
+                            out.push(h('p', { class: 'rs-note', text: 'المبيعات المؤكدة تعتمد على أنك تحدّث حالة كل زبون في تبويب «الزبائن». القيمة المحتملة تقدير من أرقامك وليست وعدًا، والنتيجة الفعلية تعتمد على سرعة ردك وجودة منتجك.' }));
+                        }
+
+                        out.push(h('b', { style: 'display:block; margin:22px 0 10px;', text: '🔥 أكثر أسئلة زبائنك تكرارًا' }));
+                        if (!data.top_questions || !data.top_questions.length) {
+                            out.push(empty('لا توجد أسئلة متكررة بعد. عندما يتكرر نفس السؤال مرتين أو أكثر سيظهر هنا — وهذا يخبرك ماذا يريد زبائنك فعلًا.'));
+                        } else {
+                            const max = Math.max(...data.top_questions.map(q => q.count));
+                            data.top_questions.forEach(q => out.push(h('div', { class: 'rs-card' },
+                                h('div', { class: 'rs-row' }, h('span', { class: 'rs-name', text: q.question }), h('span', { class: 'rs-meta', text: `${q.count} مرات` })),
+                                h('div', { style: `margin-top:8px; height:6px; border-radius:6px; background:var(--violet); width:${Math.max(6, Math.round(q.count * 100 / max))}%;` }))));
+                        }
+                        return out;
+                    }
+
                     function renderSettings() {
                         if (!settings) return [empty('تعذر تحميل الإعدادات.')];
                         const greeting = h('input', { type: 'text', maxlength: '200', value: settings.greeting || '', placeholder: 'أهلًا بك في ... كيف أقدر أخدمك؟' });
@@ -2145,10 +2221,10 @@
                         save.addEventListener('click', async () => {
                             save.disabled = true;
                             const r = await api('/enterprise/settings', {
-                                method: 'POST', body: JSON.stringify({
+                                method: 'POST', body: JSON.stringify(settingsBody({
                                     greeting: greeting.value, contact_text: contact.value, dialect: dialect.value,
                                     notify_email: notifyEmail.value, notify_leads: notify.checked
-                                })
+                                }))
                             });
                             const d = await r.json().catch(() => null);
                             if (r.ok) { settings = { ...settings, ...d }; showToast('تم حفظ الإعدادات ✅'); }
@@ -2164,12 +2240,21 @@
                             h('div', { class: 'rs-hint', text: 'اتركه فارغًا لاستخدام بريد حسابك.' }),
                             h('label', { style: 'display:flex; gap:8px; align-items:center; cursor:pointer;' }, notify, 'أرسل لي بريدًا فوريًا عند وصول زبون جديد'),
                             h('div', { style: 'margin-top:18px;' }, save),
+                            h('label', { text: 'الخصوصية' }),
+                            h('div', { class: 'rs-hint', text: 'نصوص المحادثات تُحذف تلقائيًا بعد 90 يومًا، ولا يراها إلا أنت. الزوار يرون تنبيهًا بأن المحادثة محفوظة. حذف المحادثات لا يحذف الزبائن.' }),
+                            h('div', { style: 'margin-top:10px;' }, h('button', {
+                                type: 'button', class: 'btn btn-ghost btn-sm', text: 'حذف كل نصوص المحادثات الآن', onclick: async () => {
+                                    if (!confirm('حذف كل المحادثات المسجّلة نهائيًا؟ (الزبائن لا يتأثرون)')) return;
+                                    const r = await api('/enterprise/conversations', { method: 'DELETE' });
+                                    if (r.ok) { showToast('تم حذف المحادثات'); load(false); } else showToast('تعذر الحذف');
+                                }
+                            })),
                             h('p', { class: 'rs-note', text: 'ملاحظة: وصول البريد يعتمد على إعدادات الإرسال في السيرفر؛ الزبائن يظهرون هنا دائمًا حتى لو تأخر البريد.' }))];
                     }
 
                     function renderPanel() {
                         if (!data) return;
-                        const builders = { leads: renderLeads, unanswered: renderUnanswered, convos: renderConvos, settings: renderSettings };
+                        const builders = { leads: renderLeads, unanswered: renderUnanswered, convos: renderConvos, roi: renderRoi, settings: renderSettings };
                         $('rsPanel').replaceChildren(...builders[tab]());
                         document.querySelectorAll('#rsTabs .rs-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
                     }
@@ -2381,6 +2466,14 @@
         // بعد نشر main.py على سيرفر حقيقي، غيّر هذا الرابط ليطابق رابط الخادم الفعلي
         // After deploying main.py to a real server, update this to your server's URL
         const API_BASE_URL = "https://ai-saas-backend-213z.onrender.com";
+        // رابط محادثة تجريبية حقيقية: أنشئ حسابًا باسم نشاط تجريبي، ارفع له معلومات، وضع هنا
+        // توكنه العام (يبدأ بـ pub_) — الزر يظهر تلقائيًا. اتركه فارغًا لإخفاء الزر.
+        const DEMO_CHAT_TOKEN = "";
+        if (DEMO_CHAT_TOKEN) {
+            const demoBtn = document.getElementById('demoBtn');
+            demoBtn.href = `${API_BASE_URL}/chat/${DEMO_CHAT_TOKEN}`;
+            demoBtn.style.display = '';
+        }
 
         // روابط PayPal الثابتة لكل باقة
         const PAYPAL_LINKS = {
@@ -2523,10 +2616,10 @@ For any question about these terms, reach us via the email listed on the "Contac
                 nav: { features: "المميزات", how: "كيف تعمل", pricing: "الأسعار", faq: "الأسئلة الشائعة", login: "تسجيل الدخول", cta: "ابدأ رحلتك الآن", logout: "تسجيل الخروج" },
                 hero: {
                     eyebrow: "نسخة تجريبية مجانية لمدة 14 يومًا",
-                    title: 'ذكاء اصطناعي خاص بشركتك<br><span class="grad">يجيب، يحلّل، ويعمل نيابة عنك</span>',
-                    sub: "ارفع بيانات شركتك، واحصل على مساعد ذكاء اصطناعي يجاوب عملاءك وفريقك على مدار الساعة، مبني على واجهة API آمنة وسريعة التكامل.",
+                    title: 'مساعد ذكي لنشاطك<br><span class="grad">يرد على زبائنك ويجمع لك أرقام المهتمين</span>',
+                    sub: "ارفع معلومات نشاطك (أسعار، ساعات، خدمات) فيرد مساعدك على الزبائن فورًا من موقعك أو من رابط تضعه في إنستغرام وواتساب، ويطلب أرقام المهتمين ويرسلها لك.",
                     ctaPrimary: "جرّب المنصّة الآن", ctaSecondary: "شاهد كيف تعمل",
-                    trust1: "✅ بدون بطاقة ائتمان للتجربة", trust2: "🔒 تشفير كامل للبيانات", trust3: "⚡ تكامل خلال دقائق",
+                    trust1: "✅ بدون بطاقة ائتمان للتجربة", trust2: "🔒 اتصال مشفّر (HTTPS)", trust3: "⚡ تكامل خلال دقائق",
                     mockTitle: "مساعد شركتك الذكي",
                     sideChats: "💬 المحادثات", sideFiles: "📁 الملفات", sideReports: "📊 التقارير", sideSettings: "⚙️ الإعدادات",
                     userMsg: "ما هي سياسة الاسترجاع لدينا؟",
@@ -2558,16 +2651,16 @@ For any question about these terms, reach us via the email listed on the "Contac
                     monthly: "شهري", yearly: "سنوي", save: "وفّر 20%",
                     plans: [
                         {
-                            key: "basic", name: "الباقة الأساسية", desc: "مثالية للشركات الناشئة وفرق العمل الصغيرة", m: 29, y: 23, badge: null, cta: "ابدأ بالأساسية", btnClass: "btn-ghost",
-                            feats: ["مساعد ذكي مخصص لشركة واحدة", "رفع ملف بيانات واحد", "حتى 500 استفسار شهريًا", "دعم عبر البريد الإلكتروني"]
+                            key: "basic", name: "الباقة الأساسية", desc: "للأنشطة الصغيرة: مطعم، متجر، عيادة، خدمة", m: 29, y: 23, badge: null, cta: "ابدأ بالأساسية", btnClass: "btn-ghost",
+                            feats: ["مساعد يرد على زبائنك من معلومات نشاطك (ملف واحد)", "يلتقط أرقام المهتمين ويرسل لك تنبيهًا بالبريد", "لوحة نتائج: الزبائن، أسئلة بلا جواب، المحادثات", "رابط محادثة مستقل + ويدجت للموقع", "حتى 500 سؤال شهريًا"]
                         },
                         {
-                            key: "pro", name: "الباقة الاحترافية", desc: "للشركات المتوسطة التي تحتاج مرونة أكبر", m: 79, y: 63, badge: "الأكثر طلبًا", cta: "ابدأ بالاحترافية", btnClass: "btn-primary",
-                            feats: ["مساعد ذكي مخصص لشركتكم", "حتى 10 ملفات بيانات", "استفسارات غير محدودة شهريًا", "دعم عبر البريد الإلكتروني"]
+                            key: "pro", name: "الباقة الاحترافية", desc: "لأنشطة عندها خدمات ومعلومات أكثر وزبائن كثر", m: 79, y: 63, badge: "الأكثر طلبًا", cta: "ابدأ بالاحترافية", btnClass: "btn-primary",
+                            feats: ["كل مزايا الأساسية", "حتى 10 ملفات معلومات وسياق أكبر لكل إجابة", "حتى 5000 سؤال شهريًا (استخدام عادل)", "علّم المساعد: أضف جوابًا للأسئلة التي لم يعرفها"]
                         },
                         {
-                            key: "enterprise", name: "باقة المؤسسات", desc: "للشركات الكبرى ذات الاحتياجات الخاصة", m: 199, y: 159, badge: null, cta: "تواصل مع المبيعات", btnClass: "btn-ghost",
-                            feats: ["استفسارات غير محدودة", "عدد غير محدود من ملفات البيانات", "تكامل مخصص مع أنظمتكم عند الطلب (API/Webhooks)", "تواصل مباشر معنا لتخصيص الباقة حسب احتياجاتكم"]
+                            key: "enterprise", name: "باقة المؤسسات", desc: "لبيانات كبيرة أو احتياجات خاصة نتفق عليها معك", m: 199, y: 159, badge: null, cta: "تواصل مع المبيعات", btnClass: "btn-ghost",
+                            feats: ["كل مزايا الاحترافية", "ملفات غير محدودة وسياق أكبر بكثير", "أسئلة بلا سقف شهري ثابت", "تواصل مباشر معنا — أي تخصيص نتفق عليه قبل الدفع"]
                         }
                     ],
                     perMonth: "/ شهريًا", perMonthYearly: "/ شهريًا (فوترة سنوية)"
@@ -2575,10 +2668,10 @@ For any question about these terms, reach us via the email listed on the "Contac
                 trust: {
                     kicker: "الثقة والأمان", title: "بياناتك محمية في كل خطوة",
                     items: [
-                        { ic: "🔐", title: "تشفير من طرف إلى طرف", text: "جميع البيانات تُشفّر أثناء النقل والتخزين" },
+                        { ic: "🔐", title: "اتصال مشفّر", text: "كل الاتصال بين متصفحك وخوادمنا عبر HTTPS" },
                         { ic: "🕒", title: "ضمان استرجاع 14 يومًا", text: "إن لم تقتنع، نعيد أموالك بالكامل" },
-                        { ic: "📶", title: "وقت تشغيل %99.9", text: "بنية تحتية موثوقة تعمل دون توقف" },
-                        { ic: "🧾", title: "فوترة شفافة", text: "بدون رسوم خفية أو التزامات طويلة الأمد" }
+                        { ic: "🗑️", title: "أنت تتحكم ببياناتك", text: "احذف ملفاتك ومحادثات زبائنك من لوحتك، والمحادثات تُحذف تلقائيًا بعد 90 يومًا" },
+                        { ic: "🧾", title: "فوترة شفافة", text: "بدون رسوم خفية وبدون التزام طويل" }
                     ]
                 },
                 testi: {
@@ -2611,9 +2704,9 @@ For any question about these terms, reach us via the email listed on the "Contac
                     kicker: "الأسئلة الشائعة", title: "كل ما تحتاج معرفته قبل البدء",
                     items: [
                         { q: "هل أحتاج إلى خبرة تقنية للبدء؟", a: "لا. يمكنك التسجيل والحصول على مفتاح API الخاص بك خلال دقائق، ودمجه باتباع خطوات التوثيق البسيطة." },
-                        { q: "هل يمكنني تغيير الباقة لاحقًا؟", a: "نعم، يمكنك الترقية أو التخفيض في أي وقت من لوحة التحكم دون فقدان بياناتك." },
+                        { q: "هل يمكنني تغيير الباقة لاحقًا؟", a: "نعم. تقدر تشترك بباقة أعلى أو أقل عند التجديد وتبقى ملفاتك كما هي. وللمساعدة بالتبديل راسلنا." },
                         { q: "ما هي طرق الدفع المتاحة؟", a: "ندعم الدفع عبر PayPal حاليًا. تدفع الاشتراك، ثم تستلم مفتاح API فورًا لتبدأ الاستخدام." },
-                        { q: "هل بياناتي آمنة؟", a: "جميع البيانات مشفّرة أثناء النقل والتخزين، ولا تتم مشاركتها مع أي طرف ثالث." },
+                        { q: "هل بياناتي آمنة؟", a: "الاتصال مشفّر (HTTPS) ولا نبيع بياناتك. للرد على الأسئلة نرسل المقاطع ذات الصلة من ملفاتك وسؤال الزبون إلى مزوّد الذكاء الاصطناعي (Google Gemini) ليولّد الجواب، فلا ترفع ملفات فيها كلمات سر أو بيانات حساسة. تقدر تحذف ملفاتك ومحادثاتك في أي وقت." },
                         { q: "هل يوجد ضمان استرجاع الأموال؟", a: "نعم، نوفر ضمان استرجاع كامل خلال أول 14 يومًا من الاشتراك في أي باقة." }
                     ]
                 },
@@ -2633,10 +2726,10 @@ For any question about these terms, reach us via the email listed on the "Contac
                 nav: { features: "Features", how: "How it works", pricing: "Pricing", faq: "FAQ", login: "Log in", cta: "Start your journey now", logout: "Log out" },
                 hero: {
                     eyebrow: "Free 14-day trial",
-                    title: 'AI built for your company<br><span class="grad">that answers, analyzes, and works for you</span>',
-                    sub: "Upload your company data and get an AI assistant that answers your customers and team around the clock, powered by a secure, fast-to-integrate API.",
+                    title: 'An AI assistant for your business<br><span class="grad">that answers customers and collects leads</span>',
+                    sub: "Upload your business info (prices, hours, services) and your assistant answers customers instantly on your site or from a link you put in Instagram/WhatsApp, and sends you the numbers of interested visitors.",
                     ctaPrimary: "Try the platform", ctaSecondary: "See how it works",
-                    trust1: "✅ No credit card for trial", trust2: "🔒 Full data encryption", trust3: "⚡ Integrate in minutes",
+                    trust1: "✅ No credit card for trial", trust2: "🔒 Encrypted connection (HTTPS)", trust3: "⚡ Integrate in minutes",
                     mockTitle: "Your company's AI assistant",
                     sideChats: "💬 Chats", sideFiles: "📁 Files", sideReports: "📊 Reports", sideSettings: "⚙️ Settings",
                     userMsg: "What's our refund policy?",
@@ -2668,16 +2761,16 @@ For any question about these terms, reach us via the email listed on the "Contac
                     monthly: "Monthly", yearly: "Yearly", save: "Save 20%",
                     plans: [
                         {
-                            key: "basic", name: "Basic", desc: "Perfect for startups and small teams", m: 29, y: 23, badge: null, cta: "Start with Basic", btnClass: "btn-ghost",
-                            feats: ["Dedicated AI assistant for one company", "1 data file upload", "Up to 500 queries / month", "Email support"]
+                            key: "basic", name: "Basic", desc: "For small businesses: restaurant, shop, clinic, service", m: 29, y: 23, badge: null, cta: "Start with Basic", btnClass: "btn-ghost",
+                            feats: ["Assistant answers your customers from your business info (1 file)", "Captures interested visitors' numbers + email alert", "Results dashboard: leads, unanswered questions, chats", "Standalone chat link + website widget", "Up to 500 questions / month"]
                         },
                         {
-                            key: "pro", name: "Pro", desc: "For growing companies that need more flexibility", m: 79, y: 63, badge: "Most popular", cta: "Start with Pro", btnClass: "btn-primary",
-                            feats: ["Dedicated AI assistant for your company", "Up to 10 data files", "Unlimited monthly queries", "Email support"]
+                            key: "pro", name: "Pro", desc: "For businesses with more services, info and customers", m: 79, y: 63, badge: "Most popular", cta: "Start with Pro", btnClass: "btn-primary",
+                            feats: ["Everything in Basic", "Up to 10 info files and more context per answer", "Up to 5,000 questions / month (fair use)", "Teach the assistant: add answers to questions it missed"]
                         },
                         {
-                            key: "enterprise", name: "Enterprise", desc: "For large companies with custom needs", m: 199, y: 159, badge: null, cta: "Talk to sales", btnClass: "btn-ghost",
-                            feats: ["Unlimited queries", "Unlimited number of data files", "Custom integration with your systems on request (API/Webhooks)", "Talk to us directly to tailor the plan to your needs"]
+                            key: "enterprise", name: "Enterprise", desc: "For large data or special needs we agree on with you", m: 199, y: 159, badge: null, cta: "Talk to sales", btnClass: "btn-ghost",
+                            feats: ["Everything in Pro", "Unlimited files and much larger context", "No fixed monthly question cap", "Talk to us directly — any customization is agreed before you pay"]
                         }
                     ],
                     perMonth: "/ month", perMonthYearly: "/ month (billed yearly)"
@@ -2685,10 +2778,10 @@ For any question about these terms, reach us via the email listed on the "Contac
                 trust: {
                     kicker: "Trust & security", title: "Your data is protected at every step",
                     items: [
-                        { ic: "🔐", title: "End-to-end encryption", text: "All data is encrypted in transit and at rest" },
+                        { ic: "🔐", title: "Encrypted connection", text: "All traffic between your browser and our servers uses HTTPS" },
                         { ic: "🕒", title: "14-day money-back guarantee", text: "Not convinced? Get a full refund" },
-                        { ic: "📶", title: "99.9% uptime", text: "Reliable infrastructure that stays online" },
-                        { ic: "🧾", title: "Transparent billing", text: "No hidden fees or long-term commitments" }
+                        { ic: "🗑️", title: "You control your data", text: "Delete your files and customer chats from your dashboard; chats are auto-deleted after 90 days" },
+                        { ic: "🧾", title: "Transparent billing", text: "No hidden fees and no long-term commitment" }
                     ]
                 },
                 testi: {
@@ -2721,9 +2814,9 @@ For any question about these terms, reach us via the email listed on the "Contac
                     kicker: "FAQ", title: "Everything you need to know before you start",
                     items: [
                         { q: "Do I need technical experience to get started?", a: "No. You can sign up and get your API key in minutes, then integrate it by following our simple docs." },
-                        { q: "Can I change my plan later?", a: "Yes, you can upgrade or downgrade anytime from your dashboard without losing your data." },
+                        { q: "Can I change my plan later?", a: "Yes. You can switch to a higher or lower plan at renewal and your files stay as they are. Message us if you need help switching." },
                         { q: "What payment methods are available?", a: "We currently support PayPal. Pay for your plan and get your API key instantly to start using the platform." },
-                        { q: "Is my data secure?", a: "All data is encrypted in transit and at rest, and is never shared with third parties." },
+                        { q: "Is my data secure?", a: "The connection is encrypted (HTTPS) and we don't sell your data. To answer questions we send the relevant parts of your files plus the customer's question to our AI provider (Google Gemini), so don't upload passwords or sensitive data. You can delete your files and chats anytime." },
                         { q: "Is there a money-back guarantee?", a: "Yes, we offer a full refund within the first 14 days of any plan." }
                     ]
                 },
@@ -3025,6 +3118,32 @@ For any question about these terms, reach us via the email listed on the "Contac
             if (window.loadResults) window.loadResults();
         }
 
+        function obFlag(name) {
+            try { return localStorage.getItem('nexus_ob_' + name + '_' + currentApiKey().slice(-8)) === '1'; } catch (e) { return false; }
+        }
+        function setObFlag(name) {
+            try { localStorage.setItem('nexus_ob_' + name + '_' + currentApiKey().slice(-8), '1'); } catch (e) { /* لا مشكلة */ }
+            loadPublicChatLink();
+        }
+        function renderOnboarding(me) {
+            const box = document.getElementById('onboardBox');
+            const list = document.getElementById('onboardList');
+            if (!box || !list) return;
+            const steps = [
+                ['ارفع ملف معلومات نشاطك (أسعار، ساعات، خدمات، أسئلة شائعة)', me.files_count > 0],
+                ['جرّب المساعد بسؤال حقيقي مما يسأله زبائنك', obFlag('tested')],
+                ['شارك رابط المحادثة (إنستغرام/واتساب) أو انسخ كود الموقع', obFlag('shared')],
+            ];
+            if (steps.every(x => x[1])) { box.style.display = 'none'; return; }
+            list.replaceChildren(...steps.map(([t, done]) => {
+                const li = document.createElement('li');
+                li.textContent = (done ? '✅ ' : '⬜ ') + t;
+                if (done) li.style.opacity = '.6';
+                return li;
+            }));
+            box.style.display = 'block';
+        }
+
         async function loadPublicChatLink() {
             const key = currentApiKey();
             if (!key) return;
@@ -3036,6 +3155,8 @@ For any question about these terms, reach us via the email listed on the "Contac
                 const data = await res.json();
                 const input = document.getElementById('accountPublicChatInput');
                 if (input && data.public_chat_url) input.value = data.public_chat_url;
+                fillEmbedCode(data.public_token);
+                renderOnboarding(data);
             } catch (err) {
                 // تجاهل بصمت — المستخدم يقدر يرجع ويفتح الصفحة مرة ثانية
             }
@@ -3099,10 +3220,12 @@ For any question about these terms, reach us via the email listed on the "Contac
             return localStorage.getItem('nexus_api_key') || '';
         }
 
-        function fillEmbedCode() {
-            const key = currentApiKey();
-            const code = `<script src="${API_BASE_URL}/widget.js" data-api-key="${key}"><\/script>`;
-            document.getElementById('accountEmbedCodeInput').value = code;
+        // كود التضمين يستخدم "التوكن العام" فقط (آمن للظهور بكود الموقع)،
+        // أما مفتاح الـ API الخاص فيبقى سريًا ولا يوضع بصفحة عامة أبدًا.
+        function fillEmbedCode(token) {
+            document.getElementById('accountEmbedCodeInput').value = token
+                ? `<script src="${API_BASE_URL}/widget.js" data-token="${token}"><\/script>`
+                : '';
         }
 
         async function loadAccountFiles() {
@@ -3202,6 +3325,7 @@ For any question about these terms, reach us via the email listed on the "Contac
             input.select();
             navigator.clipboard?.writeText(input.value).catch(() => document.execCommand('copy'));
             showToast(lang === 'ar' ? 'تم نسخ كود التضمين' : 'Embed code copied');
+            setObFlag('shared');
         });
 
         document.getElementById('accountCopyBtn').addEventListener('click', () => {
@@ -3216,6 +3340,7 @@ For any question about these terms, reach us via the email listed on the "Contac
             input.select();
             navigator.clipboard?.writeText(input.value).catch(() => document.execCommand('copy'));
             showToast(lang === 'ar' ? 'تم نسخ رابط المحادثة' : 'Chat link copied');
+            setObFlag('shared');
         });
 
         document.getElementById('accountFileUploadBtn').addEventListener('click', async () => {
@@ -3238,6 +3363,7 @@ For any question about these terms, reach us via the email listed on the "Contac
                 }
                 fileInput.value = '';
                 loadAccountFiles();
+                loadPublicChatLink();
                 showToast(lang === 'ar' ? 'تم رفع الملف' : 'File uploaded');
             } catch (err) {
                 showToast(lang === 'ar' ? 'تعذر رفع الملف' : 'Upload failed');
@@ -3261,6 +3387,7 @@ For any question about these terms, reach us via the email listed on the "Contac
                 });
                 const data = await res.json().catch(() => null);
                 answerBox.textContent = (res.ok && data && data.answer) ? data.answer : ((data && data.detail) || (lang === 'ar' ? 'حدث خطأ' : 'Something went wrong'));
+                if (res.ok && data && data.answer) setObFlag('tested');
             } catch (err) {
                 answerBox.textContent = lang === 'ar' ? 'حدث خطأ' : 'Something went wrong';
             }
