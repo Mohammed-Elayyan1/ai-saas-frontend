@@ -1645,7 +1645,8 @@
                                         id="requestRefundBtn">طلب استرجاع الأموال</button>
                                 </div>
 
-                                <a href="#results" class="btn btn-primary btn-block" style="margin-bottom:10px;">📊
+                                <a href="#results" class="btn btn-primary btn-block"
+                                    style="margin-bottom:10px; white-space:normal; line-height:1.5; text-align:center;">📊
                                     لوحة النتائج: الزبائن والأسئلة والمحادثات</a>
 
                                 <button type="button" class="btn btn-ghost btn-block" id="accountLogoutBtn">تسجيل
@@ -2466,6 +2467,14 @@
         // بعد نشر main.py على سيرفر حقيقي، غيّر هذا الرابط ليطابق رابط الخادم الفعلي
         // After deploying main.py to a real server, update this to your server's URL
         const API_BASE_URL = "https://ai-saas-backend-213z.onrender.com";
+        // بريد الدعم العام الظاهر للزوار (اتركه فارغًا إن لم يكن جاهزًا بعد).
+        // مثال: const SUPPORT_EMAIL = "support@yourdomain.com";
+        const SUPPORT_EMAIL = "";
+        (function () {
+            if (!SUPPORT_EMAIL) return;
+            const a = document.querySelector('[data-i18n="footer.contact"]');
+            if (a) a.href = 'mailto:' + SUPPORT_EMAIL;
+        })();
         // رابط محادثة تجريبية حقيقية: أنشئ حسابًا باسم نشاط تجريبي، ارفع له معلومات، وضع هنا
         // توكنه العام (يبدأ بـ pub_) — الزر يظهر تلقائيًا. اتركه فارغًا لإخفاء الزر.
         const DEMO_CHAT_TOKEN = "";
@@ -2530,7 +2539,7 @@
 الأسعار المعلنة بصفحة الباقات هي المبلغ الفعلي المُحصَّل شهريًا عبر PayPal. يُفعَّل حسابكم ويصدر مفتاح API الخاص بكم تلقائيًا فور تأكيد PayPal لنجاح الدفعة.
 
 3) ضمان استرجاع الأموال
-نوفر استرجاعًا كاملاً لآخر دفعة خلال 14 يومًا من تاريخها، لمرة واحدة فقط لكل حساب. يمكنكم تقديم الطلب مباشرة من لوحة التحكم بعد تسجيل الدخول، وسيُسترجع المبلغ فعليًا عبر PayPal ويُلغى تفعيل الحساب فور تنفيذ الاسترجاع.
+نوفر استرجاع آخر دفعة خلال 14 يومًا من تاريخها، لمرة واحدة فقط لكل حساب، بعد خصم رسوم معالجة الدفع التي يفرضها PayPal على تلك الدفعة (لا تشمل أي رسوم أخرى منا). يمكنكم تقديم الطلب مباشرة من لوحة التحكم بعد تسجيل الدخول، وسيظهر لكم المبلغ المُسترجع ورسوم المعالجة المخصومة بعد التنفيذ، ويُسترجع المبلغ فعليًا عبر PayPal ويُلغى تفعيل الحساب فور تنفيذ الاسترجاع.
 
 4) حدود الاستخدام
 كل باقة محكومة بعدد ملفات وعدد استفسارات شهرية كما هو موضّح بصفحة الأسعار. تجاوز هذه الحدود يتطلب الترقية لباقة أعلى.
@@ -2545,7 +2554,7 @@
 يحق لنا تعليق أو إلغاء أي حساب يُساء استخدامه أو ينتهك هذه الشروط، مع إشعاركم عبر البريد الإلكتروني المسجَّل.
 
 8) التواصل
-لأي استفسار يخص هذه الشروط، راسلونا عبر البريد الإلكتروني المذكور في صفحة "تواصل معنا".`
+لأي استفسار يخص هذه الشروط، راسلونا عبر البريد الإلكتروني المذكور في صفحة "تواصل معنا". نرد على رسائل الدعم خلال 24 ساعة من وصولها.`
             },
             en: {
                 privacyTitle: "Privacy Policy",
@@ -2591,7 +2600,7 @@ By using this platform, you agree to these terms in full.
 The prices shown on the pricing page are the actual amount charged monthly via PayPal. Your account is activated and your API key issued automatically as soon as PayPal confirms a successful payment.
 
 3) Money-back guarantee
-We offer a full refund of your most recent payment within 14 days of that payment, once per account. You can request it directly from your dashboard after logging in; the refund is actually issued via PayPal and your account is deactivated once the refund completes.
+We refund your most recent payment within 14 days of that payment, once per account, minus the payment-processing fee PayPal charges on that payment (no other fees from us). You can request it directly from your dashboard after logging in; the refunded amount and the processing fee withheld are shown once it completes, the refund is actually issued via PayPal, and your account is deactivated once the refund completes.
 
 4) Usage limits
 Each plan is bound by the file count and monthly query limits shown on the pricing page. Exceeding them requires upgrading to a higher plan.
@@ -2606,7 +2615,7 @@ The service is provided "as is". We do not guarantee the AI's answers are 100% a
 We may suspend or terminate any account that is abused or violates these terms, and will notify you at your registered email.
 
 8) Contact
-For any question about these terms, reach us via the email listed on the "Contact us" page.`
+For any question about these terms, reach us via the email listed on the "Contact us" page. We reply to support messages within 24 hours of receiving them.`
             }
         };
 
@@ -2669,7 +2678,7 @@ For any question about these terms, reach us via the email listed on the "Contac
                     kicker: "الثقة والأمان", title: "بياناتك محمية في كل خطوة",
                     items: [
                         { ic: "🔐", title: "اتصال مشفّر", text: "كل الاتصال بين متصفحك وخوادمنا عبر HTTPS" },
-                        { ic: "🕒", title: "ضمان استرجاع 14 يومًا", text: "إن لم تقتنع، نعيد أموالك بالكامل" },
+                        { ic: "🕒", title: "استرجاع خلال 14 يومًا", text: "إن لم تقتنع، نعيد المبلغ بعد خصم رسوم معالجة الدفع" },
                         { ic: "🗑️", title: "أنت تتحكم ببياناتك", text: "احذف ملفاتك ومحادثات زبائنك من لوحتك، والمحادثات تُحذف تلقائيًا بعد 90 يومًا" },
                         { ic: "🧾", title: "فوترة شفافة", text: "بدون رسوم خفية وبدون التزام طويل" }
                     ]
@@ -2707,7 +2716,8 @@ For any question about these terms, reach us via the email listed on the "Contac
                         { q: "هل يمكنني تغيير الباقة لاحقًا؟", a: "نعم. تقدر تشترك بباقة أعلى أو أقل عند التجديد وتبقى ملفاتك كما هي. وللمساعدة بالتبديل راسلنا." },
                         { q: "ما هي طرق الدفع المتاحة؟", a: "ندعم الدفع عبر PayPal حاليًا. تدفع الاشتراك، ثم تستلم مفتاح API فورًا لتبدأ الاستخدام." },
                         { q: "هل بياناتي آمنة؟", a: "الاتصال مشفّر (HTTPS) ولا نبيع بياناتك. للرد على الأسئلة نرسل المقاطع ذات الصلة من ملفاتك وسؤال الزبون إلى مزوّد الذكاء الاصطناعي (Google Gemini) ليولّد الجواب، فلا ترفع ملفات فيها كلمات سر أو بيانات حساسة. تقدر تحذف ملفاتك ومحادثاتك في أي وقت." },
-                        { q: "هل يوجد ضمان استرجاع الأموال؟", a: "نعم، نوفر ضمان استرجاع كامل خلال أول 14 يومًا من الاشتراك في أي باقة." }
+                        { q: "هل يمكنني استرجاع أموالي؟", a: "نعم، خلال أول 14 يومًا من الدفع، بعد خصم رسوم معالجة الدفع التي يفرضها PayPal على الدفعة. يظهر لك المبلغ المُسترجع والرسوم المخصومة بوضوح عند التنفيذ." },
+                        { q: "كم يستغرق الرد على استفساراتي؟", a: "نرد على رسائل الدعم خلال 24 ساعة من وصولها." + (SUPPORT_EMAIL ? ` راسلنا على ${SUPPORT_EMAIL}.` : "") }
                     ]
                 },
                 ctaFinal: {
@@ -2779,7 +2789,7 @@ For any question about these terms, reach us via the email listed on the "Contac
                     kicker: "Trust & security", title: "Your data is protected at every step",
                     items: [
                         { ic: "🔐", title: "Encrypted connection", text: "All traffic between your browser and our servers uses HTTPS" },
-                        { ic: "🕒", title: "14-day money-back guarantee", text: "Not convinced? Get a full refund" },
+                        { ic: "🕒", title: "14-day refund window", text: "Not convinced? Get a refund minus payment-processing fees" },
                         { ic: "🗑️", title: "You control your data", text: "Delete your files and customer chats from your dashboard; chats are auto-deleted after 90 days" },
                         { ic: "🧾", title: "Transparent billing", text: "No hidden fees and no long-term commitment" }
                     ]
@@ -2817,7 +2827,8 @@ For any question about these terms, reach us via the email listed on the "Contac
                         { q: "Can I change my plan later?", a: "Yes. You can switch to a higher or lower plan at renewal and your files stay as they are. Message us if you need help switching." },
                         { q: "What payment methods are available?", a: "We currently support PayPal. Pay for your plan and get your API key instantly to start using the platform." },
                         { q: "Is my data secure?", a: "The connection is encrypted (HTTPS) and we don't sell your data. To answer questions we send the relevant parts of your files plus the customer's question to our AI provider (Google Gemini), so don't upload passwords or sensitive data. You can delete your files and chats anytime." },
-                        { q: "Is there a money-back guarantee?", a: "Yes, we offer a full refund within the first 14 days of any plan." }
+                        { q: "Can I get a refund?", a: "Yes, within the first 14 days of payment, minus the payment-processing fee PayPal charges on that payment. The refunded amount and the fee withheld are shown clearly when it completes." },
+                        { q: "How fast do you reply to support messages?", a: "We reply to support messages within 24 hours of receiving them." + (SUPPORT_EMAIL ? ` Write to us at ${SUPPORT_EMAIL}.` : "") }
                     ]
                 },
                 ctaFinal: {
@@ -3283,8 +3294,8 @@ For any question about these terms, reach us via the email listed on the "Contac
                 } else if (data.refund_eligible) {
                     box.style.display = 'block';
                     info.textContent = lang === 'ar'
-                        ? 'ضمن مهلة استرجاع الأموال (14 يومًا من الدفع). يمكنكم طلب استرجاع كامل المبلغ.'
-                        : 'You are within the 14-day money-back window. You can request a full refund.';
+                        ? 'ضمن مهلة الاسترجاع (14 يومًا من الدفع). يمكنكم طلب استرجاع المبلغ بعد خصم رسوم معالجة الدفع التي يفرضها PayPal.'
+                        : 'You are within the 14-day refund window. You can request a refund minus the payment-processing fee PayPal charges.';
                     btn.style.display = 'block';
                 } else {
                     box.style.display = 'none';
@@ -3296,8 +3307,8 @@ For any question about these terms, reach us via the email listed on the "Contac
             const key = currentApiKey();
             if (!key) return;
             const confirmMsg = lang === 'ar'
-                ? 'سيتم استرجاع كامل مبلغ آخر دفعة وإلغاء تفعيل حسابكم فورًا. هل أنتم متأكدون؟'
-                : 'This will refund your last payment in full and deactivate your account immediately. Are you sure?';
+                ? 'سيتم استرجاع آخر دفعة بعد خصم رسوم معالجة الدفع التي يفرضها PayPal، وإلغاء تفعيل حسابكم فورًا. هل أنتم متأكدون؟'
+                : 'This will refund your last payment minus the payment-processing fee PayPal charges, and deactivate your account immediately. Are you sure?';
             if (!confirm(confirmMsg)) return;
             const btn = document.getElementById('requestRefundBtn');
             btn.disabled = true;
